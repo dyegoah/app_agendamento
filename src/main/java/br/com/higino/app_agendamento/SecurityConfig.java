@@ -1,50 +1,16 @@
 package br.com.higino.app_agendamento;
 
-import java.util.List;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // 🔹 Libera toda a API e os arquivos estáticos
-        http
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/app_agendamento/api/**",
-                    "/app_agendamento/**",
-                    "/painel/**",
-                    "/css/**",
-                    "/js/**",
-                    "/imagens/**",
-                    "/static/**",
-                    "/**"
-                ).permitAll()
-                .anyRequest().permitAll()
-            )
+   
 
-            // 🔹 Desativa completamente CSRF (para projeto com páginas estáticas)
-            .csrf(csrf -> csrf.disable())
-
-            // 🔹 Habilita CORS
-            .cors(cors -> cors.configurationSource(request -> {
-                var config = new CorsConfiguration();
-                config.setAllowedOrigins(List.of("*"));
-                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                config.setAllowedHeaders(List.of("*"));
-                config.setAllowCredentials(false);
-                return config;
-            }));
-
-        return http.build();
-    }
-    
+           
    
   
 
