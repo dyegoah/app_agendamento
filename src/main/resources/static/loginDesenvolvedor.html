@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login do Desenvolvedor - Sistema 8.0</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #0d6efd, #00b4d8);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', sans-serif;
+    }
+    .card {
+      border-radius: 18px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+      background: #fff;
+      color: #333;
+      width: 380px;
+      padding: 2rem;
+      text-align: center;
+    }
+    .alerta {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h4 class="fw-bold text-primary mb-3"><i class="bi bi-lock"></i> Acesso do Desenvolvedor</h4>
+    <p class="text-muted">Área restrita. Digite suas credenciais.</p>
+
+    <form id="formLogin">
+      <div class="mb-3 text-start">
+        <label class="form-label fw-semibold">Usuário</label>
+        <input type="text" id="usuario" class="form-control" required>
+      </div>
+      <div class="mb-3 text-start">
+        <label class="form-label fw-semibold">Senha</label>
+        <div class="input-group">
+          <input type="password" id="senha" class="form-control" required>
+          <button type="button" class="btn btn-outline-secondary" onclick="toggleSenha()">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 fw-semibold">
+        <i class="bi bi-box-arrow-in-right"></i> Entrar
+      </button>
+    </form>
+
+    <div class="mt-3">
+      <a href="index" class="text-decoration-none small">
+        <i class="bi bi-arrow-left"></i> Voltar à Central
+      </a>
+    </div>
+  </div>
+
+  <div id="alertaMsg" class="alert alert-danger alerta"></div>
+
+  <script>
+  // Mostrar/ocultar senha
+  function toggleSenha() {
+    const campo = document.getElementById("senha");
+    const icone = campo.nextElementSibling.querySelector("i");
+    if (campo.type === "password") {
+      campo.type = "text";
+      icone.classList.replace("bi-eye", "bi-eye-slash");
+    } else {
+      campo.type = "password";
+      icone.classList.replace("bi-eye-slash", "bi-eye");
+    }
+  }
+
+  // Exibir alertas visuais
+  function alerta(mensagem, tipo = "danger") {
+    const alertaDiv = document.getElementById("alertaMsg");
+    alertaDiv.className = `alert alert-${tipo} alerta`;
+    alertaDiv.textContent = mensagem;
+    alertaDiv.style.display = "block";
+    setTimeout(() => alertaDiv.style.display = "none", 2500);
+  }
+
+  // Envio de login
+  document.getElementById("formLogin").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const usuario = document.getElementById("usuario").value.trim();
+    const senha = document.getElementById("senha").value.trim();
+    const base = window.location.pathname.includes("/app_agendamento") ? "/app_agendamento" : "";
+
+    try {
+		const response = await fetch(`${base}/api/dev-login`, {
+		  method: "POST",
+		  headers: { "Content-Type": "application/json" },
+		  credentials: "include", // 👈 importante
+		  body: JSON.stringify({ usuario, senha })
+	 });
+
+      if (response.ok) {
+        alerta("Acesso permitido! Redirecionando...", "success");
+        setTimeout(() => window.location.href = "painelDesenvolvedor.html", 1200);
+      } else {
+        alerta("Usuário ou senha incorretos!", "danger");
+      }
+    } catch (error) {
+      alerta("Erro ao conectar com o servidor!", "danger");
+    }
+  });
+  </script>
+
+</body>
+</html>

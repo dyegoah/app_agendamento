@@ -1,0 +1,649 @@
+:root {
+	--sidebar-width: 230px;
+	--primary-color: #0d6efd;
+	--transition-speed: 0.3s;
+	--bg-dark: #121212;
+	--text-light: #f5f5f5;
+}
+
+body {
+	margin: 0;
+	font-family: 'Poppins', sans-serif;
+	overflow-x: hidden;
+	transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+/* MODO ESCURO */
+body.dark-mode {
+	background-color: var(--bg-dark);
+	color: var(--text-light);
+}
+
+body.dark-mode .card {
+	background-color: #1f1f1f;
+	color: var(--text-light);
+}
+
+.logo {
+	width: 80px;
+	height: auto;
+	max-width: 100%;
+	object-fit: contain;
+}
+
+
+.sidebar {
+	width: var(--sidebar-width);
+	background-color: var(--primary-color);
+	color: white;
+	position: fixed;
+	left: 0;
+	top: 0;
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
+	transition: width var(--transition-speed);
+	z-index: 100;
+}
+
+.sidebar.collapsed {
+	width: 70px;
+}
+
+.sidebar .nav-link {
+	color: white;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 6px 10px;
+	/* menos espaçamento interno */
+	border-radius: 8px;
+	margin: 2px 5px;
+	/* reduzido para caber mais itens */
+	white-space: nowrap;
+	font-size: 0.9rem;
+	/* texto levemente menor */
+
+}
+
+.sidebar.collapsed .nav-link span,
+.sidebar.collapsed #colorPanel {
+	display: none;
+}
+
+.color-option {
+	width: 25px;
+	height: 25px;
+	border-radius: 50%;
+	cursor: pointer;
+	border: 2px solid #fff;
+	transition: transform 0.2s;
+}
+
+.color-option:hover {
+	transform: scale(1.2);
+}
+
+.topbar {
+	height: 60px;
+	background-color: var(--primary-color);
+	color: white;
+	position: fixed;
+	left: var(--sidebar-width);
+	right: 0;
+	top: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	transition: left var(--transition-speed);
+
+}
+
+.sidebar .sidebar-footer {
+	padding: 8px;
+	/* reduzido para economizar espaço */
+}
+
+.topbar {
+	z-index: 1050;
+}
+
+.sidebar.collapsed+.topbar {
+	left: 70px;
+}
+
+.content {
+	margin-left: var(--sidebar-width);
+	margin-top: 60px;
+	transition: margin-left var(--transition-speed);
+}
+
+.sidebar {
+	width: 200px;
+	/* reduzido de 230px */
+	padding-top: 8px;
+}
+
+/* Gradiente dinâmico */
+.sidebar.gradient {
+	background: linear-gradient(135deg, var(--primary-color), #6610f2);
+}
+
+.topbar.gradient {
+	background: linear-gradient(135deg, var(--primary-color), #6610f2);
+}
+
+/* 🌈 Estende o gradiente para cabeçalhos e cards */
+.sidebar.gradient,
+.topbar.gradient,
+.card-header.gradient,
+.card.gradient {
+	background: linear-gradient(135deg, var(--primary-color), #6610f2) !important;
+	color: white;
+}
+
+
+.sidebar.collapsed~.content {
+	margin-left: 70px;
+}
+
+.stats-card {
+	text-align: center;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+	color: white;
+}
+
+@media (max-width: 768px) {
+	.sidebar {
+		left: -230px;
+	}
+
+	.sidebar.show {
+		left: 0;
+	}
+
+	.topbar {
+		left: 0;
+	}
+
+	.content {
+		margin-left: 0;
+	}
+
+
+	/* ===========================================================
+        🔹 Efeito pulse nos ícones da barra superior
+        =========================================================== */
+
+	/* Animação de pulsar */
+	@keyframes pulse {
+		0% {
+			transform: scale(1);
+		}
+
+		50% {
+			transform: scale(1.15);
+		}
+
+		100% {
+			transform: scale(1);
+		}
+	}
+
+	/* 🔹 Ícones de navegação (Home, Agendamento, etc.) */
+	.topbar-modern .nav-item i {
+		transition: transform 0.3s ease, color 0.3s ease;
+	}
+
+	.topbar-modern .nav-item:hover i {
+		animation: pulse 0.5s ease;
+		color: #ffffff;
+	}
+
+	/* 🔹 Ícone da lua (modo escuro) */
+	.topbar-modern .theme-toggle i {
+		transition: transform 0.3s ease, color 0.3s ease;
+	}
+
+	.topbar-modern .theme-toggle:hover i {
+		animation: pulse 0.5s ease;
+		color: #ffffff;
+	}
+
+	/* 🔹 Ícone do usuário (admin) */
+	.topbar-modern .user-avatar i {
+		transition: transform 0.3s ease, color 0.3s ease;
+	}
+
+	.topbar-modern .user-menu:hover .user-avatar i {
+		animation: pulse 0.5s ease;
+		color: #ffffff;
+	}
+
+	/* Efeito extra ao passar o mouse no bloco inteiro do usuário */
+	.topbar-modern .user-menu:hover {
+		transform: scale(1.03);
+		transition: transform 0.3s ease;
+	}
+
+	/* ===========================================================
+  	   🔹 Estilo para logo + nome da marca
+  	   =========================================================== */
+	.logo-section {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.brand-info {
+		display: flex;
+		flex-direction: column;
+		line-height: 1.1;
+	}
+
+	.brand-name {
+		color: #fff;
+		font-weight: 600;
+		font-size: 1.3rem;
+		letter-spacing: 0.5px;
+	}
+
+	.brand-subtitle {
+		color: rgba(255, 255, 255, 0.85);
+		font-size: 0.8rem;
+		font-weight: 400;
+	}
+
+	/* 🔹 Ajuste da logo */
+	.logo {
+		width: 55px;
+		height: 55px;
+		object-fit: contain;
+		border-radius: 10px;
+		background-color: rgba(255, 255, 255, 0.15);
+		padding: 4px;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+		transition: transform 0.2s ease;
+	}
+
+	.logo:hover {
+		transform: scale(1.05);
+	}
+
+	@media (max-width: 768px) {
+		.brand-subtitle {
+			display: none;
+		}
+	}
+
+	/* ===========================================================
+	   🔹 Estilo para logo + nome da marca
+	   =========================================================== */
+	.logo-section {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.brand-info {
+		display: flex;
+		flex-direction: column;
+		line-height: 1.1;
+	}
+
+	.brand-name {
+		color: #fff;
+		font-weight: 600;
+		font-size: 1.3rem;
+		letter-spacing: 0.5px;
+	}
+
+	.brand-subtitle {
+		color: rgba(255, 255, 255, 0.85);
+		font-size: 0.8rem;
+		font-weight: 400;
+	}
+
+	/* 🔹 Ajuste da logo */
+	.logo {
+		width: 55px;
+		height: 55px;
+		object-fit: contain;
+		border-radius: 10px;
+		background-color: rgba(255, 255, 255, 0.15);
+		padding: 4px;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+		transition: transform 0.2s ease;
+	}
+
+	.logo:hover {
+		transform: scale(1.05);
+	}
+
+	@media (max-width: 768px) {
+		.brand-subtitle {
+			display: none;
+		}
+
+
+	}
+
+	/* ===========================================================
+	   🔹 TEMAS: Modo Claro e Escuro
+	   =========================================================== */
+
+	/* 🌙 MODO ESCURO PREMIUM */
+	body.dark-mode {
+		background-color: #0f1117;
+		color: #e4e6eb;
+	}
+
+	/* Topbar moderno no dark */
+	body.dark-mode .topbar-modern {
+		background: linear-gradient(135deg, #1a1d29, #2d1b69);
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	/* Cards com gradiente sutil e bordas */
+	body.dark-mode .stats-card-modern {
+		background: linear-gradient(145deg, #1a1d29, #161922) !important;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+	}
+
+	body.dark-mode .stats-card-modern::before {
+		background: linear-gradient(90deg, #6366f1, #8b5cf6);
+	}
+
+	body.dark-mode .stats-card-modern:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+	}
+
+	/* Textos nos cards */
+	body.dark-mode .stats-card-modern .card-value {
+		color: #ffffff;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	}
+
+	body.dark-mode .stats-card-modern .card-label {
+		color: #a0a4b8 !important;
+	}
+
+	body.dark-mode .stats-card-modern .text-muted {
+		color: #8a8fa8 !important;
+	}
+
+	/* Tabelas modernas */
+	body.dark-mode .table-modern {
+		background: #1a1d29;
+		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+		border: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	body.dark-mode .table-modern thead {
+		background: linear-gradient(135deg, #1f2230, #2d1b69);
+		color: #ffffff;
+	}
+
+	body.dark-mode .table-modern th {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		font-weight: 600;
+		color: #e4e6eb;
+	}
+
+	body.dark-mode .table-modern td {
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		color: #c8cad3;
+	}
+
+	body.dark-mode .table-modern tbody tr:hover {
+		background-color: rgba(99, 102, 241, 0.08);
+	}
+
+	/* Botões e inputs */
+	body.dark-mode .btn-outline-primary {
+		border-color: #6366f1;
+		color: #6366f1;
+	}
+
+	body.dark-mode .btn-outline-primary:hover {
+		background-color: #6366f1;
+		border-color: #6366f1;
+		color: white;
+	}
+
+	body.dark-mode input,
+	body.dark-mode select,
+	body.dark-mode textarea {
+		background-color: #1a1d29 !important;
+		color: #e4e6eb !important;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+	}
+
+	body.dark-mode input:focus,
+	body.dark-mode select:focus,
+	body.dark-mode textarea:focus {
+		border-color: #6366f1;
+		box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+	}
+
+	/* Badges com cores vibrantes */
+	body.dark-mode .badge.text-bg-success {
+		background-color: #10b981 !important;
+		color: white !important;
+	}
+
+	body.dark-mode .badge.text-bg-warning {
+		background-color: #f59e0b !important;
+		color: white !important;
+	}
+
+	body.dark-mode .badge-cancelado {
+		background-color: #ef4444 !important;
+		color: white !important;
+	}
+
+	/* Conteúdo principal */
+	body.dark-mode .content {
+		background-color: #0f1117;
+	}
+
+	body.dark-mode .card {
+		background-color: #1a1d29 !important;
+		border: 1px solid rgba(255, 255, 255, 0.08);
+		color: #e4e6eb !important;
+	}
+
+	body.dark-mode .card-header {
+		background-color: #1f2230 !important;
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		color: #e4e6eb !important;
+	}
+
+	/* Textos */
+	body.dark-mode .text-primary {
+		color: #6366f1 !important;
+	}
+
+	body.dark-mode .text-muted {
+		color: #8a8fa8 !important;
+	}
+
+	body.dark-mode .text-dark {
+		color: #e4e6eb !important;
+	}
+
+	/* Logo com brilho suave */
+	body.dark-mode .logo {
+		filter: brightness(1.1) contrast(1.1);
+		box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+	}
+
+	/* Hover effects melhorados */
+	body.dark-mode .nav-item:hover {
+		background-color: rgba(99, 102, 241, 0.15);
+		color: #a5b4fc;
+	}
+
+	/* Input group */
+	body.dark-mode .input-group-text {
+		background-color: #1f2230;
+		border: 1px solid rgba(255, 255, 255, 0.15);
+		color: #a0a4b8;
+	}
+
+	/* ===========================================================
+	      🔹 EFEITOS MODERNOS NOS ÍCONES SUPERIORES (PULSE + TOOLTIP)
+	      =========================================================== */
+
+	/* Animação de pulsar */
+	@keyframes pulse {
+		0% {
+			transform: scale(1);
+			filter: brightness(1);
+		}
+
+		50% {
+			transform: scale(1.2);
+			filter: brightness(1.5);
+		}
+
+		100% {
+			transform: scale(1);
+			filter: brightness(1);
+		}
+	}
+
+	/* 🔹 Ícones principais (Home, Agendamento, Configuração, Relatório, Despesas) */
+	.topbar-modern .nav-item {
+		position: relative;
+		overflow: visible;
+	}
+
+	/* Ícone base */
+	.topbar-modern .nav-item i {
+		transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+	}
+
+	/* Efeito pulse + brilho */
+	.topbar-modern .nav-item:hover i {
+		animation: pulse 0.5s ease;
+		color: #fff;
+		text-shadow: 0 0 8px rgba(255, 255, 255, 0.6),
+			0 0 12px rgba(102, 16, 242, 0.5);
+	}
+
+	/* 🔹 Tooltip com o nome (texto do ícone) */
+	.topbar-modern .nav-item span {
+		position: absolute;
+		bottom: -25px;
+		left: 50%;
+		transform: translateX(-50%) scale(0.8);
+		opacity: 0;
+		color: #fff;
+		background: rgba(0, 0, 0, 0.75);
+		padding: 3px 8px;
+		border-radius: 6px;
+		font-size: 0.75rem;
+		font-weight: 500;
+		white-space: nowrap;
+		pointer-events: none;
+		transition: all 0.25s ease;
+	}
+
+	/* Aparece só quando passa o mouse */
+	.topbar-modern .nav-item:hover span {
+		opacity: 1;
+		transform: translateX(-50%) scale(1);
+		bottom: -30px;
+	}
+
+	/* 🔹 Ícone do modo escuro (lua) */
+	.topbar-modern .theme-toggle i {
+		transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+	}
+
+	.topbar-modern .theme-toggle:hover i {
+		animation: pulse 0.5s ease;
+		color: #fff;
+		text-shadow: 0 0 8px rgba(255, 255, 255, 0.6),
+			0 0 12px rgba(99, 102, 241, 0.6);
+	}
+
+	/* 🔹 Ícone do usuário (Admin) */
+	.topbar-modern .user-menu {
+		position: relative;
+		transition: transform 0.3s ease;
+	}
+
+	.topbar-modern .user-menu:hover {
+		transform: scale(1.05);
+	}
+
+	.topbar-modern .user-avatar i {
+		transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+	}
+
+	.topbar-modern .user-menu:hover .user-avatar i {
+		animation: pulse 0.5s ease;
+		color: #fff;
+		text-shadow: 0 0 10px rgba(255, 255, 255, 0.6),
+			0 0 14px rgba(99, 102, 241, 0.5);
+	}
+
+	/* Tooltip para Admin */
+	.topbar-modern .user-menu::after {
+		content: "Admin";
+		position: absolute;
+		bottom: -25px;
+		left: 50%;
+		transform: translateX(-50%) scale(0.8);
+		opacity: 0;
+		background: rgba(0, 0, 0, 0.75);
+		color: #fff;
+		padding: 3px 8px;
+		border-radius: 6px;
+		font-size: 0.75rem;
+		white-space: nowrap;
+		transition: all 0.25s ease;
+	}
+
+	.topbar-modern .user-menu:hover::after {
+		opacity: 1;
+		transform: translateX(-50%) scale(1);
+		bottom: -30px;
+	}
+
+	/* Tooltip para o ícone de Lua */
+	.topbar-modern .theme-toggle {
+		position: relative;
+	}
+
+	.topbar-modern .theme-toggle::after {
+		content: "Tema";
+		position: absolute;
+		bottom: -25px;
+		left: 50%;
+		transform: translateX(-50%) scale(0.8);
+		opacity: 0;
+		background: rgba(0, 0, 0, 0.75);
+		color: #fff;
+		padding: 3px 8px;
+		border-radius: 6px;
+		font-size: 0.75rem;
+		white-space: nowrap;
+		transition: all 0.25s ease;
+	}
+
+	.topbar-modern .theme-toggle:hover::after {
+		opacity: 1;
+		transform: translateX(-50%) scale(1);
+		bottom: -30px;
+	}
+
+
+}

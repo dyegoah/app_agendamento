@@ -1,0 +1,131 @@
+:root {
+  --sidebar-width: 230px;
+  --primary-color: #0d6efd;
+  --transition-speed: 0.3s;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+  transition: background-color var(--transition-speed);
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--primary-color);
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  transition: width var(--transition-speed);
+  z-index: 100;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.sidebar .nav-link {
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin: 3px 8px;
+  white-space: nowrap;
+  transition: background 0.3s;
+}
+
+.sidebar .nav-link:hover, .sidebar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.sidebar.collapsed .nav-link span {
+  display: none;
+}
+
+.sidebar .logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+/* PALETA DE CORES */
+.color-palette {
+  display: flex;
+  justify-content: space-around;
+}
+
+.color-option {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #fff;
+  transition: transform 0.2s;
+}
+
+.color-option:hover {
+  transform: scale(1.2);
+}
+
+/* TOPOBAR */
+.topbar {
+  height: 60px;
+  background-color: var(--primary-color);
+  color: white;
+  position: fixed;
+  left: var(--sidebar-width);
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: left var(--transition-speed);
+}
+
+.sidebar.collapsed + .topbar {
+  left: 70px;
+}
+
+/* CONTEÚDO */
+.content {
+  margin-left: var(--sidebar-width);
+  margin-top: 60px;
+  transition: margin-left var(--transition-speed);
+}
+
+.sidebar.collapsed ~ .content {
+  margin-left: 70px;
+}
+
+/* CARDS */
+.stats-card {
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  color: white;
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+  .sidebar {
+    left: -230px;
+  }
+  .sidebar.show {
+    left: 0;
+  }
+  .topbar {
+    left: 0;
+  }
+  .content {
+    margin-left: 0;
+  }
+}

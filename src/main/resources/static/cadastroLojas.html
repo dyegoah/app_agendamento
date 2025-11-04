@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Lojas - Sistema 8.0</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+
+  <style>
+  /* ======================================================
+     🔹 BLOCO 1 — CONFIGURAÇÃO GERAL DA PÁGINA
+     ====================================================== */
+  body {
+    background: linear-gradient(180deg, #f8f9fa, #e9ecef);
+    font-family: 'Poppins', sans-serif;
+    padding: 20px;
+  }
+
+  /* ======================================================
+     🔹 BLOCO 2 — ELEMENTOS DE CONTEÚDO E CARTÕES
+     ====================================================== */
+  .card {
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border: 1px solid #dee2e6;
+  }
+
+  /* ======================================================
+     🔹 BLOCO 3 — ALERTAS E MENSAGENS VISUAIS
+     ====================================================== */
+  .alerta {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: none;
+  }
+
+  /* ======================================================
+     🔹 BLOCO 4 — AJUSTES VISUAIS GERAIS
+     ====================================================== */
+  .text-muted.small {
+    font-size: 0.85rem;
+  }
+
+  .btn i {
+    vertical-align: middle;
+  }
+  </style>
+
+</head>
+<body>
+
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="text-primary fw-bold"><i class="bi bi-shop"></i> Cadastro de Nova Loja</h3>
+      <a href="index.html" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Voltar</a>
+    </div>
+
+    <div class="card p-4">
+      <form id="formCadastro">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Nome do Comprador</label>
+            <input type="text" id="nomeComprador" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Nome da Loja</label>
+            <input type="text" id="nomeLoja" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">E-mail</label>
+            <input type="email" id="email" class="form-control" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Telefone</label>
+            <input type="text" id="telefone" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Estado</label>
+            <select id="estado" class="form-select" required>
+              <option value="">Selecione o estado</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Cidade</label>
+            <select id="cidade" class="form-select" required>
+              <option value="">Selecione a cidade</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Senha</label>
+            <div class="input-group">
+              <input type="password" id="senha" class="form-control" required>
+              <button type="button" class="btn btn-outline-secondary" onclick="toggleSenha('senha')"><i class="bi bi-eye"></i></button>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">Confirmar Senha</label>
+            <div class="input-group">
+              <input type="password" id="confirmarSenha" class="form-control" required>
+              <button type="button" class="btn btn-outline-secondary" onclick="toggleSenha('confirmarSenha')"><i class="bi bi-eye"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button type="submit" class="btn btn-success px-4"><i class="bi bi-check-circle"></i> Salvar</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="alertaMsg" class="alert alert-success alerta"></div>
+
+    <div class="text-center mt-3">
+      <p class="text-muted small mb-0">© 2025 - Sistema 8.0 | Cadastro de Lojas</p>
+    </div>
+  </div>
+
+  <script>
+  /* ======================================================
+     🔹 BLOCO 1 — MÁSCARAS E CONFIGURAÇÕES INICIAIS
+     ====================================================== */
+  $(document).ready(() => {
+    $('#telefone').mask('(00) 9 0000-0000');
+    carregarEstados();
+    prepararCidades();
+  });
+
+  /* ======================================================
+     🔹 BLOCO 2 — EXIBIÇÃO E OCULTAÇÃO DE SENHAS
+     ====================================================== */
+  function toggleSenha(idCampo) {
+    const campo = document.getElementById(idCampo);
+    const icone = campo.nextElementSibling.querySelector('i');
+    const isPassword = campo.type === "password";
+    campo.type = isPassword ? "text" : "password";
+    icone.classList.toggle("bi-eye");
+    icone.classList.toggle("bi-eye-slash");
+  }
+
+  /* ======================================================
+     🔹 BLOCO 3 — ALERTAS VISUAIS PADRÃO
+     ====================================================== */
+  function alerta(mensagem, tipo = "success") {
+    const alertaDiv = document.getElementById("alertaMsg");
+    alertaDiv.className = `alert alert-${tipo} alerta`;
+    alertaDiv.textContent = mensagem;
+    alertaDiv.style.display = "block";
+    setTimeout(() => alertaDiv.style.display = "none", 2200);
+  }
+
+  /* ======================================================
+     🔹 BLOCO 4 — CARREGAMENTO DE ESTADOS E CIDADES
+     ====================================================== */
+  let estados = [], cidades = [], mapaSiglaParaId = {};
+
+  async function carregarEstados() {
+    try {
+      const resp = await fetch("Estados.json"); // ✅ busca o arquivo local
+      estados = await resp.json();
+      const estadoSelect = document.getElementById("estado");
+
+      mapaSiglaParaId = estados.reduce((acc, e) => {
+        acc[e.Sigla] = String(e.ID);
+        return acc;
+      }, {});
+
+      estados.forEach(e => {
+        const opt = document.createElement("option");
+        opt.value = e.Sigla;
+        opt.textContent = `${e.Nome} (${e.Sigla})`;
+        estadoSelect.appendChild(opt);
+      });
+    } catch (err) {
+      console.error("Erro ao carregar Estados:", err);
+      alerta("Erro ao carregar Estados.", "danger");
+    }
+  }
+
+
+  async function prepararCidades() {
+    try {
+      const resp = await fetch("Cidades.json");
+      cidades = await resp.json();
+    } catch {
+      alerta("Erro ao carregar Cidades.", "danger");
+    }
+  }
+
+  function preencherCidadesPorUF(siglaUF) {
+    const cidadeSelect = document.getElementById("cidade");
+    cidadeSelect.innerHTML = "<option value=''>Selecione a cidade</option>";
+    const idEstado = mapaSiglaParaId[siglaUF];
+    if (!idEstado) return;
+    const lista = cidades.filter(c => String(c.Estado) === String(idEstado));
+    lista.sort((a,b) => a.Nome.localeCompare(b.Nome, 'pt'));
+    lista.forEach(c => {
+      const opt = document.createElement("option");
+      opt.value = c.Nome;
+      opt.textContent = c.Nome;
+      cidadeSelect.appendChild(opt);
+    });
+  }
+  document.getElementById("estado").addEventListener("change", function() {
+    preencherCidadesPorUF(this.value);
+  });
+
+  /* ======================================================
+     🔹 BLOCO 5 — ENVIO DO FORMULÁRIO AO BACKEND
+     ====================================================== */
+  document.getElementById("formCadastro").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const senha = document.getElementById("senha").value.trim();
+    const confirmarSenha = document.getElementById("confirmarSenha").value.trim();
+
+    if (senha !== confirmarSenha) {
+      alerta("As senhas não coincidem!", "danger");
+      return;
+    }
+
+    const padraoSenha = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+    if (!padraoSenha.test(senha)) {
+      alerta("A senha deve ter ao menos 6 caracteres, incluindo letras e números.", "warning");
+      return;
+    }
+
+    // Gera data automática
+    const hoje = new Date();
+    const dataCompra = `${String(hoje.getDate()).padStart(2, "0")}/${String(hoje.getMonth() + 1).padStart(2, "0")}/${hoje.getFullYear()}`;
+
+	const base = "";
+
+    const loja = {
+      nomeComprador: document.getElementById("nomeComprador").value.trim(),
+      nomeLoja: document.getElementById("nomeLoja").value.trim(),
+      email: document.getElementById("email").value.trim(),
+      telefone: document.getElementById("telefone").value.trim(),
+      estado: document.getElementById("estado").value,
+      cidade: document.getElementById("cidade").value,
+      senha: senha,
+      dataCompra: dataCompra,
+      status: "EM_DIA"
+    };
+
+    try {
+		const resp = await fetch(`${window.location.origin}/app_agendamento/api/lojas`, {
+
+		  method: "POST",
+		  headers: { "Content-Type": "application/json" },
+		  body: JSON.stringify(loja)
+		});
+
+      if (resp.ok) {
+        alerta("✅ Loja cadastrada com sucesso!");
+        setTimeout(() => window.location.href = "loginAcesso.html", 1800);
+      } else {
+        const texto = await resp.text();
+        alerta(`Erro ao cadastrar: ${texto}`, "danger");
+      }
+    } catch (err) {
+      alerta("Erro de conexão com o servidor.", "danger");
+      console.error(err);
+    }
+  });
+  </script>
+
+
+  
+</body>
+</html>

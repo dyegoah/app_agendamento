@@ -1,0 +1,1765 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo 8.0</title>
+  
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Ícones Bootstrap -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <!-- CSS principal -->
+  <link rel="stylesheet" href="/app_agendamento/painel/dashboard8.0.css">
+  
+  <style>
+    /* Estilos para o novo layout */
+    :root {
+      --sidebar-width: 0px; /* Removemos sidebar lateral */
+    }
+    
+    body {
+      padding-top: 70px; /* Espaço para o topbar fixo */
+    }
+    
+    .topbar-modern {
+      background: linear-gradient(135deg, var(--primary-color), #6610f2);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      height: 70px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+    }
+    
+    .topbar-modern .logo-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .topbar-modern .logo {
+      width: 45px;
+      height: 45px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+    
+    .topbar-modern .brand-name {
+      color: white;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+	
+	.brand-subtitle {
+		color: whitesmoke 
+	}
+    
+    .topbar-modern .nav-section {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-left: 30px;
+      flex: 1;
+    }
+    
+    .topbar-modern .nav-item {
+      color: rgba(255,255,255,0.85);
+      padding: 10px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .topbar-modern .nav-item:hover, 
+    .topbar-modern .nav-item.active {
+      background-color: rgba(255,255,255,0.15);
+      color: white;
+    }
+    
+    .topbar-modern .nav-item i {
+      font-size: 1.1rem;
+    }
+    
+    .topbar-modern .user-section {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-left: auto;
+    }
+    
+    .topbar-modern .theme-toggle {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    
+    .topbar-modern .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background-color 0.2s;
+    }
+    
+    .topbar-modern .user-menu:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+    
+    .topbar-modern .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Ajustes para o conteúdo principal */
+    .content {
+      margin-left: 0;
+      margin-top: 0;
+    }
+    
+    /* Cards superiores com design moderno */
+    .stats-card-modern {
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border: none;
+      transition: transform 0.2s;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stats-card-modern:hover {
+      transform: translateY(-5px);
+    }
+    
+    .stats-card-modern::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), #6610f2);
+    }
+    
+    .stats-card-modern .card-icon {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
+    
+    .stats-card-modern .card-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    
+    .stats-card-modern .card-label {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Tabelas com design moderno */
+    .table-modern {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .table-modern thead {
+      background: linear-gradient(135deg, var(--primary-color), #6610f2);
+      color: white;
+    }
+    
+    .table-modern th {
+      border: none;
+      font-weight: 600;
+      padding: 12px 15px;
+    }
+    
+    .table-modern td {
+      padding: 12px 15px;
+      vertical-align: middle;
+    }
+    
+    .table-modern tbody tr {
+      transition: background-color 0.2s;
+    }
+    
+    .table-modern tbody tr:hover {
+      background-color: rgba(0,0,0,0.02);
+    }
+    
+    /* Responsividade */
+    @media (max-width: 992px) {
+      .topbar-modern .nav-section {
+        overflow-x: auto;
+        padding-bottom: 5px;
+      }
+      
+      .topbar-modern .nav-item span {
+        display: none;
+      }
+      
+      .topbar-modern .nav-item {
+        padding: 10px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .topbar-modern {
+        padding: 0 10px;
+      }
+      
+      .topbar-modern .brand-name {
+        display: none;
+      }
+      
+      .topbar-modern .user-menu span {
+        display: none;
+      }
+    }
+	
+	/*LOGO*/
+	/* Ajuste de exibição da logo */
+	.topbar-modern .logo {
+	  width: 60px;
+	  height: 60px;
+	  object-fit: contain; /* mantém proporção da imagem */
+	  border-radius: 8px;
+	  background-color: rgba(255, 255, 255, 0.1);
+	  padding: 4px;
+	}
+
+	input.uppercase {
+	  text-transform: uppercase !important;
+	}
+	
+	/*LOGO PADRÃO*/
+	/* Ajustes visuais para a logo da topbar */
+	.topbar-modern .logo {
+	  width: 55px;
+	  height: 55px;
+	  object-fit: contain; /* mantém proporção da logo */
+	  border-radius: 10px;
+	  background-color: rgba(255, 255, 255, 0.15);
+	  padding: 3px;
+	  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	  transition: transform 0.2s ease;
+	}
+
+	.topbar-modern .logo:hover {
+	  transform: scale(1.05);
+	}
+
+	/* 🌙 MODO ESCURO PREMIUM */
+	body.dark-mode {
+	  background-color: #0f1117;
+	  color: #e4e6eb;
+	}
+
+	/* Topbar moderno no dark */
+	body.dark-mode .topbar-modern {
+	  background: linear-gradient(135deg, #1a1d29, #2d1b69);
+	  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+	  border-bottom: 1px solid rgba(255,255,255,0.1);
+	}
+
+	/* Cards com gradiente sutil e bordas */
+	body.dark-mode .stats-card-modern {
+	  background: linear-gradient(145deg, #1a1d29, #161922) !important;
+	  border: 1px solid rgba(255,255,255,0.08);
+	  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+	}
+
+	body.dark-mode .stats-card-modern::before {
+	  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+	}
+
+	body.dark-mode .stats-card-modern:hover {
+	  transform: translateY(-5px);
+	  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+	}
+
+	/* Textos nos cards */
+	body.dark-mode .stats-card-modern .card-value {
+	  color: #ffffff;
+	  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+	}
+
+	body.dark-mode .stats-card-modern .card-label {
+	  color: #a0a4b8 !important;
+	}
+
+	body.dark-mode .stats-card-modern .text-muted {
+	  color: #8a8fa8 !important;
+	}
+
+	/* Tabelas modernas */
+	body.dark-mode .table-modern {
+	  background: #1a1d29;
+	  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+	  border: 1px solid rgba(255,255,255,0.08);
+	}
+
+	body.dark-mode .table-modern thead {
+	  background: linear-gradient(135deg, #1f2230, #2d1b69);
+	  color: #ffffff;
+	}
+
+	body.dark-mode .table-modern th {
+	  border-bottom: 1px solid rgba(255,255,255,0.1);
+	  font-weight: 600;
+	  color: #e4e6eb;
+	}
+
+	body.dark-mode .table-modern td {
+	  border-bottom: 1px solid rgba(255,255,255,0.05);
+	  color: #c8cad3;
+	}
+
+	body.dark-mode .table-modern tbody tr:hover {
+	  background-color: rgba(99, 102, 241, 0.08);
+	}
+
+	/* Botões e inputs */
+	body.dark-mode .btn-outline-primary {
+	  border-color: #6366f1;
+	  color: #6366f1;
+	}
+
+	body.dark-mode .btn-outline-primary:hover {
+	  background-color: #6366f1;
+	  border-color: #6366f1;
+	  color: white;
+	}
+
+	body.dark-mode input,
+	body.dark-mode select,
+	body.dark-mode textarea {
+	  background-color: #1a1d29 !important;
+	  color: #e4e6eb !important;
+	  border: 1px solid rgba(255,255,255,0.15);
+	}
+
+	body.dark-mode input:focus,
+	body.dark-mode select:focus,
+	body.dark-mode textarea:focus {
+	  border-color: #6366f1;
+	  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+	}
+
+	/* Badges com cores vibrantes */
+	body.dark-mode .badge.text-bg-success {
+	  background-color: #10b981 !important;
+	  color: white !important;
+	}
+
+	body.dark-mode .badge.text-bg-warning {
+	  background-color: #f59e0b !important;
+	  color: white !important;
+	}
+
+	body.dark-mode .badge-cancelado {
+	  background-color: #ef4444 !important;
+	  color: white !important;
+	}
+
+	/* Conteúdo principal */
+	body.dark-mode .content {
+	  background-color: #0f1117;
+	}
+
+	body.dark-mode .card {
+	  background-color: #1a1d29 !important;
+	  border: 1px solid rgba(255,255,255,0.08);
+	  color: #e4e6eb !important;
+	}
+
+	body.dark-mode .card-header {
+	  background-color: #1f2230 !important;
+	  border-bottom: 1px solid rgba(255,255,255,0.1);
+	  color: #e4e6eb !important;
+	}
+
+	/* Textos */
+	body.dark-mode .text-primary {
+	  color: #6366f1 !important;
+	}
+
+	body.dark-mode .text-muted {
+	  color: #8a8fa8 !important;
+	}
+
+	body.dark-mode .text-dark {
+	  color: #e4e6eb !important;
+	}
+
+	/* Logo com brilho suave */
+	body.dark-mode .logo {
+	  filter: brightness(1.1) contrast(1.1);
+	  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+	}
+
+	/* Hover effects melhorados */
+	body.dark-mode .nav-item:hover {
+	  background-color: rgba(99, 102, 241, 0.15);
+	  color: #a5b4fc;
+	}
+
+	/* Input group */
+	body.dark-mode .input-group-text {
+	  background-color: #1f2230;
+	  border: 1px solid rgba(255,255,255,0.15);
+	  color: #a0a4b8;
+	}
+	
+	
+	/* 🌙 TABELA MODERNA NO DARK MODE */
+	/* 🌙 TABELA MODERNA NO DARK MODE - CORRIGIDA */
+	body.dark-mode .card.border-0.shadow-sm {
+	  background: linear-gradient(145deg, #1a1d29, #161922);
+	  border: 1px solid rgba(255,255,255,0.1);
+	  box-shadow: 0 8px 32px rgba(0,0,0,0.3) !important;
+	  border-radius: 12px;
+	  overflow: hidden;
+	}
+
+	body.dark-mode .card.border-0.shadow-sm .card-body {
+	  background: transparent;
+	}
+
+	body.dark-mode .card.border-0.shadow-sm .bg-light {
+	  background: linear-gradient(135deg, #1f2230, #252837) !important;
+	  border-bottom: 1px solid rgba(255,255,255,0.1);
+	}
+
+	/* FUNDO DA TABELA CORRIGIDO */
+	body.dark-mode .table-modern {
+	  background: #1a1d29 !important; /* Fundo escuro sólido */
+	  backdrop-filter: blur(10px);
+	  border: 1px solid rgba(255,255,255,0.08);
+	  border-radius: 12px;
+	  overflow: hidden;
+	  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+	  color: #e4e6eb !important; /* Cor do texto principal */
+	}
+
+	/* CABEÇALHO DA TABELA */
+	body.dark-mode .table-modern thead {
+	  background: linear-gradient(135deg, #6366f1, #8b5cf6, #a855f7) !important;
+	  color: white;
+	  position: relative;
+	}
+
+	body.dark-mode .table-modern thead th {
+	  background: transparent !important;
+	  border: none;
+	  font-weight: 600;
+	  padding: 16px 15px;
+	  color: #ffffff !important;
+	  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+	}
+
+	/* CORPO DA TABELA - FUNDO ESCURO COM TEXTO CLARO */
+	body.dark-mode .table-modern tbody {
+	  background: #1a1d29 !important;
+	}
+
+	body.dark-mode .table-modern tbody tr {
+	  background: #1a1d29 !important;
+	  transition: all 0.3s ease;
+	  border-bottom: 1px solid rgba(255,255,255,0.05);
+	}
+
+	/* Linhas alternadas para melhor legibilidade */
+	body.dark-mode .table-modern tbody tr:nth-child(even) {
+	  background: #1f2230 !important; /* Tom levemente mais claro */
+	}
+
+	body.dark-mode .table-modern tbody tr:nth-child(odd) {
+	  background: #1a1d29 !important; /* Tom base */
+	}
+
+	/* TEXTO DAS CÉLULAS - CLARO E LEGÍVEL */
+	body.dark-mode .table-modern td {
+	  background: inherit !important; /* Herda o fundo da linha */
+	  padding: 14px 15px;
+	  color: #e4e6eb !important; /* Cinza claro para texto */
+	  border-bottom: 1px solid rgba(255,255,255,0.05);
+	  vertical-align: middle;
+	  transition: all 0.3s ease;
+	  font-weight: 500;
+	}
+
+	/* Destaque para informações principais */
+	body.dark-mode .table-modern td:first-child,  /* Data */
+	body.dark-mode .table-modern td:nth-child(2), /* Horário */
+	body.dark-mode .table-modern td:nth-child(4) { /* Telefone */
+	  color: #f1f5f9 !important; /* Branco mais puro */
+	}
+
+	/* Nome do cliente com máximo destaque */
+	body.dark-mode .table-modern td:nth-child(3) { /* Nome */
+	  color: #ffffff !important; /* Branco total */
+	  font-weight: 600;
+	}
+
+	/* EFEITO HOVER MODERNO */
+	body.dark-mode .table-modern tbody tr:hover {
+	  background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1)) !important;
+	  transform: translateX(4px);
+	  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+	}
+
+	body.dark-mode .table-modern tbody tr:hover td {
+	  color: #ffffff !important; /* Texto branco no hover */
+	  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+	}
+
+	/* BOTÕES DE AÇÃO */
+	body.dark-mode .table-modern .btn-success {
+	  background: linear-gradient(135deg, #10b981, #059669);
+	  border: none;
+	  color: white;
+	  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+	}
+
+	body.dark-mode .table-modern .btn-danger {
+	  background: linear-gradient(135deg, #ef4444, #dc2626);
+	  border: none;
+	  color: white;
+	  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+	}
+
+	/* BOTÃO DE SERVIÇO */
+	body.dark-mode .table-modern .btn-outline-primary {
+	  background: rgba(99, 102, 241, 0.1);
+	  border: 1px solid rgba(99, 102, 241, 0.3);
+	  color: #a5b4fc !important; /* Roxo claro legível */
+	  font-weight: 500;
+	  transition: all 0.3s ease;
+	}
+
+	body.dark-mode .table-modern .btn-outline-primary:hover {
+	  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.2));
+	  border-color: #6366f1;
+	  color: white !important;
+	}
+
+	/* BADGES COLORIDOS */
+	body.dark-mode .badge.text-bg-success {
+	  background: linear-gradient(135deg, #10b981, #059669) !important;
+	  color: white !important;
+	}
+
+	body.dark-mode .badge.text-bg-warning {
+	  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+	  color: white !important;
+	}
+
+	body.dark-mode .badge-cancelado {
+	  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+	  color: white !important;
+	}
+
+	/* MENSAGEM DE TABELA VAZIA */
+	body.dark-mode .table-modern tbody .text-muted {
+	  color: #8a8fa8 !important; /* Cinza para mensagens secundárias */
+	  background: #1a1d29 !important;
+	}
+	
+	/* ===========================================================
+	   🔹 Efeito pulse nos ícones da barra superior
+	   =========================================================== */
+
+	/* Animação de pulsar */
+	@keyframes pulse {
+	  0% { transform: scale(1); }
+	  50% { transform: scale(1.15); }
+	  100% { transform: scale(1); }
+	}
+
+	/* 🔹 Ícones de navegação (Home, Agendamento, etc.) */
+	.topbar-modern .nav-item i {
+	  transition: transform 0.3s ease, color 0.3s ease;
+	}
+
+	.topbar-modern .nav-item:hover i {
+	  animation: pulse 0.5s ease;
+	  color: #ffffff;
+	}
+
+	/* 🔹 Ícone da lua (modo escuro) */
+	.topbar-modern .theme-toggle i {
+	  transition: transform 0.3s ease, color 0.3s ease;
+	}
+
+	.topbar-modern .theme-toggle:hover i {
+	  animation: pulse 0.5s ease;
+	  color: #ffffff;
+	}
+
+	/* 🔹 Ícone do usuário (admin) */
+	.topbar-modern .user-avatar i {
+	  transition: transform 0.3s ease, color 0.3s ease;
+	}
+
+	.topbar-modern .user-menu:hover .user-avatar i {
+	  animation: pulse 0.5s ease;
+	  color: #ffffff;
+	}
+
+	/* Efeito extra ao passar o mouse no bloco inteiro do usuário */
+	.topbar-modern .user-menu:hover {
+	  transform: scale(1.03);
+	  transition: transform 0.3s ease;
+	}
+
+	
+	/* ===========================================================
+	   🔹 EFEITOS MODERNOS NOS ÍCONES SUPERIORES (PULSE + TOOLTIP)
+	   =========================================================== */
+
+	/* Animação de pulsar */
+	@keyframes pulse {
+	  0% { transform: scale(1); filter: brightness(1); }
+	  50% { transform: scale(1.2); filter: brightness(1.5); }
+	  100% { transform: scale(1); filter: brightness(1); }
+	}
+
+	/* 🔹 Ícones principais (Home, Agendamento, Configuração, Relatório, Despesas) */
+	.topbar-modern .nav-item {
+	  position: relative;
+	  overflow: visible;
+	}
+
+	/* Ícone base */
+	.topbar-modern .nav-item i {
+	  transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+	}
+
+	/* Efeito pulse + brilho */
+	.topbar-modern .nav-item:hover i {
+	  animation: pulse 0.5s ease;
+	  color: #fff;
+	  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6),
+	               0 0 12px rgba(102, 16, 242, 0.5);
+	}
+
+	/* 🔹 Tooltip com o nome (texto do ícone) */
+	.topbar-modern .nav-item span {
+	  position: absolute;
+	  bottom: -25px;
+	  left: 50%;
+	  transform: translateX(-50%) scale(0.8);
+	  opacity: 0;
+	  color: #fff;
+	  background: rgba(0, 0, 0, 0.75);
+	  padding: 3px 8px;
+	  border-radius: 6px;
+	  font-size: 0.75rem;
+	  font-weight: 500;
+	  white-space: nowrap;
+	  pointer-events: none;
+	  transition: all 0.25s ease;
+	}
+
+	/* Aparece só quando passa o mouse */
+	.topbar-modern .nav-item:hover span {
+	  opacity: 1;
+	  transform: translateX(-50%) scale(1);
+	  bottom: -30px;
+	}
+
+	/* 🔹 Ícone do modo escuro (lua) */
+	.topbar-modern .theme-toggle i {
+	  transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+	}
+
+	.topbar-modern .theme-toggle:hover i {
+	  animation: pulse 0.5s ease;
+	  color: #fff;
+	  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6),
+	               0 0 12px rgba(99, 102, 241, 0.6);
+	}
+
+	/* 🔹 Ícone do usuário (Admin) */
+	.topbar-modern .user-menu {
+	  position: relative;
+	  transition: transform 0.3s ease;
+	}
+
+	.topbar-modern .user-menu:hover {
+	  transform: scale(1.05);
+	}
+
+	.topbar-modern .user-avatar i {
+	  transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+	}
+
+	.topbar-modern .user-menu:hover .user-avatar i {
+	  animation: pulse 0.5s ease;
+	  color: #fff;
+	  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6),
+	               0 0 14px rgba(99, 102, 241, 0.5);
+	}
+
+	/* Tooltip para Admin */
+	.topbar-modern .user-menu::after {
+	  content: "Admin";
+	  position: absolute;
+	  bottom: -25px;
+	  left: 50%;
+	  transform: translateX(-50%) scale(0.8);
+	  opacity: 0;
+	  background: rgba(0, 0, 0, 0.75);
+	  color: #fff;
+	  padding: 3px 8px;
+	  border-radius: 6px;
+	  font-size: 0.75rem;
+	  white-space: nowrap;
+	  transition: all 0.25s ease;
+	}
+
+	.topbar-modern .user-menu:hover::after {
+	  opacity: 1;
+	  transform: translateX(-50%) scale(1);
+	  bottom: -30px;
+	}
+
+	/* Tooltip para o ícone de Lua */
+	.topbar-modern .theme-toggle {
+	  position: relative;
+	}
+
+	.topbar-modern .theme-toggle::after {
+	  content: "Tema";
+	  position: absolute;
+	  bottom: -25px;
+	  left: 50%;
+	  transform: translateX(-50%) scale(0.8);
+	  opacity: 0;
+	  background: rgba(0, 0, 0, 0.75);
+	  color: #fff;
+	  padding: 3px 8px;
+	  border-radius: 6px;
+	  font-size: 0.75rem;
+	  white-space: nowrap;
+	  transition: all 0.25s ease;
+	}
+
+	.topbar-modern .theme-toggle:hover::after {
+	  opacity: 1;
+	  transform: translateX(-50%) scale(1);
+	  bottom: -30px;
+	}
+
+  </style>
+  
+  <script>
+    const lojas = JSON.parse(localStorage.getItem("lojasCadastradas") || "[]");
+    const lojaAtual = lojas.find(l => l.nomeLoja === "Minha Loja");
+
+    if (lojaAtual && lojaAtual.status === "em atraso") {
+      localStorage.setItem("clienteStatus", "bloqueado");
+      alert("Acesso bloqueado por atraso no pagamento.");
+      const ctx = "/" + location.pathname.split("/")[1];
+      window.location.href = `${ctx}/loginAcesso.html`;
+    } else {
+      localStorage.setItem("clienteStatus", "ativo");
+    }
+  </script>
+</head>
+
+<body>
+  <!-- TOBAR MODERNO -->
+  <header class="topbar-modern">
+	<div class="logo-section">
+	  <img id="logoCliente" 
+	       src="/app_agendamento/imagens/logo%20Jamille.png" 
+	       alt="Logo Jamille Higino" 
+	       class="logo"
+	       onerror="this.onerror=null; this.src='/app_agendamento/imagens/logo-padrao.png';">
+
+	  <div class="brand-info">
+	    <div class="brand-name">Jamille Higino</div>
+	    <div class="brand-subtitle">Enfermagem e Estética</div>
+	  </div>
+	</div>
+    
+    <nav class="nav-section">
+      <a href="/app_agendamento/painel/painelGerencia.html" class="nav-item active">
+        <i class="bi bi-house-door"></i><span>Painel Inicial</span>
+      </a>
+	<a href="/app_agendamento/painel/agendamentoServico.html" class="nav-item">
+		<i class="bi bi-calendar-check"></i><span>Agendamento</span>
+	</a>
+	<!-- 🔗 Botão pequeno para copiar link de agendamento -->
+	<button id="btnCopiarLinkTopo" class="btn btn-outline-light btn-sm" title="Copiar link do agendamento">
+		<i class="bi bi-link-45deg"></i>
+	</button>
+			
+	  <a href="/app_agendamento/painel/configAgendamento.html" class="nav-item">
+        <i class="bi bi-gear"></i><span>Configurar Agenda</span>
+      </a>
+      <a href="/app_agendamento/painel/relatorioAgendamento.html" class="nav-item">
+        <i class="bi bi-bar-chart"></i><span>Relatório</span>
+      </a>
+      <a href="/app_agendamento/painel/agendamentoDespesa.html" class="nav-item">
+        <i class="bi bi-cash-coin"></i><span>Despesas</span>
+      </a>
+    </nav>
+    
+    <div class="user-section">
+      <button id="btnModo" class="theme-toggle">
+        <i class="bi bi-moon-stars"></i>
+      </button>
+      <div class="user-menu" id="userMenuDropdown">
+        <div class="user-avatar">
+          <i class="bi bi-person"></i>
+        </div>
+        <span>Admin</span>
+        <i class="bi bi-chevron-down"></i>
+      </div>
+	  <button id="btnEditarLoja" class="btn btn-outline-light btn-sm" title="Editar informações da loja">
+	    <i class="bi bi-pencil-square"></i>
+	  </button>
+	  <!-- 🔗 Botão pequeno WhatsApp-style para copiar link de agendamento -->
+	 
+
+    </div>
+  </header>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="content p-3 p-md-4">
+    <div class="container-fluid">
+      <div class="row mb-4">
+        <div class="col">
+          <h4 class="fw-bold mb-1 text-primary">Bem-vindo ao Painel Administrativo 8.0</h4>
+          <p class="text-muted mb-0">Acompanhe a movimentação de serviços e produtos.</p>
+        </div>
+      </div>
+
+      <!-- ============================ -->
+      <!-- LINHA 1: CARDS DE RESUMO -->
+      <!-- ============================ -->
+      <div class="row g-3 mb-4">
+        <!-- Total de Agendamentos -->
+        <div class="col-6 col-md-3">
+          <div id="cardAgendamentosPainel" class="card stats-card-modern bg-white">
+            <i class="bi bi-calendar2-event card-icon text-primary"></i>
+            <div class="card-value text-dark" id="totalAgendamentosPainel">0</div>
+            <div class="card-label text-muted">Agendamentos</div>
+            <div class="text-muted small mt-1" id="totalAgendamentosHojePainel">Hoje: 0</div>
+          </div>
+        </div>
+
+        <!-- Card livre para outra métrica -->
+        <div class="col-6 col-md-3">
+          <div class="card stats-card-modern bg-white">
+            <i class="bi bi-bar-chart card-icon text-info"></i>
+            <div class="card-value text-dark" id="placeholderCardPainel">Em breve</div>
+            <div class="card-label text-muted">Indicador Personalizado</div>
+          </div>
+        </div>
+
+        <!-- Próximos Vencimentos -->
+        <div class="col-6 col-md-3">
+          <div id="cardVencimentoPainel" class="card stats-card-modern bg-white">
+            <i class="bi bi-alarm card-icon text-warning"></i>
+            <div class="card-value text-dark" id="qtdItensVencimentoPainel">0 itens</div>
+            <div class="card-label text-muted">Próximo a Vencer</div>
+            <div class="text-muted small mt-1" id="dataMaisProximaPainel">—</div>
+          </div>
+        </div>
+
+        <!-- Balanço Financeiro -->
+        <div class="col-6 col-md-3">
+          <div id="cardFinanceiroPainel" class="card stats-card-modern bg-white">
+            <i class="bi bi-cash-stack card-icon text-success"></i>
+            <div class="card-value text-dark" id="valorReceitaTotalPainel">R$ 0,00</div>
+            <div class="card-label text-muted">Balanço Financeiro</div>
+            <div class="text-muted small mt-1" id="valorDespesasMensaisPainel">Despesas: R$ 0,00</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AGENDAMENTOS RECEBIDOS -->
+      <div class="card border-0 shadow-sm mt-4">
+        
+        <div class="card-body p-0">
+          <div class="p-3 border-bottom bg-light">
+            <!-- 🔹 Seletor de Data -->
+            <div class="d-flex justify-content-between align-items-center">
+				<div class="card-header bg-white border-0 py-3">
+				          <h5 class="mb-0 text-dark"><i class="bi bi-person-lines-fill me-2 text-primary"></i> Agendamentos Recebidos</h5>
+				        </div>
+				
+				 <h6 class="text-secondary fw-semibold mb-0 d-none">
+                📅 Data selecionada: <span id="dataSelecionadaLabel"></span>
+              </h6>
+
+              <div class="d-flex align-items-center gap-2">
+                <input type="date" id="filtroDataAgendamento" class="form-control form-control-sm w-auto">
+                <button id="btnHoje" class="btn btn-outline-primary btn-sm" title="Ir para hoje">
+                  <i class="bi bi-calendar-day"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- 🔍 Campo de busca -->
+            <div class="mt-3">
+              <div class="input-group input-group-sm w-50">
+                <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+                <input type="text" id="filtroBusca" class="form-control" placeholder="Pesquisar por serviço, nome ou status...">
+              </div>
+            </div>
+          </div>
+
+          <!-- 🧾 Tabela de agendamentos -->
+          <div class="table-responsive">
+            <table class="table table-modern table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Horário</th>
+                  <th>Nome</th>
+                  <th>Telefone</th>
+                  <th>Serviço</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tabelaAgendamentos"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL — Edição de Serviço -->
+  <div class="modal fade" id="modalServico" tabindex="-1" aria-labelledby="modalServicoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="modalServicoLabel"><i class="bi bi-plus-circle me-2"></i>Adicionar/Editar Serviço</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <div id="camposServicos">
+            <div class="row g-2 mb-2 campo-servico">
+              <div class="col-7">
+				<input type="text" class="form-control uppercase" placeholder="Tipo de serviço" oninput="this.value = this.value.toUpperCase()">
+              </div>
+              <div class="col-4">
+                <input type="text" class="form-control valor-mask" placeholder="Valor (R$)">
+              </div>
+              <div class="col-1 d-flex align-items-center justify-content-center">
+                <button type="button" class="btn btn-outline-success btn-sm" onclick="adicionarLinhaServico()">
+                  <i class="bi bi-plus-lg"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" onclick="salvarServicosModal()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  
+  <!-- MODAL DE EDIÇÃO DE LOGO E NOME DA LOJA -->
+  <div class="modal fade" id="modalEditarLoja" tabindex="-1" aria-labelledby="modalEditarLojaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title" id="modalEditarLojaLabel">
+            <i class="bi bi-shop me-2"></i>Editar informações da Loja
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+		<div class="modal-body">
+		  <!-- Nome -->
+		  <div class="mb-3">
+		    <label class="form-label fw-semibold">Nome da Empresa</label>
+		    <input type="text" id="inputNomeLoja" class="form-control" placeholder="Ex: Clínica Jamille Higino">
+		  </div>
+
+		  <!-- Endereço -->
+		  <div class="mb-3">
+		    <label class="form-label fw-semibold">Endereço (Rua, número)</label>
+		    <input type="text" id="inputEnderecoLoja" class="form-control" placeholder="Ex: Rua das Flores, 123">
+		  </div>
+
+		  <!-- Cidade e Estado -->
+		  <div class="mb-3">
+		    <label class="form-label fw-semibold">Cidade / Estado</label>
+		    <input type="text" id="inputCidadeEstadoLoja" class="form-control" placeholder="Ex: Fortaleza - CE">
+		  </div>
+
+		  <!-- Telefone -->
+		  <div class="mb-3">
+		    <label class="form-label fw-semibold">Telefone</label>
+		    <input type="tel" id="inputTelefoneLoja" class="form-control" placeholder="(85) 9 9999-9999">
+		  </div>
+
+		  <!-- E-mail -->
+		  <div class="mb-3">
+		    <label class="form-label fw-semibold">E-mail de Contato</label>
+		    <input type="email" id="inputEmailLoja" class="form-control" placeholder="contato@empresa.com">
+		  </div>
+
+		  <!-- Logo -->
+		  <div class="mb-3">
+		    <label class="form-label fw-semibold">Logo da Empresa</label>
+		    <input type="file" id="inputLogoLoja" class="form-control" accept="image/*">
+		    <div class="text-center mt-3">
+		      <img id="previewLogoLoja" src="" alt="Prévia da logo" style="max-height: 100px; display:none; border-radius: 10px;">
+		    </div>
+		  </div>
+		</div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button class="btn btn-primary" id="btnSalvarLoja">Salvar alterações</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- ===============  SCRIPTS PRINCIPAIS ================ -->
+  <!-- ===================================================== -->
+
+  
+  <script>
+  let agendamentoSelecionadoId = null;
+  let modalServico;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    modalServico = new bootstrap.Modal(document.getElementById("modalServico"));
+  });
+
+  function abrirModalServico(id, servicoAtual) {
+    agendamentoSelecionadoId = id;
+    const container = document.getElementById("camposServicos");
+    container.innerHTML = "";
+
+    // 🔹 Separa os serviços salvos anteriormente (ex: "BOTÓX - R$ 150,00; PEELING - R$ 180,00")
+    const listaServicos = (servicoAtual && servicoAtual.trim() !== "" && servicoAtual !== "livre")
+      ? servicoAtual.split(";").map(s => s.trim())
+      : [""];
+
+    // 🔹 Cria um bloco de inputs para cada serviço
+    listaServicos.forEach((item, index) => {
+      const partes = item.split(" - R$ ");
+      const nomeServico = (partes[0] || "").trim();
+      const valorServico = (partes[1] || "").trim();
+
+      const linha = document.createElement("div");
+      linha.className = "row g-2 mb-2 campo-servico";
+      linha.innerHTML = `
+        <div class="col-7">
+          <input type="text" class="form-control uppercase"
+                 placeholder="Tipo de serviço"
+                 value="${nomeServico}"
+                 oninput="this.value = this.value.toUpperCase()">
+        </div>
+        <div class="col-4">
+          <input type="text" class="form-control valor-mask"
+                 placeholder="Valor (R$)"
+                 value="${valorServico}">
+        </div>
+        <div class="col-1 d-flex align-items-center justify-content-center">
+          ${
+            index === listaServicos.length - 1
+              ? `<button type="button" class="btn btn-outline-success btn-sm" onclick="adicionarLinhaServico()">
+                   <i class='bi bi-plus-lg'></i>
+                 </button>`
+              : `<button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.campo-servico').remove()">
+                   <i class='bi bi-x-lg'></i>
+                 </button>`
+          }
+        </div>
+      `;
+      container.appendChild(linha);
+    });
+
+    aplicarMascaraValor();
+    modalServico.show();
+  }
+
+
+
+  // ✅ SUBSTITUIR o template dentro de adicionarLinhaServico()
+  function adicionarLinhaServico() {
+    const container = document.getElementById("camposServicos");
+    const linha = document.createElement("div");
+    linha.className = "row g-2 mb-2 campo-servico";
+    linha.innerHTML = `
+      <div class="col-7"><input type="text" class="form-control uppercase" placeholder="Tipo de serviço" oninput="this.value = this.value.toUpperCase()"></div>
+      <div class="col-4"><input type="text" class="form-control valor-mask" placeholder="Valor (R$)"></div>
+      <div class="col-1 d-flex align-items-center justify-content-center">
+        <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.campo-servico').remove()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    `;
+    container.appendChild(linha);
+    aplicarMascaraValor();
+  }
+
+
+  function aplicarMascaraValor() {
+    document.querySelectorAll('.valor-mask').forEach(input => {
+      input.addEventListener('input', e => {
+        let v = e.target.value.replace(/\D/g, '');
+        v = (v / 100).toFixed(2) + '';
+        v = v.replace('.', ',');
+        v = v.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        e.target.value = v;
+      });
+    });
+  }
+
+  async function salvarServicosModal() {
+    const linhas = document.querySelectorAll("#camposServicos .campo-servico");
+    const servicos = [];
+    let somaValores = 0;
+
+    linhas.forEach(linha => {
+      const nome = linha.querySelector("input[placeholder='Tipo de serviço']").value.trim();
+      const valorStr = linha.querySelector("input.valor-mask").value.trim();
+      if (nome) {
+        // Extrai valor numérico do campo (ex: "1.250,50" → 1250.50)
+        const valorNum = parseFloat(valorStr.replace(/\./g, '').replace(',', '.')) || 0;
+        somaValores += valorNum;
+        servicos.push(`${nome} - R$ ${valorStr || '0,00'}`);
+      }
+    });
+
+    if (servicos.length === 0) {
+      alert("⚠️ Insira ao menos um serviço antes de salvar.");
+      return;
+    }
+
+    const textoFinal = servicos.join("; ");
+
+    // Atualiza visualmente na tabela
+	const botao = document.querySelector(`button[onclick*="${agendamentoSelecionadoId}"]`);
+	if (botao) {
+	  const primeiroServico = (servicos[0] || '').replace(/\s*-\s*R\$\s*[\d\.\,]+$/, '').trim();
+	  botao.textContent = primeiroServico || 'Adicionar serviço';
+	}
+	
+    // Atualiza o card de balanço financeiro em tempo real
+    totalFinanceiro += somaValores;
+    const elReceita = document.getElementById("valorReceitaTotalPainel");
+    elReceita.textContent = "R$ " + totalFinanceiro.toLocaleString("pt-BR", {minimumFractionDigits: 2});
+
+    // Envia para backend
+    try {
+      const resp = await fetch(`/app_agendamento/api/agendamento-servico/${agendamentoSelecionadoId}/servico`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ servico: textoFinal })
+      });
+      if (!resp.ok) throw new Error("Erro ao salvar serviço no banco.");
+      modalServico.hide();
+    } catch (e) {
+      console.error("Erro ao salvar serviço:", e);
+      alert("❌ Falha ao salvar serviço no banco. Verifique o backend.");
+    }
+  }
+
+  </script>
+
+  
+  <!-- Scripts existentes mantidos intactos -->
+  <script>
+    // =====================================================
+    // 🔹 BLOCO 1 - VALIDAÇÃO DE ACESSO
+    // =====================================================
+    (() => {
+      const lojas = JSON.parse(localStorage.getItem("lojasCadastradas") || "[]");
+      const lojaAtual = lojas.find(l => l.nomeLoja === "Minha Loja");
+      if (lojaAtual && lojaAtual.status === "em atraso") {
+        localStorage.setItem("clienteStatus", "bloqueado");
+        alert("Acesso bloqueado por atraso no pagamento.");
+        const ctx = "/" + location.pathname.split("/")[1];
+        window.location.href = `${ctx}/loginAcesso.html`;
+      } else {
+        localStorage.setItem("clienteStatus", "ativo");
+      }
+    })();
+  </script>
+
+  <script>
+    // ===== Utilidades de data =====
+    function toISO(str) {
+      if (!str) return null;
+      let s = String(str).trim();
+      if (s.includes("T")) s = s.split("T")[0];              // corta tempo se vier "2025-10-31T00:00:00"
+      if (s.includes("-")) return s;                         // já está em ISO (YYYY-MM-DD)
+      if (s.includes("/")) {                                 // converte BR -> ISO
+        const [d, m, y] = s.split("/");
+        return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+      }
+      return null;
+    }
+
+    function isoToBR(iso) {
+      if (!iso) return "";
+      const s = iso.includes("T") ? iso.split("T")[0] : iso;
+      const [y, m, d] = s.split("-");
+      if (!y || !m || !d) return iso;
+      return `${d}/${m}/${y}`;
+    }
+
+    // ===== Renderização da tabela com filtro de data =====
+    async function renderAgendamentosTabela(dateISO, filtroTexto = "") {
+      const tbody = document.getElementById("tabelaAgendamentos");
+      const label = document.getElementById("dataSelecionadaLabel");
+
+      const todayISO = 	  new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
+      const alvoISO = dateISO || todayISO;
+      const alvoBR = isoToBR(alvoISO);
+
+      // Rótulo acima da tabela
+      label.textContent = (alvoISO === todayISO) ? `Hoje (${alvoBR})` : alvoBR;
+
+      try {
+        const resp = await fetch("/app_agendamento/api/agendamento-servico");
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const dados = await resp.json();
+
+        const texto = (filtroTexto || "").toLowerCase().trim();
+
+        // 🔒 Filtro estrito pela data selecionada
+        const filtrados = dados
+          .filter(a => {
+            const itemISO = toISO(a.data);    // aceita "YYYY-MM-DD" ou "DD/MM/YYYY"
+            if (!itemISO) return false;
+            if (itemISO !== alvoISO) return false;
+
+            if (!texto) return true;
+            return (a.servico || "").toLowerCase().includes(texto)
+              || (a.nomeCliente || "").toLowerCase().includes(texto)
+              || (a.status || "").toLowerCase().includes(texto);
+          })
+          .sort((a, b) => (a.horario || "").localeCompare(b.horario || ""));
+
+        // Render
+        tbody.innerHTML = "";
+        if (filtrados.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">
+            Nenhum agendamento para ${alvoISO === todayISO ? "hoje" : alvoBR}.
+          </td></tr>`;
+          return;
+        }
+
+		// ✅ SUBSTITUIR dentro do forEach da renderização da tabela (em renderAgendamentosTabela)
+		filtrados.forEach(a => {
+		  const status = a.status || "Aguardando";
+		  const classe =
+		    status === "Atendido" ? "text-bg-success" :
+		    status === "Cancelado" ? "badge-cancelado" : "text-bg-warning";
+
+		  const dataExibir = isoToBR(toISO(a.data));
+
+		  const servicoLabel = ((a.servico || '').split(';')[0] || '')
+		    .replace(/\s*-\s*R\$\s*[\d\.\,]+$/, '')
+		    .trim() || 'Adicionar serviço';
+
+		  tbody.insertAdjacentHTML("beforeend", `
+		    <tr>
+		      <td>${dataExibir}</td>
+		      <td>${a.horario || ""}</td>
+		      <td>${a.nomeCliente || ""}</td>
+		      <td>${a.telefone || ""}</td>
+		      <td>
+		        <button class="btn btn-outline-primary btn-sm w-100"
+		                onclick="abrirModalServico('${a.id}', '${(a.servico || '').replace(/'/g, "\\'")}')">
+		          ${servicoLabel}
+		        </button>
+		      </td>
+		      <td><span class="badge ${classe}">${status}</span></td>
+		      <td class="text-center">
+		        <button class="btn btn-sm btn-success me-1" onclick="confirmarAtendido('${a.id}')">
+		          <i class="bi bi-check2-circle"></i>
+		        </button>
+		        <button class="btn btn-sm btn-danger" onclick="confirmarCancelado('${a.id}')">
+		          <i class="bi bi-x-circle"></i>
+		        </button>
+		      </td>
+		    </tr>
+		  `);
+		});
+
+
+      } catch (e) {
+        console.error("Erro ao carregar agendamentos:", e);
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">
+          Erro ao carregar agendamentos.
+        </td></tr>`;
+      }
+    }
+
+    // ===== Inicialização sincronizada com o calendário =====
+    document.addEventListener("DOMContentLoaded", () => {
+      const inputData = document.getElementById("filtroDataAgendamento");
+      const inputBusca = document.getElementById("filtroBusca");
+	  const todayISO = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
+
+      // Define data padrão (hoje) no input date
+      inputData.value = todayISO;
+
+      // Carrega somente os agendamentos da data corrente
+      renderAgendamentosTabela(todayISO);
+
+      // Ao mudar a data no calendário
+      inputData.addEventListener("change", (e) => {
+        renderAgendamentosTabela(e.target.value, inputBusca.value);
+      });
+
+      // Ao digitar no campo de busca (filtra dentro da data escolhida)
+      inputBusca.addEventListener("input", (e) => {
+        renderAgendamentosTabela(inputData.value, e.target.value);
+      });
+
+      // 🔁 Auto-refresh a cada 10s respeitando a data selecionada
+      setInterval(() => {
+        renderAgendamentosTabela(inputData.value, inputBusca.value);
+      }, 10000);
+    });
+  </script>
+
+  <script>
+    // =====================================================
+    // 🔹 BLOCO 2.1 — FUNÇÕES DE STATUS (Atendido / Cancelado) COM CONFIRMAÇÃO
+    // =====================================================
+
+    async function confirmarAtendido(id) {
+      const linha = event.target.closest("tr");
+      const celulaStatus = linha.querySelector("td:nth-child(6) span");
+
+      // 🔸 Mensagem de confirmação
+      const confirmar = confirm("✅ Tem certeza que deseja marcar este agendamento como ATENDIDO?");
+      if (!confirmar) return; // se clicar em 'Cancelar', apenas sai
+
+      // 🔸 Atualiza visualmente
+      celulaStatus.textContent = "Atendido!";
+      celulaStatus.className = "badge text-bg-success";
+
+      try {
+        // 🔸 Atualiza no banco
+        const resp = await fetch(`/app_agendamento/api/agendamento-servico/${id}/status`, {
+          method: "PUT",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({status: "Atendido"})
+        });
+
+        if (!resp.ok) throw new Error("Erro ao salvar no banco");
+
+        // ✅ Atualiza tabela após salvar
+        await carregarAgendamentosBanco(document.getElementById("filtroBusca")?.value || "");
+
+        alert("✔️ Agendamento marcado como ATENDIDO com sucesso!");
+        console.log("✔️ Status alterado para ATENDIDO e persistido no banco.");
+      } catch (e) {
+        console.error("Erro ao atualizar status:", e);
+        alert("❌ Falha ao atualizar no banco. Verifique o backend.");
+      }
+    }
+
+    async function confirmarCancelado(id) {
+      const linha = event.target.closest("tr");
+      const celulaStatus = linha.querySelector("td:nth-child(6) span");
+
+      // 🔸 Mensagem de confirmação
+      const confirmar = confirm("⚠️ Tem certeza que deseja CANCELAR este agendamento?");
+      if (!confirmar) return; // se clicar em 'Cancelar', apenas sai
+
+      // 🔸 Atualiza visualmente
+      celulaStatus.textContent = "Cancelado!";
+      celulaStatus.className = "badge badge-cancelado";
+
+      try {
+        // 🔸 Atualiza no banco
+        const resp = await fetch(`/app_agendamento/api/agendamento-servico/${id}/status`, {
+          method: "PUT",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({status: "Cancelado"})
+        });
+
+        if (!resp.ok) throw new Error("Erro ao salvar no banco");
+
+        // ✅ Atualiza tabela após salvar
+        await carregarAgendamentosBanco(document.getElementById("filtroBusca")?.value || "");
+
+        alert("🛑 Agendamento CANCELADO com sucesso!");
+        console.log("✔️ Status alterado para CANCELADO e persistido no banco.");
+      } catch (e) {
+        console.error("Erro ao atualizar status:", e);
+        alert("❌ Falha ao atualizar no banco. Verifique o backend.");
+      }
+    }
+  </script>
+ 
+   <script>
+  async function atualizarServico(id, novoServico) {
+    try {
+      const resp = await fetch(`/app_agendamento/api/agendamento-servico/${id}/servico`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ servico: novoServico })
+      });
+      if (!resp.ok) throw new Error("Erro ao salvar serviço no banco.");
+      console.log(`💾 Serviço atualizado para ${novoServico}`);
+    } catch (e) {
+      console.error("Erro ao atualizar serviço:", e);
+      alert("❌ Falha ao salvar serviço no banco. Verifique o backend.");
+    }
+  }
+  </script>
+
+  
+  <script>
+    // =====================================================
+    // 🔹 BLOCO 3 - CARDS DE INDICADORES (BALANÇO / VENCIMENTOS / AGENDAMENTOS)
+    // =====================================================
+
+    function atualizarCardsPainel() {
+      atualizarCardFinanceiro();
+      atualizarCardVencimentos();
+      atualizarTotalAgendamentos();
+    }
+
+	async function atualizarCardFinanceiro() {
+	  try {
+	    // 🔹 1. Busca todos os agendamentos do backend
+	    const respAg = await fetch("/app_agendamento/api/agendamento-servico");
+	    if (!respAg.ok) throw new Error("Erro ao buscar agendamentos.");
+	    const ags = await respAg.json();
+
+	    // 🔹 2. Soma todos os valores contidos nos campos de serviço (ex: "BOTÓX - R$ 150,00; PEELING - R$ 180,00")
+	    let totalReceita = 0;
+	    ags.forEach(a => {
+	      if (a.servico && a.servico.trim() !== "") {
+	        const matches = a.servico.match(/R\$ ?([\d\.,]+)/g);
+	        if (matches) {
+	          matches.forEach(v => {
+	            const num = parseFloat(v.replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+	            totalReceita += num;
+	          });
+	        }
+	      }
+	    });
+
+	    // 🔹 3. Calcula despesas (mantém lógica atual)
+	    const despesasMensais = JSON.parse(localStorage.getItem("despesas") || "[]");
+	    const totalDespesas = despesasMensais.reduce((s, d) => s + (parseFloat(d.valorTotal) || 0), 0);
+
+	    // 🔹 4. Atualiza card com total somado de todos os valores dos modais
+	    const elReceita = document.getElementById("valorReceitaTotalPainel");
+	    const elDespesas = document.getElementById("valorDespesasMensaisPainel");
+
+	    elReceita.textContent = "R$ " + totalReceita.toLocaleString("pt-BR", {minimumFractionDigits: 2});
+	    elDespesas.textContent = "Despesas: R$ " + totalDespesas.toLocaleString("pt-BR", {minimumFractionDigits: 2});
+
+	    console.log("💰 Total geral de serviços (todos modais):", totalReceita);
+	  } catch (erro) {
+	    console.error("❌ Erro ao calcular balanço financeiro:", erro);
+	    document.getElementById("valorReceitaTotalPainel").textContent = "Erro";
+	  }
+	}
+
+
+    function atualizarCardVencimentos() {
+      const arr = JSON.parse(localStorage.getItem("despesasProfissionais") || "[]");
+      const hoje = new Date();
+      const futuras = arr
+        .map(d => ({...d, dataISO: d.vencimento ? d.vencimento.split("/").reverse().join("-") : null}))
+        .filter(d => d.dataISO && d.dataISO >= hoje.toISOString().slice(0, 10))
+        .sort((a, b) => a.dataISO.localeCompare(b.dataISO));
+
+      const elData = document.getElementById("dataMaisProximaPainel");
+      const elQtd = document.getElementById("qtdItensVencimentoPainel");
+
+      if (!futuras.length) {
+        elData.textContent = "—"; 
+        elQtd.textContent = "0 itens";
+        return;
+      }
+
+      const proxISO = futuras[0].dataISO;
+      const qtd = futuras.filter(x => x.dataISO === proxISO).length;
+      const prox = new Date(proxISO);
+      const diasRest = Math.ceil((prox - hoje) / (1000 * 60 * 60 * 24));
+
+      elData.textContent = proxISO.split("-").reverse().join("/");
+      elQtd.textContent = `${qtd} ${qtd > 1 ? "itens" : "item"}`;
+    }
+
+    async function atualizarTotalAgendamentos() {
+      try {
+        // 🔹 Busca todos os agendamentos do backend
+        const resp = await fetch("/app_agendamento/api/agendamento-servico");
+        if (!resp.ok) throw new Error("Erro ao buscar agendamentos no backend.");
+
+        const ags = await resp.json();
+
+        // 🔹 Total geral
+        const total = ags.length;
+
+        // 🔹 Data atual (formato ISO e BR)
+		const hojeISO = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+        const hojeBR = new Date().toLocaleDateString("pt-BR");
+
+        // 🔹 Total do dia (verifica formatos diferentes)
+        const totalHoje = ags.filter(a => {
+          const d = (a.data || "").trim();
+          return d === hojeISO || d === hojeBR ||
+            d.startsWith(hojeISO) || d.startsWith(hojeBR);
+        }).length;
+
+        // 🔹 Atualiza elementos visuais existentes
+        document.getElementById("totalAgendamentosPainel").textContent = total;
+        document.getElementById("totalAgendamentosHojePainel").textContent = `Hoje: ${totalHoje}`;
+
+        console.log(`📊 Agendamentos - Total: ${total} | Hoje: ${totalHoje}`);
+
+      } catch (erro) {
+        console.error("❌ Erro ao carregar agendamentos:", erro);
+        document.getElementById("totalAgendamentosPainel").textContent = "—";
+        document.getElementById("totalAgendamentosHojePainel").textContent = "Erro";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      atualizarCardsPainel();
+	  const valorInicial = document.getElementById("valorReceitaTotalPainel").textContent.replace(/[^\d,]/g, '').replace(',', '.');
+	  totalFinanceiro = parseFloat(valorInicial) || 0;
+
+      setInterval(atualizarCardsPainel, 60000);
+    });
+  </script>
+
+  <script>
+    // =====================================================
+    // 🔹 BLOCO 4 - BOTÃO SAIR
+    // =====================================================
+    document.getElementById("userMenuDropdown")?.addEventListener("click", () => {
+      if (!confirm("Deseja realmente sair do sistema?")) return;
+      localStorage.removeItem("clienteLogado");
+      alert("Sessão encerrada com sucesso.");
+      const ctx = "/" + location.pathname.split("/")[1];
+      window.location.href = `${ctx}/loginAcesso.html`;
+    });
+  </script>
+
+  <script>
+    // =====================================================
+    // 🔹 BLOCO  - BOTÃO IR PARA HOJE
+    // =====================================================
+    document.getElementById("btnHoje")?.addEventListener("click", () => {
+      const inputData = document.getElementById("filtroDataAgendamento");
+      const inputBusca = document.getElementById("filtroBusca");
+	  const hojeISO = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().split("T")[0];
+
+      inputData.value = hojeISO;
+      renderAgendamentosTabela(hojeISO, inputBusca.value);
+
+      // Breve destaque visual no botão
+      const btn = document.getElementById("btnHoje");
+      btn.classList.add("btn-success");
+      setTimeout(() => btn.classList.remove("btn-success"), 800);
+    });
+			
+  </script>
+
+  <script>
+  /* =====================================================
+     🔹 Alternar entre Modo Claro e Escuro
+     ===================================================== */
+  document.addEventListener("DOMContentLoaded", () => {
+    const btnModo = document.getElementById("btnModo");
+    const icone = btnModo.querySelector("i");
+
+    // Carrega o modo salvo no navegador
+    const temaSalvo = localStorage.getItem("temaSelecionado") || "light";
+    document.body.classList.add(`${temaSalvo}-mode`);
+    icone.className = temaSalvo === "dark" ? "bi bi-sun" : "bi bi-moon-stars";
+
+    btnModo.addEventListener("click", () => {
+      const modoAtual = document.body.classList.contains("dark-mode") ? "dark" : "light";
+      const novoModo = modoAtual === "dark" ? "light" : "dark";
+
+      // Troca as classes
+      document.body.classList.remove(`${modoAtual}-mode`);
+      document.body.classList.add(`${novoModo}-mode`);
+
+      // Troca ícone
+      icone.className = novoModo === "dark" ? "bi bi-sun" : "bi bi-moon-stars";
+
+      // Salva preferência
+      localStorage.setItem("temaSelecionado", novoModo);
+    });
+  });
+  </script>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const modal = new bootstrap.Modal(document.getElementById("modalEditarLoja"));
+    const btnAbrir = document.getElementById("btnEditarLoja");
+    const btnSalvar = document.getElementById("btnSalvarLoja");
+
+    const inputNome = document.getElementById("inputNomeLoja");
+    const inputEndereco = document.getElementById("inputEnderecoLoja");
+    const inputCidadeEstado = document.getElementById("inputCidadeEstadoLoja");
+    const inputTelefone = document.getElementById("inputTelefoneLoja");
+    const inputEmail = document.getElementById("inputEmailLoja");
+    const inputLogo = document.getElementById("inputLogoLoja");
+    const previewLogo = document.getElementById("previewLogoLoja");
+
+    const logoTopo = document.getElementById("logoCliente");
+    const nomeTopo = document.querySelector(".brand-name");
+
+    // 🔹 Carrega dados da loja
+    const lojaId = localStorage.getItem("lojaId") || "1";
+    const dadosSalvos = JSON.parse(localStorage.getItem(`dadosLojaPainel_${lojaId}`) || "{}");
+
+    if (dadosSalvos.nome) nomeTopo.textContent = dadosSalvos.nome;
+    if (dadosSalvos.logoBase64) logoTopo.src = dadosSalvos.logoBase64;
+
+    // 🔹 Abre modal preenchendo campos
+    btnAbrir.addEventListener("click", () => {
+      inputNome.value = dadosSalvos.nome || "";
+      inputEndereco.value = dadosSalvos.endereco || "";
+      inputCidadeEstado.value = dadosSalvos.cidadeEstado || "";
+      inputTelefone.value = dadosSalvos.telefone || "";
+      inputEmail.value = dadosSalvos.email || "";
+
+      if (dadosSalvos.logoBase64) {
+        previewLogo.src = dadosSalvos.logoBase64;
+        previewLogo.style.display = "block";
+      } else {
+        previewLogo.style.display = "none";
+      }
+      modal.show();
+    });
+
+    // 🔹 Preview da logo
+    inputLogo.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = ev => {
+          previewLogo.src = ev.target.result;
+          previewLogo.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // 🔹 Salva alterações
+    btnSalvar.addEventListener("click", () => {
+      const novaLogo = previewLogo.src.startsWith("data:image") ? previewLogo.src : dadosSalvos.logoBase64 || "";
+      const novosDados = {
+        nome: inputNome.value.trim() || "Minha Empresa",
+        endereco: inputEndereco.value.trim() || "",
+        cidadeEstado: inputCidadeEstado.value.trim() || "",
+        telefone: inputTelefone.value.trim() || "",
+        email: inputEmail.value.trim() || "",
+        logoBase64: novaLogo
+      };
+
+      // Atualiza topo
+      nomeTopo.textContent = novosDados.nome;
+      if (novosDados.logoBase64) logoTopo.src = novosDados.logoBase64;
+
+      // Salva no localStorage
+      localStorage.setItem(`dadosLojaPainel_${lojaId}`, JSON.stringify(novosDados));
+
+      modal.hide();
+      alert("✅ Informações da loja atualizadas com sucesso!");
+    });
+  });
+  </script>
+
+
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const btnCopiarLinkTopo = document.getElementById("btnCopiarLinkTopo");
+    if (!btnCopiarLinkTopo) return;
+
+    // 🔹 Garante que o ícone de WhatsApp apareça sempre antes de clicar
+    btnCopiarLinkTopo.innerHTML = '<i class="bi bi-whatsapp"></i>';
+
+    btnCopiarLinkTopo.addEventListener("click", async () => {
+      const baseUrl = window.location.origin;
+      const linkAgendamento = `${baseUrl}/app_agendamento/painel/agendamentoServico.html`;
+
+      try {
+        await navigator.clipboard.writeText(linkAgendamento);
+
+        // ✅ Troca ícone para “check” temporariamente
+        btnCopiarLinkTopo.innerHTML = '<i class="bi bi-check-circle"></i>';
+        btnCopiarLinkTopo.style.backgroundColor = "#128C7E";
+
+        setTimeout(() => {
+          // 🔁 Volta o ícone do WhatsApp
+          btnCopiarLinkTopo.innerHTML = '<i class="bi bi-whatsapp"></i>';
+          btnCopiarLinkTopo.style.backgroundColor = "#25D366";
+        }, 2000);
+
+        alert("✅ Link de agendamento copiado!\nEnvie pelo WhatsApp, Instagram ou Facebook.");
+      } catch (err) {
+        console.error("Erro ao copiar:", err);
+        alert("⚠️ Não foi possível copiar automaticamente. Copie manualmente:\n" + linkAgendamento);
+      }
+    });
+  });
+  </script>
+
+
+
+  <!-- Script do painel -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/app_agendamento/painel/dashboard8.0.js"></script>
+</body>
+
+</html>

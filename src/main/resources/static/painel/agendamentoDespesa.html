@@ -1,0 +1,2390 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Controle de Despesas</title>
+	
+	<link rel="stylesheet" href="/app_agendamento/painel/topbar.css">
+	
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+	<!-- ========================================================= -->
+	<!-- 🎨 ESTILOS ORGANIZADOS E OTIMIZADOS - CONTROLE DE DESPESAS -->
+	<!-- ========================================================= -->
+	<style>
+	/* ========================================================= */
+	/* 🌐 BASE GERAL */
+	body {
+	  background-color: #f5f5f5;
+	  font-size: 0.9rem;
+	  color: #333;
+	}
+	.card {
+	  background: linear-gradient(135deg, #e0e0e0, #ffffff);
+	  color: #212529;
+	  border-radius: 10px;
+	  margin-bottom: 1.5rem;
+	  border: 1px solid #dee2e6;
+	  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+	}
+
+	/* ========================================================= */
+	/* 🧱 ESTRUTURA DOS CARDS SUPERIORES */
+	.card-total-geral,
+	.card-total-anual,
+	.card-vencimentos,
+	.card-mensal {
+	  background-color: #6c757d !important;
+	  color: #fff;
+	  border-radius: 8px;
+	  border: none;
+	  transition: transform 0.2s ease;
+	}
+	.card-total-geral:hover,
+	.card-total-anual:hover,
+	.card-vencimentos:hover,
+	.card-mensal:hover {
+	  transform: translateY(-2px);
+	}
+	.card-total .card-body {
+	  padding: 1rem 0.75rem;
+	}
+	.card-total .card-title {
+	  font-size: 0.85rem;
+	  margin-bottom: 0.5rem;
+	  opacity: 0.9;
+	}
+	.card-total .display-6 {
+	  font-size: 1.4rem;
+	  font-weight: 600;
+	}
+
+	/* ========================================================= */
+	/* 🧾 CABEÇALHOS E RODAPÉS DOS CARDS */
+	.card-header {
+	  background-color: #a0a0a0;
+	  color: #fff;
+	  font-weight: 600;
+	  font-size: 0.95rem;
+	  padding: 0.75rem 1rem;
+	  border-radius: 10px 10px 0 0 !important;
+	}
+	.card-footer {
+	  background-color: #f8f9fa;
+	  border-top: 1px solid #dee2e6;
+	  padding: 0.75rem 1rem;
+	}
+
+	/* 🟩 Todos os cards superiores com altura igual */
+	.card-uniforme {
+	  height: 100%;
+	  min-height: 165px;
+	  display: flex;
+	  flex-direction: column;
+	  justify-content: center;
+	}
+
+	/* Card Lucro por Serviço - mesmo padrão visual */
+	.card-lucro {
+	  background-color: #198754 !important; /* verde */
+	  color: #fff;
+	  border-radius: 8px;
+	  border: none;
+	  transition: transform 0.2s ease;
+	}
+	.card-lucro:hover {
+	  transform: translateY(-2px);
+	}
+
+	/* 🎨 Cores principais dos cards superiores — altere aqui quando quiser */
+	:root {
+	  --card-total-geral: #6f42c1;     /* Roxo */
+	  --card-total-anual: #0d6efd;     /* Azul */
+	  --card-vencimentos: #fd7e14;     /* Laranja */
+	  --card-mensal: #20c997;          /* Verde Água */
+	  --card-lucro: #198754;           /* Verde padrão (Lucro) */
+	}
+
+	/* 🟪 Card: Total Geral */
+	.card-total-geral {
+	  background-color: var(--card-total-geral) !important;
+	  color: #fff;
+	}
+
+	/* 🟦 Card: Total Anual */
+	.card-total-anual {
+	  background-color: var(--card-total-anual) !important;
+	  color: #fff;
+	}
+
+	/* 🟧 Card: Próximos Vencimentos */
+	.card-vencimentos {
+	  background-color: var(--card-vencimentos) !important;
+	  color: #fff;
+	}
+
+	/* 🟩 Card: Despesas Mensais */
+	.card-mensal {
+	  background-color: var(--card-mensal) !important;
+	  color: #fff;
+	}
+
+	/* 🟢 Card: Lucro por Serviço */
+	.card-lucro {
+	  background-color: var(--card-lucro) !important;
+	  color: #fff;
+	}
+
+	/* 🔹 Todos os cards com altura uniforme */
+	.card-uniforme {
+	  height: 100%;
+	  min-height: 165px;
+	  display: flex;
+	  flex-direction: column;
+	  justify-content: center;
+	}
+
+	
+	/* ========================================================= */
+	/* 📋 TABELAS */
+	.table-container {
+	  max-height: 350px;
+	  overflow-y: auto;
+	}
+	.table {
+	  margin-bottom: 0;
+	  font-size: 0.85rem;
+	}
+	.table th {
+	  background-color: #f1f1f1;
+	  font-weight: 600;
+	  color: #343a40;
+	}
+	.table td {
+	  font-size: 0.82rem;
+	  vertical-align: middle;
+	  border-color: #e9ecef;
+	}
+	.table tbody tr:hover {
+	  background-color: #f8f9fa;
+	}
+	.total-field {
+	  font-weight: 700;
+	  font-size: 0.9rem;
+	  color: #212529;
+	}
+
+	/* ========================================================= */
+	/* 🧮 INPUTS, BOTÕES E BARRAS DE FERRAMENTAS */
+	.inputs-bar {
+	  background-color: #f8f9fa;
+	  padding: 0.75rem;
+	  border-bottom: 1px solid #dee2e6;
+	}
+	.form-control-sm {
+	  font-size: 0.85rem;
+	  padding: 0.4rem 0.6rem;
+	  border-radius: 6px;
+	}
+	.form-control-sm:focus {
+	  border-color: #6c757d;
+	  box-shadow: 0 0 0 0.15rem rgba(108, 117, 125, 0.25);
+	}
+	.btn-sm {
+	  font-size: 0.8rem;
+	  padding: 0.4rem 0.75rem;
+	  border-radius: 6px;
+	  font-weight: 500;
+	}
+
+	/* 🎨 Cores de botões padronizadas */
+	.btn-success,
+	.btn-warning,
+	.btn-danger,
+	.btn-secondary {
+	  background-color: #6c757d;
+	  border: none;
+	  color: #fff;
+	  transition: background 0.2s ease;
+	}
+	.btn-success:hover,
+	.btn-warning:hover,
+	.btn-danger:hover,
+	.btn-secondary:hover {
+	  background-color: #5a6268;
+	}
+
+	/* ========================================================= */
+	/* 🔢 PAGINAÇÃO */
+	.pagination-sm .page-link {
+	  font-size: 0.8rem;
+	  padding: 0.4rem 0.75rem;
+	  color: #212529;
+	  border: 1px solid #dee2e6;
+	  background-color: #fff;
+	}
+	.page-item.active .page-link {
+	  background-color: #6c757d;
+	  border-color: #6c757d;
+	  color: #fff;
+	}
+
+	/* ========================================================= */
+	/* 📱 RESPONSIVIDADE */
+	@media (max-width: 768px) {
+	  .table th, .table td {
+	    font-size: 0.75rem;
+	    padding: 0.4rem 0.5rem !important;
+	  }
+	  .card-total .display-6 {
+	    font-size: 1.2rem;
+	  }
+	}
+	
+	/* 🌙 MODO ESCURO PREMIUM - AGENDAMENTODESPESA */
+	body.dark-mode {
+	  background-color: #0f1117;
+	  color: #e4e6eb;
+	}
+
+	/* Topbar moderno no dark */
+	body.dark-mode .topbar-modern {
+	  background: linear-gradient(135deg, #1a1d29, #2d1b69);
+	  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+	  border-bottom: 1px solid rgba(255,255,255,0.1);
+	}
+
+	/* Cards com gradiente sutil e bordas */
+	body.dark-mode .card {
+	  background: linear-gradient(145deg, #1a1d29, #161922) !important;
+	  border: 1px solid rgba(255,255,255,0.08);
+	  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+	  color: #e4e6eb;
+	}
+
+	body.dark-mode .card:hover {
+	  transform: translateY(-2px);
+	  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+	}
+
+	/* Cabeçalhos dos cards */
+	body.dark-mode .card-header {
+	  background: linear-gradient(135deg, #1f2230, #252837) !important;
+	  border-bottom: 1px solid rgba(255,255,255,0.1);
+	  color: #e4e6eb !important;
+	}
+
+	body.dark-mode .card-footer {
+	  background: rgba(255,255,255,0.02);
+	  border-top: 1px solid rgba(255,255,255,0.1);
+	}
+
+	/* Cards de totais superiores */
+	body.dark-mode .card-total-geral,
+	body.dark-mode .card-total-anual,
+	body.dark-mode .card-vencimentos,
+	body.dark-mode .card-mensal,
+	body.dark-mode .card-lucro {
+	  box-shadow: 0 6px 20px rgba(0,0,0,0.3) !important;
+	  border: 1px solid rgba(255,255,255,0.1) !important;
+	}
+
+	body.dark-mode .card-total-geral:hover,
+	body.dark-mode .card-total-anual:hover,
+	body.dark-mode .card-vencimentos:hover,
+	body.dark-mode .card-mensal:hover,
+	body.dark-mode .card-lucro:hover {
+	  transform: translateY(-3px);
+	  box-shadow: 0 10px 25px rgba(0,0,0,0.4) !important;
+	}
+
+	/* Textos nos cards de totais */
+	body.dark-mode .card-total .card-title,
+	body.dark-mode .card-total .display-6 {
+	  color: #ffffff !important;
+	  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+	}
+
+	body.dark-mode .card-total .text-muted {
+	  color: rgba(255,255,255,0.8) !important;
+	}
+
+	/* Tabelas modernas no dark */
+	body.dark-mode .table {
+	  background: #1a1d29 !important;
+	  color: #e4e6eb;
+	}
+
+	body.dark-mode .table th {
+	  background: linear-gradient(135deg, #1f2230, #252837) !important;
+	  color: #ffffff !important;
+	  border-bottom: 1px solid rgba(255,255,255,0.1);
+	  font-weight: 600;
+	}
+
+	body.dark-mode .table td {
+	  background: #1a1d29 !important;
+	  color: #e4e6eb !important;
+	  border-bottom: 1px solid rgba(255,255,255,0.05);
+	  transition: all 0.3s ease;
+	}
+
+	/* Linhas alternadas para melhor legibilidade */
+	body.dark-mode .table tbody tr:nth-child(even) {
+	  background: #1f2230 !important;
+	}
+
+	body.dark-mode .table tbody tr:nth-child(odd) {
+	  background: #1a1d29 !important;
+	}
+
+	/* Efeito hover nas linhas */
+	body.dark-mode .table tbody tr:hover {
+	  background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.1)) !important;
+	  transform: translateX(4px);
+	}
+
+	body.dark-mode .table tbody tr:hover td {
+	  color: #ffffff !important;
+	  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+	}
+
+	/* Barras de inputs */
+	body.dark-mode .inputs-bar {
+	  background: linear-gradient(135deg, #1f2230, #252837);
+	  border-bottom: 1px solid rgba(255,255,255,0.1);
+	}
+
+	/* Formulários e inputs */
+	body.dark-mode .form-control {
+	  background: #1a1d29 !important;
+	  border: 1px solid rgba(255,255,255,0.15);
+	  color: #e4e6eb !important;
+	}
+
+	body.dark-mode .form-control:focus {
+	  background: #1a1d29 !important;
+	  border-color: #6366f1;
+	  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+	  color: #e4e6eb !important;
+	}
+
+	body.dark-mode .form-control::placeholder {
+	  color: #9ca3af !important;
+	}
+
+	body.dark-mode select.form-control {
+	  background: #1a1d29 !important;
+	  color: #e4e6eb !important;
+	}
+
+	body.dark-mode select.form-control option {
+	  background: #1a1d29;
+	  color: #e4e6eb;
+	}
+
+	/* Input group */
+	body.dark-mode .input-group-text {
+	  background: #1f2230 !important;
+	  border: 1px solid rgba(255,255,255,0.15);
+	  color: #a0a4b8 !important;
+	}
+
+	/* Botões modernos */
+	body.dark-mode .btn {
+	  transition: all 0.3s ease;
+	  border: none;
+	}
+
+	body.dark-mode .btn-success {
+	  background: linear-gradient(135deg, #059669, #047857);
+	  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+	}
+
+	body.dark-mode .btn-success:hover {
+	  background: linear-gradient(135deg, #047857, #065f46);
+	  transform: translateY(-2px);
+	  box-shadow: 0 6px 16px rgba(5, 150, 105, 0.4);
+	}
+
+	body.dark-mode .btn-warning {
+	  background: linear-gradient(135deg, #d97706, #b45309);
+	  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+	}
+
+	body.dark-mode .btn-warning:hover {
+	  background: linear-gradient(135deg, #b45309, #92400e);
+	  transform: translateY(-2px);
+	}
+
+	body.dark-mode .btn-danger {
+	  background: linear-gradient(135deg, #dc2626, #b91c1c);
+	  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+	}
+
+	body.dark-mode .btn-danger:hover {
+	  background: linear-gradient(135deg, #b91c1c, #991b1b);
+	  transform: translateY(-2px);
+	}
+
+	body.dark-mode .btn-secondary {
+	  background: linear-gradient(135deg, #6b7280, #4b5563);
+	  box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+	}
+
+	body.dark-mode .btn-secondary:hover {
+	  background: linear-gradient(135deg, #4b5563, #374151);
+	  transform: translateY(-2px);
+	}
+
+	body.dark-mode .btn-outline-primary {
+	  background: rgba(99, 102, 241, 0.1);
+	  border: 1px solid rgba(99, 102, 241, 0.3);
+	  color: #a5b4fc;
+	}
+
+	body.dark-mode .btn-outline-primary:hover {
+	  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.2));
+	  border-color: #6366f1;
+	  color: white;
+	}
+
+	/* Paginação */
+	body.dark-mode .pagination .page-link {
+	  background: #1a1d29;
+	  border: 1px solid rgba(255,255,255,0.15);
+	  color: #e4e6eb;
+	}
+
+	body.dark-mode .pagination .page-link:hover {
+	  background: rgba(99, 102, 241, 0.2);
+	  border-color: rgba(99, 102, 241, 0.3);
+	  color: #a5b4fc;
+	}
+
+	body.dark-mode .page-item.active .page-link {
+	  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+	  border-color: #6366f1;
+	  color: white;
+	}
+
+	/* Checkboxes */
+	body.dark-mode .form-check-input {
+	  background-color: #1a1d29;
+	  border: 1px solid rgba(255,255,255,0.2);
+	}
+
+	body.dark-mode .form-check-input:checked {
+	  background-color: #6366f1;
+	  border-color: #6366f1;
+	}
+
+	/* Badges e indicadores */
+	body.dark-mode .badge {
+	  border: none;
+	}
+
+	body.dark-mode .total-field {
+	  color: #a5b4fc !important;
+	  font-weight: 600;
+	  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+	}
+
+	/* Textos e cores */
+	body.dark-mode .text-primary {
+	  color: #6366f1 !important;
+	}
+
+	body.dark-mode .text-success {
+	  color: #10b981 !important;
+	}
+
+	body.dark-mode .text-danger {
+	  color: #ef4444 !important;
+	}
+
+	body.dark-mode .text-warning {
+	  color: #f59e0b !important;
+	}
+
+	body.dark-mode .text-muted {
+	  color: #9ca3af !important;
+	}
+
+	body.dark-mode .text-dark {
+	  color: #e4e6eb !important;
+	}
+
+	/* Efeitos de hover nos ícones da topbar */
+	body.dark-mode .topbar-modern .nav-item:hover i {
+	  animation: pulse 0.5s ease;
+	  color: #a5b4fc;
+	  text-shadow: 0 0 8px rgba(165, 180, 252, 0.6),
+	               0 0 12px rgba(99, 102, 241, 0.5);
+	}
+
+	body.dark-mode .topbar-modern .theme-toggle:hover i {
+	  animation: pulse 0.5s ease;
+	  color: #a5b4fc;
+	  text-shadow: 0 0 8px rgba(165, 180, 252, 0.6),
+	               0 0 12px rgba(99, 102, 241, 0.6);
+	}
+
+	body.dark-mode .topbar-modern .user-menu:hover .user-avatar i {
+	  animation: pulse 0.5s ease;
+	  color: #a5b4fc;
+	  text-shadow: 0 0 10px rgba(165, 180, 252, 0.6),
+	               0 0 14px rgba(99, 102, 241, 0.5);
+	}
+
+	/* Container de tabela com scroll */
+	body.dark-mode .table-container {
+	  background: #1a1d29;
+	  border: 1px solid rgba(255,255,255,0.08);
+	}
+
+	/* Destaque do custo por serviço */
+	body.dark-mode #cpsDestaqueServico,
+	body.dark-mode #cpsDestaqueVenda,
+	body.dark-mode #cpsDestaqueCusto,
+	body.dark-mode #cpsDestaqueLucro,
+	body.dark-mode #cpsDestaqueData {
+	  background: rgba(255,255,255,0.05);
+	  border: 1px solid rgba(255,255,255,0.1);
+	  color: #e4e6eb;
+	}
+
+	/* Indicador de lucro */
+	body.dark-mode #lucroGeralIndicador {
+	  color: #e4e6eb;
+	}
+
+	body.dark-mode #listaLucroServicos {
+	  color: #c8cad3;
+	}
+
+	/* Lista de serviços no card de lucro */
+	body.dark-mode #listaLucroServicos ul {
+	  color: #c8cad3;
+	}
+
+	body.dark-mode #listaLucroServicos .text-success {
+	  color: #10b981 !important;
+	}
+
+	body.dark-mode #listaLucroServicos .text-danger {
+	  color: #ef4444 !important;
+	}
+
+	/* Botão PDF */
+	body.dark-mode .btn-danger {
+	  background: linear-gradient(135deg, #ef4444, #dc2626);
+	}
+
+	body.dark-mode .btn-danger:hover {
+	  background: linear-gradient(135deg, #dc2626, #b91c1c);
+	}
+
+	/* Seleção de serviços no estoque */
+	body.dark-mode #servicoEstoque {
+	  background: #1a1d29 !important;
+	  color: #e4e6eb !important;
+	}
+
+	body.dark-mode #servicoEstoque option {
+	  background: #1a1d29;
+	  color: #e4e6eb;
+	}
+
+	/* Animações */
+	@keyframes pulse {
+	  0% { transform: scale(1); filter: brightness(1); }
+	  50% { transform: scale(1.2); filter: brightness(1.5); }
+	  100% { transform: scale(1); filter: brightness(1); }
+	}
+
+	/* Responsividade */
+	@media (max-width: 768px) {
+	  body.dark-mode .card-uniforme {
+	    min-height: 140px;
+	  }
+	  
+	  body.dark-mode .card-total .display-6 {
+	    font-size: 1.1rem;
+	  }
+	  
+	  body.dark-mode .table th,
+	  body.dark-mode .table td {
+	    font-size: 0.75rem;
+	    padding: 0.4rem 0.5rem !important;
+	  }
+	}
+
+	/* Scrollbar personalizada */
+	body.dark-mode ::-webkit-scrollbar {
+	  width: 8px;
+	}
+
+	body.dark-mode ::-webkit-scrollbar-track {
+	  background: #1a1d29;
+	}
+
+	body.dark-mode ::-webkit-scrollbar-thumb {
+	  background: rgba(99, 102, 241, 0.5);
+	  border-radius: 4px;
+	}
+
+	body.dark-mode ::-webkit-scrollbar-thumb:hover {
+	  background: rgba(99, 102, 241, 0.7);
+	}
+	
+	
+	</style>
+
+
+
+</head>
+
+<body>
+	
+	<header class="topbar-modern">
+		  <div class="logo-section">
+		    <img id="logoCliente" 
+		         src="/app_agendamento/imagens/logo%20Jamille.png"
+		         alt="Logo Jamille Higino"
+		         class="logo"
+		         onerror="this.onerror=null; this.src='/app_agendamento/imagens/logo-padrao.png';">
+		    <div class="brand-info">
+		      <div class="brand-name">Jamille Higino</div>
+		      <div class="brand-subtitle">Enfermagem e Estética</div>
+		    </div>
+		  </div>
+
+		  <nav class="nav-section">
+		    <a href="/app_agendamento/painel/painelGerencia.html" class="nav-item"><i class="bi bi-house-door"></i><span>Home</span></a>
+		    <a href="/app_agendamento/painel/agendamentoServico.html" class="nav-item"><i class="bi bi-calendar-check"></i><span>Agendamento</span></a>
+		    <a href="/app_agendamento/painel/configAgendamento.html" class="nav-item"><i class="bi bi-gear"></i><span>Configuração</span></a>
+		    <a href="/app_agendamento/painel/relatorioAgendamento.html" class="nav-item"><i class="bi bi-bar-chart"></i><span>Relatórios</span></a>
+		    <a href="/app_agendamento/painel/agendamentoDespesa.html" class="nav-item"><i class="bi bi-cash-coin"></i><span>Despesas</span></a>
+		  </nav>
+
+		  <div class="user-section">
+		    <button id="btnModo" class="theme-toggle"><i class="bi bi-moon-stars"></i></button>
+		    <div class="user-menu" id="userMenuDropdown">
+		      <div class="user-avatar"><i class="bi bi-person"></i></div>
+		      <span>Admin</span>
+		    </div>
+		  </div>
+		</header>
+		
+	
+	<div class="container mt-4">
+
+		<!-- 🔹 BOTÕES SUPERIORES -->
+		<div class="mb-3 text-end">
+			<a href="painelGerencia.html" class="btn btn-secondary btn-sm">
+				<i class="bi bi-arrow-left"></i> Voltar
+			</a>
+			<button id="btnGerarPDF" class="btn btn-danger btn-sm ms-2">
+				<i class="bi bi-filetype-pdf"></i> Gerar PDF
+			</button>
+		</div>
+
+		<!-- 🔹 CARDS DE TOTAIS - CORES DISTINTAS -->
+		
+		<div class="row mb-4 g-3 row-cols-1 row-cols-md-5">
+		  <!-- Card Total Geral -->
+		  <div class="col">
+		    <div class="card text-center shadow-sm card-total-geral card-uniforme">
+		      <div class="card-body">
+		        <h6 class="card-title text-uppercase fw-bold">
+		          <i class="bi bi-graph-up-arrow"></i> Total Geral
+		        </h6>
+		        <div class="display-6 fw-bold" id="valorTotalDespesas">R$ 0,00</div>
+		      </div>
+		    </div>
+		  </div>
+
+		  <!-- Card Total Anual -->
+		  <div class="col">
+		    <div class="card text-center shadow-sm card-total-anual card-uniforme">
+		      <div class="card-body">
+		        <h6 class="card-title text-uppercase fw-bold">
+		          <i class="bi bi-calendar3"></i> Total Anual
+		        </h6>
+		        <div class="display-6 fw-bold" id="valorTotalDespesasAnual">R$ 0,00</div>
+		      </div>
+		    </div>
+		  </div>
+
+		  <!-- Card Vencimentos -->
+		  <div class="col">
+		    <div class="card text-center shadow-sm card-vencimentos card-uniforme">
+		      <div class="card-body">
+		        <h6 class="card-title text-uppercase fw-bold">
+		          <i class="bi bi-alarm"></i> Próximos Vencimentos
+		        </h6>
+		        <div class="mb-1 fs-6" id="qtdItensVencimento">0 itens</div>
+		        <div class="fw-bold fs-6" id="dataMaisProxima">—</div>
+		      </div>
+		    </div>
+		  </div>
+
+		  <!-- Card Mensal -->
+		  <div class="col">
+		    <div class="card text-center shadow-sm card-mensal card-uniforme">
+		      <div class="card-body">
+		        <h6 class="card-title text-uppercase fw-bold">
+		          <i class="bi bi-cash-stack"></i> Despesas Mensais
+		        </h6>
+		        <div class="display-6 fw-bold" id="totalMensalResumo">R$ 0,00</div>
+		      </div>
+		    </div>
+		  </div>
+
+		  <!-- 💰 Card Lucro por Serviço -->
+		  <!-- 💰 Card Lucro por Serviço (com indicador de desempenho) -->
+		  <div class="col">
+		    <div class="card text-center shadow-sm card-lucro card-uniforme">
+		      <div class="card-body">
+		        <h6 class="card-title text-uppercase fw-bold">
+		          <i class="bi bi-coin"></i> Lucro por Serviço
+		        </h6>
+
+		        <!-- Indicador visual do lucro total -->
+		        <div id="lucroGeralIndicador" class="mb-2" style="font-size: 1.2rem;">
+		          <span id="lucroGeralValor">R$ 0,00</span>
+		          <i id="lucroGeralIcone" class="bi bi-dash-lg"></i>
+		        </div>
+
+		        <!-- Lista de lucro por serviço -->
+		        <div id="listaLucroServicos" style="font-size: 0.9rem; text-align:left; max-height: 80px; overflow-y:auto;">
+		          <em>Nenhum cálculo disponível.</em>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+		<!-- 💰 DESPESAS MENSAL (FUNCIONALIDADE ORIGINAL RESTAURADA) -->
+		<div class="card shadow-sm">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<span><i class="bi bi-cash-coin"></i> Controle de Despesas</span>
+				<span id="totalGeral" class="total-field">Total: R$ 0,00</span>
+			</div>
+
+			<div class="table-responsive table-container">
+				<!-- Barra de inputs fixa (Mensal) - ESTRUTURA ORIGINAL -->
+				<div class="inputs-bar">
+					<div class="row g-2 align-items-center">
+						<div class="col-12 col-md-3">
+							<input type="text" id="item" class="form-control form-control-sm" placeholder="Item"
+								required>
+						</div>
+						<div class="col-12 col-md-3">
+							<input type="text" id="descricao" class="form-control form-control-sm"
+								placeholder="Descrição">
+						</div>
+						<div class="col-4 col-md-2">
+							<input type="number" id="qntItem" class="form-control form-control-sm text-center" min="1"
+								max="999" placeholder="0" required>
+						</div>
+						<div class="col-5 col-md-2">
+							<input type="text" id="valorUnitario" class="form-control form-control-sm"
+								placeholder="Valor (R$)" required>
+						</div>
+						<div class="col-3 col-md-2">
+							<button id="btnAdicionar" class="btn btn-success btn-sm w-100">
+								<i class="bi bi-plus-circle"></i> Adicionar
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Tabela - ESTRUTURA ORIGINAL COMPLETA -->
+				<table class="table table-bordered table-hover align-middle mb-0" id="tabelaDespesas">
+					<thead class="text-center">
+						<tr>
+							<th><input type="checkbox" id="selecionarTodos"></th>
+							<th>Qnt</th>
+							<th class="col-item">Item</th>
+							<th class="col-desc">Descrição</th>
+							<th class="col-qnt">Qnt Item</th>
+							<th class="col-valor">Valor Uni R$</th>
+							<th class="col-valor">Valor Total R$</th>
+							<th>Ações</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+
+			<div class="card-footer">
+				<div class="d-flex justify-content-between align-items-center">
+					<div class="flex-grow-1 d-flex justify-content-center">
+						<ul class="pagination pagination-sm mb-0" id="paginacaoTabela"></ul>
+					</div>
+					<div class="d-flex gap-2">
+						<button class="btn btn-danger btn-sm" id="btnExcluirSelecionados"><i class="bi bi-trash3"></i>
+							Apagar Selecionados</button>
+						<button class="btn btn-danger btn-sm" id="btnExcluirTudo"><i class="bi bi-x-circle"></i> Apagar
+							Tudo</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 📅 DESPESAS ANUAIS (FUNCIONALIDADE ORIGINAL RESTAURADA) -->
+		<div class="card shadow-sm">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<span><i class="bi bi-calendar3"></i> Despesas Anuais</span>
+				<span id="totalGeralAnual" class="total-field">Total: R$ 0,00</span>
+			</div>
+
+			<div class="table-responsive table-container">
+				<!-- Barra de inputs fixa (Anual) - ESTRUTURA ORIGINAL -->
+				<div class="inputs-bar">
+					<div class="row g-2 align-items-center">
+						<div class="col-12 col-md-3">
+							<input type="text" id="itemAnual" class="form-control form-control-sm" placeholder="Item">
+						</div>
+						<div class="col-12 col-md-3">
+							<input type="text" id="descricaoAnual" class="form-control form-control-sm"
+								placeholder="Descrição">
+						</div>
+						<div class="col-4 col-md-2">
+							<input type="number" id="qntItemAnual" class="form-control form-control-sm text-center"
+								min="1" max="999" placeholder="0">
+						</div>
+						<div class="col-5 col-md-2">
+							<input type="text" id="valorUnitarioAnual" class="form-control form-control-sm"
+								placeholder="Valor (R$)">
+						</div>
+						<div class="col-3 col-md-2">
+							<button id="btnAdicionarAnual" class="btn btn-success btn-sm w-100">
+								<i class="bi bi-plus-circle"></i> Adicionar
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Tabela - ESTRUTURA ORIGINAL COMPLETA -->
+				<table class="table table-bordered table-hover align-middle mb-0" id="tabelaDespesasAnuais">
+					<thead class="text-center">
+						<tr>
+							<th><input type="checkbox" id="selecionarTodosAnual"></th>
+							<th>Qnt</th>
+							<th class="col-item">Item</th>
+							<th class="col-desc">Descrição</th>
+							<th class="col-qnt">Qnt Item</th>
+							<th class="col-valor">Valor Uni R$</th>
+							<th class="col-valor">Valor Total R$</th>
+							<th>Ações</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+
+			<div class="card-footer">
+				<div class="d-flex justify-content-between align-items-center">
+					<div class="flex-grow-1 d-flex justify-content-center">
+						<ul class="pagination pagination-sm mb-0" id="paginacaoTabelaAnual"></ul>
+					</div>
+					<div class="d-flex gap-2">
+						<button class="btn btn-danger btn-sm" id="btnExcluirSelecionadosAnual"><i
+								class="bi bi-trash3"></i> Apagar Selecionados</button>
+						<button class="btn btn-danger btn-sm" id="btnExcluirTudoAnual"><i class="bi bi-x-circle"></i>
+							Apagar Tudo</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 💼 DESPESAS DE PRODUTOS PROFISSIONAIS (ORIGINAL) -->
+		<div class="card shadow-sm">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<span><i class="bi bi-briefcase"></i> Despesas de Produtos Profissionais</span>
+				<span id="totalGeralProfissional" class="total-field">Total: R$ 0,00</span>
+			</div>
+
+			<div class="table-responsive table-container">
+				<!-- Barra de inputs fixa (Profissionais) - ESTRUTURA ORIGINAL -->
+				<div class="inputs-bar">
+					<div class="row g-2 align-items-center">
+						<div class="col-12 col-md-3">
+							<input type="text" id="itemProfissional" class="form-control form-control-sm"
+								placeholder="Item">
+						</div>
+						<div class="col-12 col-md-3">
+							<input type="text" id="descricaoProfissional" class="form-control form-control-sm"
+								placeholder="Qnt. Unid.">
+						</div>
+						<div class="col-4 col-md-2">
+							<input type="number" id="qntItemProfissional"
+								class="form-control form-control-sm text-center" min="1" max="999" placeholder="0">
+						</div>
+						<div class="col-5 col-md-2">
+							<input type="text" id="valorUnitarioProfissional" class="form-control form-control-sm"
+								placeholder="Valor (R$)">
+						</div>
+						<div class="col-12 col-md-2">
+							<input type="date" id="vencimentoProfissional" class="form-control form-control-sm"
+								required>
+						</div>
+						<div class="col-3 col-md-2">
+							<button id="btnAdicionarProfissional" class="btn btn-success btn-sm w-100">
+								<i class="bi bi-plus-circle"></i> Adicionar
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Tabela - ESTRUTURA ORIGINAL COMPLETA -->
+				<table class="table table-bordered table-hover align-middle mb-0" id="tabelaDespesasProfissionais">
+					<thead class="text-center">
+						<tr>
+							<th><input type="checkbox" id="selecionarTodosProfissional"></th>
+							<th>Qnt</th>
+							<th class="col-item">Item</th>
+							<th class="col-desc">Qnt. Unid.</th>
+							<th class="col-qnt">Qnt Item</th>
+							<th class="col-valor">Valor Uni R$</th>
+							<th class="col-valor">Valor Total R$</th>
+							<th class="text-center">Vencimento</th>
+							<th>Ações</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+
+			<div class="card-footer">
+				<div class="d-flex justify-content-between align-items-center">
+					<div class="flex-grow-1 d-flex justify-content-center">
+						<ul class="pagination pagination-sm mb-0" id="paginacaoTabelaProfissional"></ul>
+					</div>
+					<div class="d-flex gap-2">
+						<button class="btn btn-danger btn-sm" id="btnExcluirSelecionadosProfissional"><i
+								class="bi bi-trash3"></i> Apagar Selecionados</button>
+						<button class="btn btn-danger btn-sm" id="btnExcluirTudoProfissional"><i
+								class="bi bi-x-circle"></i> Apagar Tudo</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 🧱 CONSTRUÇÃO DO PRODUTO (ORIGINAL) -->
+		<div class="card shadow-sm">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<span><i class="bi bi-hammer"></i> Construção do Produto</span>
+				<span id="totalGeralConstrucao" class="total-field">Total: R$ 0,00</span>
+			</div>
+
+			<div class="table-responsive table-container">
+				<!-- Barra de inputs fixa - ESTRUTURA ORIGINAL -->
+				<div class="inputs-bar">
+					<div class="row g-2 align-items-center">
+						<div class="col-12 col-md-3">
+							<input type="text" id="itemConstrucao" class="form-control form-control-sm"
+								placeholder="Item">
+						</div>
+						<div class="col-12 col-md-3">
+							<input type="text" id="descricaoConstrucao" class="form-control form-control-sm"
+								placeholder="Descrição">
+						</div>
+						<div class="col-4 col-md-2">
+							<input type="number" id="qntItemConstrucao" class="form-control form-control-sm text-center"
+								min="1" max="999" placeholder="0">
+						</div>
+						<div class="col-5 col-md-2">
+							<input type="text" id="valorUnitarioConstrucao" class="form-control form-control-sm"
+								placeholder="Valor (R$)">
+						</div>
+						<div class="col-3 col-md-2">
+							<button id="btnAdicionarConstrucao" class="btn btn-success btn-sm w-100">
+								<i class="bi bi-plus-circle"></i> Adicionar
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<!-- Tabela - ESTRUTURA ORIGINAL COMPLETA -->
+				<table class="table table-bordered table-hover align-middle mb-0" id="tabelaConstrucao">
+					<thead class="text-center">
+						<tr>
+							<th><input type="checkbox" id="selecionarTodosConstrucao"></th>
+							<th>Qnt</th>
+							<th class="col-item">Item</th>
+							<th class="col-desc">Descrição</th>
+							<th class="col-qnt">Qnt Item</th>
+							<th class="col-valor">Valor Uni R$</th>
+							<th class="col-valor">Valor Total R$</th>
+							<th>Ações</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+
+			<div class="card-footer">
+				<div class="d-flex justify-content-between align-items-center">
+					<div class="flex-grow-1 d-flex justify-content-center">
+						<ul class="pagination pagination-sm mb-0" id="paginacaoTabelaConstrucao"></ul>
+					</div>
+					<div class="d-flex gap-2">
+						<button class="btn btn-danger btn-sm" id="btnExcluirSelecionadosConstrucao"><i
+								class="bi bi-trash3"></i> Apagar Selecionados</button>
+						<button class="btn btn-danger btn-sm" id="btnExcluirTudoConstrucao"><i
+								class="bi bi-x-circle"></i> Apagar Tudo</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		
+		<!-- 📦 CONTROLE DE ESTOQUE AUTOMÁTICO -->
+		<div class="card shadow-sm">
+		  <div class="card-header d-flex justify-content-between align-items-center">
+		    <span><i class="bi bi-box-seam"></i> Controle de Estoque</span>
+		    <span id="totalGeralEstoque" class="total-field">Total: R$ 0,00</span>
+		  </div>
+
+		  <div class="table-responsive table-container">
+		    <!-- Barra de inputs fixa -->
+		    <div class="inputs-bar">
+		      <div class="row g-2 align-items-center">
+		        <!-- Selecionar serviço (carrega dos serviços cadastrados) -->
+		        <div class="col-12 col-md-4">
+		          <select id="servicoEstoque" class="form-control form-control-sm">
+		            <option value="">Selecione um serviço...</option>
+		          </select>
+		        </div>
+		        <div class="col-12 col-md-2">
+		          <button id="btnGerarEstoque" class="btn btn-success btn-sm w-100">
+		            <i class="bi bi-calculator"></i> Gerar Cálculo
+		          </button>
+		        </div>
+		      </div>
+		    </div>
+
+		    <!-- Tabela de estoque -->
+		    <table class="table table-bordered table-hover align-middle mb-0" id="tabelaEstoque">
+		      <thead class="text-center">
+		        <tr>
+		          <th>#</th>
+		          <th>Serviço</th>
+		          <th>Item</th>
+		          <th>Qtd. Usada</th>
+		          <th>Valor Uni (R$)</th>
+		          <th>Valor Total (R$)</th>
+		        </tr>
+		      </thead>
+		      <tbody></tbody>
+		    </table>
+		  </div>
+		</div>
+		
+		<!-- 💰 CUSTO POR SERVIÇO — Destaque (último cálculo) + Histórico -->
+		<div class="card shadow-sm">
+		  <div class="card-header d-flex justify-content-between align-items-center">
+		    <span><i class="bi bi-clipboard-data"></i> Custo por Serviço</span>
+		    <span id="cpsTotalLucroAcumulado" class="total-field">Total Lucro: R$ 0,00</span>
+		  </div>
+
+		  <!-- Destaque do último cálculo -->
+		  <div class="inputs-bar">
+		    <div class="row g-2">
+		      <div class="col-12 col-md-3">
+		        <input type="text" id="cpsDestaqueServico" class="form-control form-control-sm" placeholder="Serviço" readonly>
+		      </div>
+		      <div class="col-4 col-md-2">
+		        <input type="text" id="cpsDestaqueVenda" class="form-control form-control-sm text-end" placeholder="Venda (R$)" readonly>
+		      </div>
+		      <div class="col-4 col-md-2">
+		        <input type="text" id="cpsDestaqueCusto" class="form-control form-control-sm text-end" placeholder="Custo (R$)" readonly>
+		      </div>
+		      <div class="col-4 col-md-2">
+		        <input type="text" id="cpsDestaqueLucro" class="form-control form-control-sm text-end" placeholder="Lucro (R$)" readonly>
+		      </div>
+		      <div class="col-12 col-md-3">
+		        <input type="text" id="cpsDestaqueData" class="form-control form-control-sm text-end" placeholder="Data" readonly>
+		      </div>
+		    </div>
+		  </div>
+
+		  <!-- Histórico (banco de dados dos cálculos) -->
+		  <div class="table-responsive table-container">
+		    <table class="table table-bordered table-hover align-middle mb-0" id="tabelaCustoServico">
+		      <thead class="text-center">
+		        <tr>
+		          <th>#</th>
+		          <th>Serviço</th>
+		          <th>Venda (R$)</th>
+		          <th>Custo (R$)</th>
+		          <th>Lucro (R$)</th>
+		          <th>Data</th>
+		          <th>Ações</th>
+		        </tr>
+		      </thead>
+		      <tbody></tbody>
+		    </table>
+		  </div>
+
+		  <div class="card-footer">
+		    <div class="d-flex justify-content-between align-items-center">
+		      <div class="flex-grow-1 d-flex justify-content-center">
+		        <ul class="pagination pagination-sm mb-0" id="paginacaoCustoServico"></ul>
+		      </div>
+		      <div class="d-flex gap-2">
+		        <button class="btn btn-danger btn-sm" id="btnCpsExcluirSelecionados">
+		          <i class="bi bi-trash3"></i> Apagar Selecionados
+		        </button>
+		        <button class="btn btn-danger btn-sm" id="btnCpsExcluirTudo">
+		          <i class="bi bi-x-circle"></i> Apagar Tudo
+		        </button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+		
+		<!-- 💰 TABELA DE SERVIÇOS E VALORES -->
+			<div class="card shadow-sm">
+			  <div class="card-header d-flex justify-content-between align-items-center">
+			    <span><i class="bi bi-clipboard-check"></i> Serviços e Valores por Agendamento</span>
+			    <span id="totalServicos" class="total-field">Total: R$ 0,00</span>
+			  </div>
+
+			  <div class="table-responsive table-container">
+			    <div class="inputs-bar">
+			      <div class="row g-2 align-items-center">
+			        <div class="col-12 col-md-5">
+			         <input type="text" id="nomeServico" class="form-control form-control-sm" placeholder="Nome do Serviço" maxlength="60" required>
+			        </div>
+			        <div class="col-6 col-md-3">
+			          <input type="text" id="valorServico" class="form-control form-control-sm" placeholder="Valor (R$)" required>
+			        </div>
+			        <div class="col-6 col-md-2">
+			          <button id="btnAdicionarServico" class="btn btn-success btn-sm w-100">
+			            <i class="bi bi-plus-circle"></i> Adicionar
+			          </button>
+			        </div>
+			      </div>
+			    </div>
+
+			    <table class="table table-bordered table-hover align-middle mb-0" id="tabelaServicos">
+			      <thead class="text-center">
+			        <tr>
+			          <th><input type="checkbox" id="selecionarTodosServicos"></th>
+			          <th></th>
+			          <th>Serviço</th>
+			          <th>Valor (R$)</th>
+			          <th>Ações</th>
+			        </tr>
+			      </thead>
+			      <tbody></tbody>
+			    </table>
+			  </div>
+
+			  <div class="card-footer">
+			    <div class="d-flex justify-content-between align-items-center">
+			      <div class="flex-grow-1 d-flex justify-content-center">
+			        <ul class="pagination pagination-sm mb-0" id="paginacaoServicos"></ul>
+			      </div>
+			      <div class="d-flex gap-2">
+			        <button class="btn btn-danger btn-sm" id="btnExcluirSelecionadosServicos">
+			          <i class="bi bi-trash3"></i> Apagar Selecionados
+			        </button>
+			        <button class="btn btn-danger btn-sm" id="btnExcluirTudoServicos">
+			          <i class="bi bi-x-circle"></i> Apagar Tudo
+			        </button>
+			      </div>
+			    </div>
+			  </div>
+			</div>
+		
+	</div>
+
+	
+
+	
+	
+	<!-- ========================================================= -->
+	<!-- ✅ SCRIPTS ORGANIZADOS E OTIMIZADOS — AGENDAMENTO DESPESA -->
+	<!-- ========================================================= -->
+
+	<!-- 🔁 Observador do localStorage para reagir a mudanças globais -->
+	<script>
+	(function () {
+	  const _setItem = localStorage.setItem;
+	  localStorage.setItem = function (key, value) {
+	    _setItem.call(this, key, value);
+	    try { window.dispatchEvent(new CustomEvent('lschange', { detail: { key } })); } catch (_) {}
+	  };
+	})();
+	</script>
+
+	<!-- 💵 Utilitários de moeda (únicos e compartilhados por todas as tabelas) -->
+	<script>
+	function formatarMoeda(valor) {
+	  if (!valor) return '';
+	  valor = valor.toString().replace(/\D/g, '');
+	  valor = (valor / 100).toFixed(2) + '';
+	  valor = valor.replace('.', ',').replace(/(\d)(\d{3})(\d{3}),/g, '$1.$2.$3,').replace(/(\d)(\d{3}),/g, '$1.$2,');
+	  return 'R$ ' + valor;
+	}
+	function parseMoeda(valor) {
+	  if (!valor) return 0;
+	  return parseFloat(valor.toString().replace('R$ ', '').replace(/\./g, '').replace(',', '.')) || 0;
+	}
+	</script>
+
+	<!-- ========================================================= -->
+	<!-- 🧰 Função genérica de CRUD para tabelas de despesas       -->
+	<!--  - Suporta paginação, edição, exclusão, seleção múltipla  -->
+	<!--  - Suporta coluna de vencimento (opcional)                -->
+	<!-- ========================================================= -->
+	<!-- ========================================================= -->
+	<!-- ✅ SCRIPT COMPLETO DE INTEGRAÇÃO BACKEND + FRONT-END      -->
+	<!-- ========================================================= -->
+	<script>
+	function inicializarTabela(config) {
+	  const {
+	    tabelaId, totalId,
+	    itemId, descId, qntId, valorId, vencId = null,
+	    btnAddId, pagId, btnExcAllId, btnExcSelId, chkAllId,
+	    storageKey, temVencimento = false
+	  } = config;
+
+	  const $tbody = document.querySelector(`#${tabelaId} tbody`);
+	  const $total = document.getElementById(totalId);
+	  const $item  = document.getElementById(itemId);
+	  const $desc  = document.getElementById(descId);
+	  const $qnt   = document.getElementById(qntId);
+	  const $valor = document.getElementById(valorId);
+	  const $venc  = vencId ? document.getElementById(vencId) : null;
+
+	  const $btnAdd   = document.getElementById(btnAddId);
+	  const $pag      = document.getElementById(pagId);
+	  const $btnExcAll= document.getElementById(btnExcAllId);
+	  const $btnExcSel= document.getElementById(btnExcSelId);
+	  const $chkAll   = document.getElementById(chkAllId);
+
+	  let lista = JSON.parse(localStorage.getItem(storageKey) || '[]');
+	  let idEdit = null;
+	  let pagAtual = 1;
+	  const itensPag = 20;
+
+	  // ============================================================
+	  // 🔹 Renderização de tabela e paginação
+	  // ============================================================
+	  function render() {
+	    if (!$tbody) return;
+	    $tbody.innerHTML = '';
+	    let tot = 0;
+	    const ini = (pagAtual - 1) * itensPag;
+	    const fim = ini + itensPag;
+	    const page = lista.slice(ini, fim);
+
+	    page.forEach((d, i) => {
+	      tot += d.valorTotal || 0;
+	      const tr = document.createElement('tr');
+	      tr.innerHTML = `
+	        <td class="text-center"><input type="checkbox" class="chkItem" data-id="${d.id}"></td>
+	        <td class="text-center">${ini + i + 1}</td>
+	        <td>${d.item}</td>
+	        <td>${d.descricao || ''}</td>
+	        <td class="text-center">${d.qnt}</td>
+	        <td class="text-end">${formatarMoeda((d.valorUnitario || 0).toFixed(2))}</td>
+	        <td class="text-end">${formatarMoeda((d.valorTotal || 0).toFixed(2))}</td>
+	        ${temVencimento ? `<td class="text-center">${d.vencimento || '-'}</td>` : ''}
+	        <td class="text-center">
+	          <button class="btn btn-warning btn-sm me-1" onclick="editar_${storageKey}(${d.id})"><i class="bi bi-pencil"></i></button>
+	          <button class="btn btn-danger btn-sm" onclick="excluir_${storageKey}(${d.id})"><i class="bi bi-trash"></i></button>
+	        </td>`;
+	      $tbody.appendChild(tr);
+	    });
+
+	    if ($total) $total.textContent = `Total: ${formatarMoeda(tot.toFixed(2))}`;
+	    renderPaginacao();
+	    if (typeof atualizarTotalGeral === 'function') atualizarTotalGeral();
+	  }
+
+	  function renderPaginacao() {
+	    if (!$pag) return;
+	    $pag.innerHTML = '';
+	    const tot = Math.ceil(lista.length / itensPag) || 1;
+	    for (let i = 1; i <= tot; i++) {
+	      $pag.insertAdjacentHTML('beforeend', `
+	        <li class="page-item ${i === pagAtual ? 'active' : ''}">
+	          <button class="page-link" onclick="mudarPag_${storageKey}(${i})">${i}</button>
+	        </li>`);
+	    }
+	  }
+
+	  window[`mudarPag_${storageKey}`] = (p) => { pagAtual = p; render(); };
+	  window[`editar_${storageKey}`] = (id) => {
+	    const d = lista.find(x => x.id === id);
+	    if (!d) return;
+	    if ($item)  $item.value  = d.item;
+	    if ($desc)  $desc.value  = d.descricao || '';
+	    if ($qnt)   $qnt.value   = d.qnt;
+	    if ($valor) $valor.value = formatarMoeda((d.valorUnitario || 0).toFixed(2));
+	    if (temVencimento && $venc) $venc.value = d.vencimento ? d.vencimento.split('/').reverse().join('-') : '';
+	    idEdit = id;
+	  };
+	  window[`excluir_${storageKey}`] = (id) => {
+	    lista = lista.filter(x => x.id !== id);
+	    localStorage.setItem(storageKey, JSON.stringify(lista));
+	    render();
+	  };
+
+	  // ============================================================
+	  // 🔹 Seleção múltipla / Exclusão
+	  // ============================================================
+	  $chkAll?.addEventListener('change', (e) => {
+	    $tbody.querySelectorAll('.chkItem').forEach(chk => chk.checked = e.target.checked);
+	  });
+	  $btnExcSel?.addEventListener('click', () => {
+	    const sel = [...$tbody.querySelectorAll('.chkItem:checked')].map(c => +c.dataset.id);
+	    if (!sel.length) return alert('Nenhum item selecionado.');
+	    if (!confirm('Excluir selecionados?')) return;
+	    lista = lista.filter(x => !sel.includes(x.id));
+	    localStorage.setItem(storageKey, JSON.stringify(lista));
+	    render();
+	  });
+	  $btnExcAll?.addEventListener('click', () => {
+	    if (!confirm('Apagar todos os itens?')) return;
+	    lista = [];
+	    localStorage.removeItem(storageKey);
+	    render();
+	  });
+
+	  // ============================================================
+	  // 🔹 Máscara de moeda
+	  // ============================================================
+	  $valor?.addEventListener('input', e => e.target.value = formatarMoeda(e.target.value));
+
+	  // ------------------------------------------------------------
+	  // 🔎 Extrai o primeiro número (inteiro ou decimal ,/. ) da descrição
+	  //    Exemplos aceitos: "500", "500 ml", "1 cx (20)", "0,5 L", "300.000 mg"
+	  // ------------------------------------------------------------
+	  function extrairNumeroDaDescricao(txt) {
+	    if (!txt) return 0;
+	    const m = txt.toString().match(/(\d+(?:[.,]\d+)?)/);
+	    if (!m) return 0;
+	    return parseFloat(m[1].replace('.', '').replace(',', '.')) || 0;
+	  }
+
+	  
+	  // ============================================================
+	  // 🔹 Adicionar / Atualizar + Envio ao Backend
+	  // ============================================================
+	  $btnAdd?.addEventListener('click', async () => {
+	    const itemVal = ($item?.value || '').trim();
+	    const descVal = ($desc?.value || '').trim();
+	    const qntVal  = parseInt($qnt?.value || '0', 10);
+		let vu = parseMoeda($valor?.value || '');
+		let vt;
+
+		// ⚠️ Regra especial SOMENTE para "despesasProfissionais":
+		// - O input de "valor" passa a ser interpretado como VALOR TOTAL.
+		// - O VALOR UNITÁRIO será calculado: total / número extraído da descrição.
+		if (storageKey === 'despesasProfissionais') {
+		  const numeroDesc = extrairNumeroDaDescricao($desc?.value || '');
+		  const totalInformado = parseMoeda($valor?.value || '');
+
+		  if (numeroDesc <= 0 || totalInformado <= 0) {
+		    alert('Informe um número válido na Descrição e um Valor Total maior que zero.');
+		    return;
+		  }
+
+		  vu = totalInformado / numeroDesc; // valor unitário calculado
+		  vt = totalInformado;              // valor total é o que o usuário digitou
+
+		  // (opcional) Se quiser já mostrar o unitário no input antes de salvar:
+		  // $valor.value = formatarMoeda(vu.toFixed(2));
+		} else {
+		  // Demais tabelas mantêm a lógica original: total = quantidade * valor unitário digitado
+		  vt = qntVal * vu;
+		}
+
+	    if (!itemVal || !qntVal || qntVal <= 0 || vu <= 0) return;
+
+	    let vencBr = null;
+	    if (temVencimento) {
+	      const vencISO = $venc?.value || '';
+	      if (!vencISO) return alert('Informe a data de vencimento!');
+	      const hoje = new Date().toISOString().slice(0,10);
+	      if (vencISO < hoje) return alert('⚠️ A data de vencimento não pode ser anterior à data atual.');
+	      vencBr = vencISO.split('-').reverse().join('/');
+	    }
+
+	    const novo = {
+	      id: idEdit || Date.now(),
+	      item: itemVal,
+	      descricao: descVal,
+	      qnt: qntVal,
+	      valorUnitario: vu,
+	      valorTotal: vt,
+	      ...(temVencimento ? { vencimento: vencBr } : {})
+	    };
+
+	    if (idEdit) {
+	      const idx = lista.findIndex(x => x.id === idEdit);
+	      if (idx >= 0) lista[idx] = novo;
+	      idEdit = null;
+	    } else {
+	      lista.push(novo);
+	    }
+
+	    localStorage.setItem(storageKey, JSON.stringify(lista));
+	    if ($item)  $item.value  = '';
+	    if ($desc)  $desc.value  = '';
+	    if ($qnt)   $qnt.value   = '';
+	    if ($valor) $valor.value = '';
+	    if ($venc)  $venc.value  = '';
+	    render();
+
+	    // 🔗 Determina o tipo de despesa com base na tabela
+	    let tipoDespesa = "";
+	    switch (storageKey) {
+	      case "despesas": tipoDespesa = "mensal"; break;
+	      case "despesasAnuais": tipoDespesa = "anual"; break;
+	      case "despesasProfissionais": tipoDespesa = "profissional"; break;
+	      case "construcaoProduto": tipoDespesa = "construcao"; break;
+	      default: tipoDespesa = "";
+	    }
+
+	    if (tipoDespesa) {
+	      try {
+	        const lojaId = localStorage.getItem("lojaId");
+	        if (!lojaId) {
+	          console.warn("⚠️ Nenhuma loja logada. Salvando apenas localmente.");
+	          return;
+	        }
+
+	        const payload = {
+	          tipoDespesa,
+	          item: itemVal,
+	          descricao: descVal,
+	          quantidade: qntVal,
+	          valorUnitario: vu,
+	          valorTotal: vt,
+	          ...(temVencimento ? { vencimento: vencBr } : {}),
+	          loja: { id: lojaId }
+	        };
+
+	        const resp = await fetch(window.location.origin + `/app_agendamento/api/agendamento-despesa/${tipoDespesa}`, {
+	          method: "POST",
+	          headers: { "Content-Type": "application/json" },
+	          body: JSON.stringify(payload)
+	        });
+
+	        if (!resp.ok) {
+	          console.error(`❌ Erro ao salvar despesa ${tipoDespesa}:`, resp.status, await resp.text());
+	        } else {
+	          console.log(`✅ Despesa ${tipoDespesa} salva e sincronizada!`);
+	        }
+	      } catch (err) {
+	        console.error(`🚨 Erro no envio da despesa ${tipoDespesa}:`, err);
+	      }
+	    }
+	  });
+
+	  // ============================================================
+	  // 🔄 Carregamento inicial dos dados do banco (GET)
+	  // ============================================================
+	  (async function preloadDados() {
+	    let tipoDespesa = "";
+	    switch (storageKey) {
+	      case "despesas": tipoDespesa = "mensal"; break;
+	      case "despesasAnuais": tipoDespesa = "anual"; break;
+	      case "despesasProfissionais": tipoDespesa = "profissional"; break;
+	      case "construcaoProduto": tipoDespesa = "construcao"; break;
+	      default: tipoDespesa = "";
+	    }
+
+	    if (!tipoDespesa) {
+	      render();
+	      return;
+	    }
+
+	    try {
+	      const lojaId = localStorage.getItem("lojaId");
+	      if (!lojaId) {
+	        console.warn("⚠️ Nenhuma loja logada. Carregando apenas do localStorage.");
+	        render();
+	        return;
+	      }
+
+	      const resp = await fetch(window.location.origin + `/app_agendamento/api/agendamento-despesa/${tipoDespesa}/${lojaId}`);
+	      if (resp.ok) {
+	        const dados = await resp.json();
+	        lista = (dados || []).map(d => ({
+	          id: d.id,
+	          item: d.item,
+	          descricao: d.descricao,
+	          qnt: d.quantidade,
+	          valorUnitario: d.valorUnitario,
+	          valorTotal: d.valorTotal,
+	          ...(d.vencimento ? { vencimento: d.vencimento } : {})
+	        }));
+	        localStorage.setItem(storageKey, JSON.stringify(lista));
+	      } else {
+	        console.error(`❌ Falha ao carregar ${tipoDespesa}:`, resp.status, await resp.text());
+	      }
+	    } catch (e) {
+	      console.error(`🚨 Erro ao carregar ${tipoDespesa}:`, e);
+	    }
+	    render();
+	  })();
+	}
+	</script>
+
+
+
+
+	<!-- ========================================================= -->
+	<!-- 🧾 Tabela específica: Serviços e Valores por Agendamento  -->
+	<!--  - Estrutura mais simples (nome + valor)                  -->
+	<!--  - Key: servicosAgendamento                               -->
+	<!-- ========================================================= -->
+	<script>
+	(function initServicos() {
+		
+		
+
+	  const $tbody = document.querySelector('#tabelaServicos tbody');
+	  const $total = document.getElementById('totalServicos');
+	  const $nome  = document.getElementById('nomeServico');
+	  const $valor = document.getElementById('valorServico');
+
+	  const $btnAdd    = document.getElementById('btnAdicionarServico');
+	  const $chkAll    = document.getElementById('selecionarTodosServicos');
+	  const $btnExcAll = document.getElementById('btnExcluirTudoServicos');
+	  const $btnExcSel = document.getElementById('btnExcluirSelecionadosServicos');
+	  const $pag       = document.getElementById('paginacaoServicos');
+
+	  let lista = JSON.parse(localStorage.getItem('servicosAgendamento') || '[]');
+	  let idEdit = null;
+	  let pagAtual = 1;
+	  const itensPag = 15;
+
+	  // ===============================================================
+	  // 🔹 RENDERIZAÇÃO DA TABELA
+	  // ===============================================================
+	  function render() {
+	    if (!$tbody) return;
+	    $tbody.innerHTML = '';
+	    let tot = 0;
+	    const ini = (pagAtual - 1) * itensPag;
+	    const fim = ini + itensPag;
+	    const page = lista.slice(ini, fim);
+
+	    page.forEach((s, i) => {
+	      tot += s.valor || 0;
+	      const tr = document.createElement('tr');
+	      tr.innerHTML = `
+	        <td class="text-center"><input type="checkbox" class="chkItemS" data-id="${s.id}"></td>
+	        <td class="text-center">${ini + i + 1}</td>
+	        <td>${s.nome}</td>
+	        <td class="text-end">${formatarMoeda((s.valor || 0).toFixed(2))}</td>
+	        <td class="text-center">
+	          <button class="btn btn-warning btn-sm me-1" onclick="editar_servico(${s.id})"><i class="bi bi-pencil"></i></button>
+	          <button class="btn btn-danger btn-sm" onclick="excluir_servico(${s.id})"><i class="bi bi-trash"></i></button>
+	        </td>`;
+	      $tbody.appendChild(tr);
+	    });
+
+	    if ($total) $total.textContent = `Total: ${formatarMoeda(tot.toFixed(2))}`;
+	    renderPag();
+	  }
+
+	  function renderPag() {
+	    if (!$pag) return;
+	    $pag.innerHTML = '';
+	    const tot = Math.ceil(lista.length / itensPag) || 1;
+	    for (let i = 1; i <= tot; i++) {
+	      $pag.insertAdjacentHTML('beforeend', `
+	        <li class="page-item ${i === pagAtual ? 'active' : ''}">
+	          <button class="page-link" onclick="mudarPag_servicos(${i})">${i}</button>
+	        </li>`);
+	    }
+	  }
+
+	  window.mudarPag_servicos = (p) => { pagAtual = p; render(); };
+	  window.editar_servico = (id) => {
+	    const s = lista.find(x => x.id === id);
+	    if (!s) return;
+	    if ($nome)  $nome.value = s.nome;
+	    if ($valor) $valor.value = formatarMoeda((s.valor || 0).toFixed(2));
+	    idEdit = id;
+	  };
+	  window.excluir_servico = (id) => {
+	    lista = lista.filter(x => x.id !== id);
+	    localStorage.setItem('servicosAgendamento', JSON.stringify(lista));
+	    render();
+	  };
+
+	  $chkAll?.addEventListener('change', (e) => {
+	    $tbody.querySelectorAll('.chkItemS').forEach(chk => chk.checked = e.target.checked);
+	  });
+
+	  $btnExcSel?.addEventListener('click', () => {
+	    const sel = [...$tbody.querySelectorAll('.chkItemS:checked')].map(c => +c.dataset.id);
+	    if (!sel.length) return alert('Nenhum item selecionado.');
+	    lista = lista.filter(x => !sel.includes(x.id));
+	    localStorage.setItem('servicosAgendamento', JSON.stringify(lista));
+	    render();
+	  });
+
+	  $btnExcAll?.addEventListener('click', () => {
+	    if (!confirm('Apagar todos os serviços?')) return;
+	    lista = [];
+	    localStorage.removeItem('servicosAgendamento');
+	    render();
+	  });
+
+	  $valor?.addEventListener('input', e => e.target.value = formatarMoeda(e.target.value));
+
+	  // ===============================================================
+	  // 🔹 ADIÇÃO DE SERVIÇO + ENVIO AO BACKEND
+	  // ===============================================================
+	  $btnAdd?.addEventListener('click', async () => {
+	    const nome  = ($nome?.value || '').trim();
+	    const valor = parseMoeda($valor?.value || '');
+	    if (!nome || valor <= 0) return alert('Preencha corretamente o serviço e o valor.');
+
+	    const novo = { id: idEdit || Date.now(), nome, valor };
+	    if (idEdit) {
+	      const idx = lista.findIndex(x => x.id === idEdit);
+	      if (idx >= 0) lista[idx] = novo;
+	      idEdit = null;
+	    } else {
+	      lista.push(novo);
+	    }
+
+	    localStorage.setItem('servicosAgendamento', JSON.stringify(lista));
+	    if ($nome)  $nome.value = '';
+	    if ($valor) $valor.value = '';
+	    render();
+
+	    // 🔗 Envio ao backend (corrigido e funcional)
+	    try {
+	      const lojaId = localStorage.getItem("lojaId");
+	      if (!lojaId) {
+	        console.warn("⚠️ Nenhuma loja logada. O serviço será salvo apenas localmente.");
+	        return;
+	      }
+
+	      const payload = {
+	        tipoDespesa: 'servico',
+	        nomeTabela: 'servicosAgendamento',
+	        servico: nome,
+	        valor: valor,
+	        item: nome,
+	        descricao: 'Serviço cadastrado no painel',
+	        quantidade: 1,
+	        valorUnitario: valor,
+	        valorTotal: valor,
+	        loja: { id: lojaId }
+	      };
+
+		  const resp = await fetch(window.location.origin + '/app_agendamento/api/agendamento-despesa/servico', {
+	        method: 'POST',
+	        headers: { 'Content-Type': 'application/json' },
+	        body: JSON.stringify(payload)
+	      });
+
+		  if (resp.ok) {
+		    const salvo = await resp.json();
+		    // atualiza o id do item recém-adicionado
+		    const idx = lista.findIndex(x => x.id === novo.id);
+		    if (idx >= 0 && salvo?.id) {
+		      lista[idx].id = salvo.id;
+		      localStorage.setItem('servicosAgendamento', JSON.stringify(lista));
+		    }
+		    console.log("✅ Serviço salvo no banco com sucesso!");
+		  }
+
+	    } catch (err) {
+	      console.error("🚨 Erro ao enviar serviço:", err);
+	    }
+	  });
+
+	  // ===============================================================
+	  // 🔹 CARREGAR SERVIÇOS EXISTENTES DO BACKEND
+	  // ===============================================================
+	  async function carregarServicosBackend() {
+	    const lojaId = localStorage.getItem("lojaId");
+	    if (!lojaId) {
+	      console.warn("⚠️ Nenhuma loja logada. Não foi possível buscar serviços do banco.");
+	      return;
+	    }
+
+	    try {
+			const resp = await fetch(window.location.origin + `/app_agendamento/api/agendamento-despesa/servico/${lojaId}`);
+	      if (!resp.ok) throw new Error("Erro ao buscar serviços do backend.");
+
+	      const servicos = await resp.json();
+	      console.log("📦 Serviços carregados do banco:", servicos);
+
+	      lista = servicos.map(s => ({
+	        id: s.id,
+	        nome: s.servico || s.item || "Serviço sem nome",
+	        valor: s.valor || s.valorUnitario || 0
+	      }));
+
+		  
+	      render();
+	    } catch (erro) {
+	      console.error("🚨 Erro ao carregar serviços do backend:", erro);
+	    }
+	  }
+
+	  // ===============================================================
+	  // 🔹 INICIALIZAÇÃO AO CARREGAR A PÁGINA
+	  // ===============================================================
+	  document.addEventListener('DOMContentLoaded', async () => {
+	    await carregarServicosBackend(); // busca do banco
+	    render(); // exibe a tabela
+	  });
+	})();
+	</script>
+
+
+
+	<!-- ========================================================= -->
+	<!-- 📊 Totais gerais + Card de Vencimentos                    -->
+	<!-- ========================================================= -->
+	<script>
+	function atualizarTotalGeral() {
+	  const d = JSON.parse(localStorage.getItem('despesas') || '[]');
+	  const a = JSON.parse(localStorage.getItem('despesasAnuais') || '[]');
+	  const p = JSON.parse(localStorage.getItem('despesasProfissionais') || '[]');
+	  const c = JSON.parse(localStorage.getItem('construcaoProduto') || '[]');
+
+	  const totalMensal = d.reduce((s, i) => s + (i.valorTotal || 0), 0);
+	  const totalAnual  = a.reduce((s, i) => s + (i.valorTotal || 0), 0);
+	  const totalProf   = p.reduce((s, i) => s + (i.valorTotal || 0), 0);
+	  const totalConst  = c.reduce((s, i) => s + (i.valorTotal || 0), 0);
+
+	  const totalGeral = totalMensal + totalAnual + totalProf + totalConst;
+
+	  const $geral = document.getElementById('valorTotalDespesas');
+	  const $anual = document.getElementById('valorTotalDespesasAnual');
+	  const $mensal= document.getElementById('totalMensalResumo');
+
+	  if ($geral) $geral.textContent = formatarMoeda(totalGeral.toFixed(2));
+	  if ($anual) $anual.textContent = formatarMoeda(totalAnual.toFixed(2));
+	  if ($mensal) $mensal.textContent = formatarMoeda(totalMensal.toFixed(2));
+	}
+
+	function atualizarCardVencimentos() {
+	  const arr = JSON.parse(localStorage.getItem('despesasProfissionais') || '[]');
+	  const hojeISO = new Date().toISOString().slice(0, 10);
+	  const futuras = arr
+	    .map(d => ({ ...d, dataISO: d?.vencimento ? d.vencimento.split('/').reverse().join('-') : null }))
+	    .filter(d => d.dataISO && d.dataISO >= hojeISO)
+	    .sort((a, b) => a.dataISO.localeCompare(b.dataISO));
+
+	  const $data = document.getElementById('dataMaisProxima');
+	  const $qtd  = document.getElementById('qtdItensVencimento');
+
+	  if (!futuras.length) {
+	    if ($data) $data.textContent = '—';
+	    if ($qtd)  $qtd.textContent  = '0 itens';
+	    return;
+	  }
+
+	  const proxISO = futuras[0].dataISO;
+	  const qtd = futuras.filter(x => x.dataISO === proxISO).length;
+
+	  if ($data) $data.textContent = proxISO.split('-').reverse().join('/');
+	  if ($qtd)  $qtd.textContent  = `${qtd} ${qtd > 1 ? 'itens' : 'item'}`;
+	}
+
+	window.addEventListener('lschange', (e) => {
+	  if (['despesas', 'despesasAnuais', 'despesasProfissionais', 'construcaoProduto'].includes(e.detail.key)) {
+	    atualizarTotalGeral();
+	  }
+	  if (e.detail.key === 'despesasProfissionais') {
+	    atualizarCardVencimentos();
+	  }
+	});
+
+	document.addEventListener('DOMContentLoaded', () => {
+	  atualizarTotalGeral();
+	  atualizarCardVencimentos();
+	});
+	</script>
+
+	<!-- ========================================================= -->
+	<!-- 🖨️ PDF (estilo Office, sem checkboxes/ações)              -->
+	<!-- ========================================================= -->
+	<script>
+	document.getElementById('btnGerarPDF')?.addEventListener('click', () => {
+	  const el = document.createElement('div');
+
+	  const cabecalho = `
+	    <div style="text-align:center; margin-bottom:12px;">
+	      <h2 style="color:#0d6efd; margin:0;">Controle Financeiro</h2>
+	      <p style="font-size:13px; color:#333; margin:0;">Relatório de Despesas Mensais e Anuais</p>
+	    </div>
+	    <hr style="margin:8px 0;">
+	  `;
+
+	  function limparTabela(id) {
+	    const clone = document.getElementById(id).cloneNode(true);
+	    clone.querySelectorAll('th:first-child, th:last-child, td:first-child, td:last-child').forEach(e => e.remove());
+	    clone.style.width = '95%';
+	    clone.style.margin = '0 auto';
+	    clone.style.borderCollapse = 'collapse';
+	    clone.querySelectorAll('th, td').forEach(td => {
+	      td.style.border = '1px solid #000';
+	      td.style.padding = '4px 6px';
+	      td.style.fontSize = '10.5px';
+	      td.style.whiteSpace = 'normal';
+	      td.style.wordWrap = 'break-word';
+	    });
+	    clone.querySelectorAll('th').forEach(th => {
+	      th.style.backgroundColor = '#f0f0f0';
+	      th.style.fontWeight = 'bold';
+	      th.style.textAlign = 'center';
+	    });
+	    return clone.outerHTML;
+	  }
+
+	  const tabelaMensal = limparTabela('tabelaDespesas');
+	  const totalMensal  = document.getElementById('totalGeral')?.outerText || '';
+	  const tabelaAnual  = limparTabela('tabelaDespesasAnuais');
+	  const totalAnual   = document.getElementById('totalGeralAnual')?.outerText || '';
+
+	  el.innerHTML = `
+	    ${cabecalho}
+	    <div style="padding: 0 20px;">
+	      <h4 style="color:#0d6efd; margin-top:10px;">Controle de Despesas</h4>
+	      ${tabelaMensal}
+	      <div style="text-align:right; margin:6px 12px 20px 0;">
+	        <span style="font-weight:bold; font-size:11px;">${totalMensal}</span>
+	      </div>
+
+	      <h4 style="color:#0d6efd; margin-top:10px;">Despesas Anuais</h4>
+	      ${tabelaAnual}
+	      <div style="text-align:right; margin:6px 12px 0 0;">
+	        <span style="font-weight:bold; font-size:11px;">${totalAnual}</span>
+	      </div>
+	    </div>
+	  `;
+
+	  html2pdf().set({
+	    margin: [10, 12, 10, 12],
+	    filename: 'relatorio_despesas.pdf',
+	    html2canvas: { scale: 1.3, useCORS: true, scrollX: 0, scrollY: 0, letterRendering: true },
+	    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+	  }).from(el).save();
+	});
+	</script>
+
+	<!-- ========================================================= -->
+	<!-- 🚀 Inicialização das tabelas com a função genérica        -->
+	<!-- ========================================================= -->
+	<script>
+	document.addEventListener('DOMContentLoaded', () => {
+	  // Mensal
+	  inicializarTabela({
+	    tabelaId:'tabelaDespesas', totalId:'totalGeral',
+	    itemId:'item', descId:'descricao', qntId:'qntItem', valorId:'valorUnitario',
+	    btnAddId:'btnAdicionar', pagId:'paginacaoTabela',
+	    btnExcAllId:'btnExcluirTudo', btnExcSelId:'btnExcluirSelecionados', chkAllId:'selecionarTodos',
+	    storageKey:'despesas'
+	  });
+
+	  // Anual
+	  inicializarTabela({
+	    tabelaId:'tabelaDespesasAnuais', totalId:'totalGeralAnual',
+	    itemId:'itemAnual', descId:'descricaoAnual', qntId:'qntItemAnual', valorId:'valorUnitarioAnual',
+	    btnAddId:'btnAdicionarAnual', pagId:'paginacaoTabelaAnual',
+	    btnExcAllId:'btnExcluirTudoAnual', btnExcSelId:'btnExcluirSelecionadosAnual', chkAllId:'selecionarTodosAnual',
+	    storageKey:'despesasAnuais'
+	  });
+
+	  // Profissionais (com vencimento)
+	  inicializarTabela({
+	    tabelaId:'tabelaDespesasProfissionais', totalId:'totalGeralProfissional',
+	    itemId:'itemProfissional', descId:'descricaoProfissional', qntId:'qntItemProfissional', valorId:'valorUnitarioProfissional',
+	    vencId:'vencimentoProfissional', temVencimento:true,
+	    btnAddId:'btnAdicionarProfissional', pagId:'paginacaoTabelaProfissional',
+	    btnExcAllId:'btnExcluirTudoProfissional', btnExcSelId:'btnExcluirSelecionadosProfissional', chkAllId:'selecionarTodosProfissional',
+	    storageKey:'despesasProfissionais'
+	  });
+
+	  // Construção
+	  inicializarTabela({
+	    tabelaId:'tabelaConstrucao', totalId:'totalGeralConstrucao',
+	    itemId:'itemConstrucao', descId:'descricaoConstrucao', qntId:'qntItemConstrucao', valorId:'valorUnitarioConstrucao',
+	    btnAddId:'btnAdicionarConstrucao', pagId:'paginacaoTabelaConstrucao',
+	    btnExcAllId:'btnExcluirTudoConstrucao', btnExcSelId:'btnExcluirSelecionadosConstrucao', chkAllId:'selecionarTodosConstrucao',
+	    storageKey:'construcaoProduto'
+	  });
+	});
+	
+	</script>
+
+	<script>
+	document.addEventListener("DOMContentLoaded", () => {
+	  const $servicoEstoque = document.getElementById("servicoEstoque");
+	  const $tabelaEstoque = document.querySelector("#tabelaEstoque tbody");
+	  const $totalGeralEstoque = document.getElementById("totalGeralEstoque");
+	  const $btnGerar = document.getElementById("btnGerarEstoque");
+
+	  // 1️⃣ Carregar opções de serviços existentes
+	  const servicos = JSON.parse(localStorage.getItem("servicosAgendamento") || "[]");
+	  servicos.forEach(s => {
+	    const opt = document.createElement("option");
+	    opt.value = s.nome;
+	    opt.textContent = `${s.nome} — ${formatarMoeda(s.valor)}`;
+	    $servicoEstoque.appendChild(opt);
+	  });
+
+	  // 2️⃣ Quando clicar em Gerar, monta o cálculo automático
+	  $btnGerar.addEventListener("click", () => {
+	    const servicoSelecionado = $servicoEstoque.value;
+	    if (!servicoSelecionado) {
+	      alert("Selecione um serviço para gerar o cálculo!");
+	      return;
+	    }
+
+	    const construcao = JSON.parse(localStorage.getItem("construcaoProduto") || "[]");
+	    const profissionais = JSON.parse(localStorage.getItem("despesasProfissionais") || "[]");
+
+	    // Filtrar itens da construção que pertencem ao serviço escolhido
+	    const itensDoProduto = construcao.filter(i =>
+	      i.item.toLowerCase().includes(servicoSelecionado.toLowerCase())
+	    );
+
+	    if (itensDoProduto.length === 0) {
+	      alert(`Nenhum item encontrado na construção para o serviço: ${servicoSelecionado}`);
+	      return;
+	    }
+
+	    $tabelaEstoque.innerHTML = "";
+	    let totalGeral = 0;
+	    let linha = 1;
+
+	    itensDoProduto.forEach(item => {
+	      const insumo = profissionais.find(p =>
+	        p.item.toLowerCase().includes(item.descricao.toLowerCase())
+	      );
+
+	      const valorUnitario = insumo ? insumo.valorUnitario : 0;
+	      const qtdUsada = item.qnt || 1;
+	      const valorTotal = qtdUsada * valorUnitario;
+	      totalGeral += valorTotal;
+
+	      const tr = document.createElement("tr");
+	      tr.innerHTML = `
+	        <td class="text-center">${linha++}</td>
+	        <td>${servicoSelecionado}</td>
+	        <td>${item.descricao}</td>
+	        <td class="text-center">${qtdUsada}</td>
+	        <td class="text-end">${formatarMoeda(valorUnitario.toFixed(2))}</td>
+	        <td class="text-end">${formatarMoeda(valorTotal.toFixed(2))}</td>
+	      `;
+	      $tabelaEstoque.appendChild(tr);
+	    });
+
+	    $totalGeralEstoque.textContent = `Total: ${formatarMoeda(totalGeral.toFixed(2))}`;
+	  });
+	});
+	</script>
+
+	<script>
+		 
+	   /* ============================================================
+	      🔗 CONTROLE DE ESTOQUE  →  CUSTO POR SERVIÇO (Histórico)
+	      - Corrigido: agora o select de serviços não mostra duplicados.
+	      - Mostra e salva automaticamente o custo de cada serviço.
+	      ============================================================ */
+
+	   (function initControleEstoqueECustos() {
+	     const $servicoEstoque = document.getElementById("servicoEstoque");
+	     const $btnGerar = document.getElementById("btnGerarEstoque");
+	     const $tbodyEstoque = document.querySelector("#tabelaEstoque tbody");
+	     const $totalEstoque = document.getElementById("totalGeralEstoque");
+
+	     // Destaque (último cálculo salvo)
+	     const $dServ = document.getElementById("cpsDestaqueServico");
+	     const $dVend = document.getElementById("cpsDestaqueVenda");
+	     const $dCust = document.getElementById("cpsDestaqueCusto");
+	     const $dLucr = document.getElementById("cpsDestaqueLucro");
+	     const $dData = document.getElementById("cpsDestaqueData");
+
+	     // Histórico
+	     const $histTbody = document.querySelector("#tabelaCustoServico tbody");
+	     const $histPag   = document.getElementById("paginacaoCustoServico");
+	     const $histLucroAcumulado = document.getElementById("cpsTotalLucroAcumulado");
+
+	     let hist = JSON.parse(localStorage.getItem("custoPorServico") || "[]");
+	     let pagAtual = 1;
+	     const itensPag = 15;
+
+	     /* ============================================================
+	        🟩 UTILITÁRIO - normaliza nomes de serviços
+	     ============================================================ */
+	     function _normalizarNomeServico(txt = "") {
+	       return txt
+	         .toString()
+	         .normalize('NFD')
+	         .replace(/\p{Diacritic}/gu, '')
+	         .replace(/\s+/g, ' ')
+	         .trim()
+	         .toLowerCase();
+	     }
+
+	     /* ============================================================
+	        🟩 POPULAR SELECT SEM DUPLICADOS
+	     ============================================================ */
+	     function popularSelectServicosEstoque() {
+	       if (!$servicoEstoque) return;
+	       $servicoEstoque.innerHTML = '<option value="">Selecione um serviço...</option>';
+
+	       const servicosAgendamento = JSON.parse(localStorage.getItem("servicosAgendamento") || "[]");
+	       const custoPorServico     = JSON.parse(localStorage.getItem("custoPorServico") || "[]");
+
+	       const mapPorNome = new Map();
+
+	       // 🟢 Prioridade 1 — Serviços e Valores por Agendamento
+	       for (const s of servicosAgendamento) {
+	         const chave = _normalizarNomeServico(s?.nome || '');
+	         if (!chave) continue;
+	         if (!mapPorNome.has(chave)) {
+	           mapPorNome.set(chave, { nome: (s.nome || '').trim(), valor: +s.valor || 0 });
+	         }
+	       }
+
+	       // 🟡 Prioridade 2 — Histórico de custo (backup)
+	       for (const c of custoPorServico) {
+	         const chave = _normalizarNomeServico(c?.servico || '');
+	         if (!chave) continue;
+	         if (!mapPorNome.has(chave)) {
+	           mapPorNome.set(chave, { nome: (c.servico || '').trim(), valor: +c.valorVenda || 0 });
+	         }
+	       }
+
+	       const listaOrdenada = Array.from(mapPorNome.values()).sort((a, b) =>
+	         a.nome.localeCompare(b.nome, 'pt-BR', { sensitivity: 'base' })
+	       );
+
+	       for (const s of listaOrdenada) {
+	         const opt = document.createElement('option');
+	         opt.value = s.nome;
+	         const val = Number.isFinite(s.valor) ? s.valor : 0;
+	         opt.textContent = `${s.nome} — ${formatarMoeda(val.toFixed(2))}`;
+	         $servicoEstoque.appendChild(opt);
+	       }
+	     }
+
+	     // ✅ Carrega opções e histórico ao abrir página
+	     document.addEventListener("DOMContentLoaded", () => {
+	       popularSelectServicosEstoque();
+	       renderHistorico();
+	       renderDestaque();
+	     });
+
+	     // 🔔 Atualiza quando mudar localStorage
+	     window.addEventListener('lschange', (e) => {
+	       if (['servicosAgendamento', 'custoPorServico'].includes(e.detail.key)) {
+	         popularSelectServicosEstoque();
+	       }
+	     });
+
+	     /* ============================================================
+	        🧮 BOTÃO "GERAR CÁLCULO" — cálculo + salvamento automático
+	     ============================================================ */
+	     $btnGerar?.addEventListener("click", () => {
+	       const servicoSelecionado = ($servicoEstoque?.value || "").trim();
+	       if (!servicoSelecionado) return alert("Selecione um serviço!");
+
+	       const servicos     = JSON.parse(localStorage.getItem("servicosAgendamento") || "[]");
+	       const construcao   = JSON.parse(localStorage.getItem("construcaoProduto") || "[]");
+	       const profissionais= JSON.parse(localStorage.getItem("despesasProfissionais") || "[]");
+
+	       const vendaServico = (servicos.find(s => s.nome === servicoSelecionado)?.valor) || 0;
+
+	       const itensDoProduto = construcao.filter(i =>
+	         (i.item || "").toLowerCase().includes(servicoSelecionado.toLowerCase())
+	       );
+
+	       if (!itensDoProduto.length) {
+	         alert(`Nenhum item de construção encontrado para: ${servicoSelecionado}`);
+	         return;
+	       }
+
+	       $tbodyEstoque.innerHTML = "";
+	       let totalCusto = 0;
+	       let seq = 1;
+
+	       const itensDetalhados = itensDoProduto.map(item => {
+	         const nomeBusca = (item.descricao || "").toLowerCase();
+	         const insumo = profissionais.find(p => (p.item || "").toLowerCase().includes(nomeBusca));
+
+	         const valorUnit = insumo ? (insumo.valorUnitario || 0) : 0;
+	         const qtdUsada  = item.qnt || 1;
+	         const totalItem = qtdUsada * valorUnit;
+	         totalCusto += totalItem;
+
+	         const tr = document.createElement("tr");
+	         tr.innerHTML = `
+	           <td class="text-center">${seq++}</td>
+	           <td>${servicoSelecionado}</td>
+	           <td>${item.descricao || '(sem descrição)'}</td>
+	           <td class="text-center">${qtdUsada}</td>
+	           <td class="text-end">${formatarMoeda((valorUnit).toFixed(2))}</td>
+	           <td class="text-end">${formatarMoeda((totalItem).toFixed(2))}</td>
+	         `;
+	         $tbodyEstoque.appendChild(tr);
+
+	         return {
+	           itemDescricao: item.descricao || '',
+	           quantidadeUsada: qtdUsada,
+	           valorUnitario: valorUnit,
+	           valorTotal: totalItem
+	         };
+	       });
+
+	       $totalEstoque.textContent = `Total: ${formatarMoeda(totalCusto.toFixed(2))}`;
+
+	       const registro = {
+	         id: Date.now(),
+	         servico: servicoSelecionado,
+	         valorVenda: vendaServico || 0,
+	         valorCusto: totalCusto || 0,
+	         lucro: (vendaServico || 0) - (totalCusto || 0),
+	         dataISO: new Date().toISOString(),
+	         dataBR: new Date().toLocaleDateString("pt-BR"),
+	         itens: itensDetalhados
+	       };
+
+	       hist.push(registro);
+	       localStorage.setItem("custoPorServico", JSON.stringify(hist));
+
+		   // 🔗 Enviar registro ao backend
+		   try {
+		     const lojaId = localStorage.getItem("lojaId");
+		     if (lojaId) {
+		       const payload = {
+		         servico: registro.servico,
+		         valorVenda: registro.valorVenda,
+		         valorCusto: registro.valorCusto,
+		         lucro: registro.lucro,
+		         itensJson: JSON.stringify(registro.itens),
+		         loja: { id: lojaId }
+		       };
+
+		       fetch(window.location.origin + "/app_agendamento/api/custo-servico", {
+		         method: "POST",
+		         headers: { "Content-Type": "application/json" },
+		         body: JSON.stringify(payload)
+		       }).then(r => {
+		         if (!r.ok) console.error("❌ Falha ao salvar custo no backend:", r.status);
+		         else console.log("✅ Custo por serviço salvo com sucesso no backend!");
+		       });
+		     }
+		   } catch (err) {
+		     console.error("🚨 Erro ao enviar custo por serviço:", err);
+		   }
+
+	       renderDestaque();
+	       renderHistorico();
+	     });
+
+	     /* ============================================================
+	        🟦 DESTAQUE — último cálculo
+	     ============================================================ */
+	     function renderDestaque() {
+	       if (!hist.length) {
+	         $dServ.value = '';
+	         $dVend.value = '';
+	         $dCust.value = '';
+	         $dLucr.value = '';
+	         $dData.value = '';
+	         return;
+	       }
+	       const ultimo = hist[hist.length - 1];
+	       $dServ.value = ultimo.servico;
+	       $dVend.value = formatarMoeda((ultimo.valorVenda || 0).toFixed(2));
+	       $dCust.value = formatarMoeda((ultimo.valorCusto || 0).toFixed(2));
+	       $dLucr.value = formatarMoeda((ultimo.lucro || 0).toFixed(2));
+	       $dData.value = ultimo.dataBR;
+	     }
+
+	     /* ============================================================
+	        🟨 HISTÓRICO — lista paginada de custos salvos
+	     ============================================================ */
+	     function renderHistorico() {
+	       $histTbody.innerHTML = '';
+
+	       const lista = hist.slice();
+	       const ini = (pagAtual - 1) * itensPag;
+	       const fim = ini + itensPag;
+	       const page = lista.slice(ini, fim);
+
+	       page.forEach((r) => {
+	         const tr = document.createElement('tr');
+	         tr.innerHTML = `
+	           <td class="text-center"><input type="checkbox" class="cps-chk" data-id="${r.id}"></td>
+	           <td>${r.servico}</td>
+	           <td class="text-end">${formatarMoeda((r.valorVenda || 0).toFixed(2))}</td>
+	           <td class="text-end">${formatarMoeda((r.valorCusto || 0).toFixed(2))}</td>
+	           <td class="text-end ${(r.lucro||0) >= 0 ? 'text-success' : 'text-danger'}">${formatarMoeda((r.lucro || 0).toFixed(2))}</td>
+	           <td class="text-center">${r.dataBR}</td>
+	           <td class="text-center">
+	             <button class="btn btn-warning btn-sm me-1" onclick="cps_verDetalhes(${r.id})"><i class="bi bi-eye"></i></button>
+	             <button class="btn btn-danger btn-sm" onclick="cps_excluir(${r.id})"><i class="bi bi-trash"></i></button>
+	           </td>
+	         `;
+	         $histTbody.appendChild(tr);
+	       });
+
+	       const lucroTotal = hist.reduce((s, x) => s + (x.lucro || 0), 0);
+	       if ($histLucroAcumulado)
+	         $histLucroAcumulado.textContent = `Total Lucro: ${formatarMoeda(lucroTotal.toFixed(2))}`;
+
+	       renderPaginacao();
+	     }
+
+	     function renderPaginacao() {
+	       if (!$histPag) return;
+	       $histPag.innerHTML = '';
+	       const totPag = Math.ceil(hist.length / itensPag) || 1;
+	       for (let i = 1; i <= totPag; i++) {
+	         $histPag.insertAdjacentHTML('beforeend', `
+	           <li class="page-item ${i === pagAtual ? 'active' : ''}">
+	             <button class="page-link" onclick="cps_mudarPag(${i})">${i}</button>
+	           </li>
+	         `);
+	       }
+	     }
+
+	     /* ============================================================
+	        🟥 AÇÕES — excluir, ver detalhes, etc.
+	     ============================================================ */
+	     window.cps_mudarPag = (p) => { pagAtual = p; renderHistorico(); };
+
+	     window.cps_excluir = (id) => {
+	       if (!confirm('Excluir registro de custo?')) return;
+	       hist = hist.filter(x => x.id !== id);
+	       localStorage.setItem("custoPorServico", JSON.stringify(hist));
+	       renderDestaque();
+	       renderHistorico();
+	     };
+
+	     window.cps_verDetalhes = (id) => {
+	       const r = hist.find(x => x.id === id);
+	       if (!r) return;
+	       const linhas = (r.itens || []).map(i =>
+	         `• ${i.itemDescricao} — Qtd: ${i.quantidadeUsada} — Unit: ${formatarMoeda((i.valorUnitario||0).toFixed(2))} — Total: ${formatarMoeda((i.valorTotal||0).toFixed(2))}`
+	       ).join('\n');
+	       alert(
+	   `Serviço: ${r.servico}
+	   Venda: ${formatarMoeda((r.valorVenda||0).toFixed(2))}
+	   Custo: ${formatarMoeda((r.valorCusto||0).toFixed(2))}
+	   Lucro: ${formatarMoeda((r.lucro||0).toFixed(2))}
+	   Data: ${r.dataBR}
+
+	   Itens:
+	   ${linhas || '(sem itens)'}`
+	       );
+	     };
+
+	     document.getElementById('btnCpsExcluirSelecionados')?.addEventListener('click', () => {
+	       const idsSel = [...document.querySelectorAll('.cps-chk:checked')].map(c => +c.dataset.id);
+	       if (!idsSel.length) return alert('Nenhum item selecionado.');
+	       if (!confirm('Excluir selecionados?')) return;
+	       hist = hist.filter(x => !idsSel.includes(x.id));
+	       localStorage.setItem("custoPorServico", JSON.stringify(hist));
+	       renderDestaque();
+	       renderHistorico();
+	     });
+
+	     document.getElementById('btnCpsExcluirTudo')?.addEventListener('click', () => {
+	       if (!confirm('Apagar TODO o histórico de custo por serviço?')) return;
+	       hist = [];
+	       localStorage.removeItem("custoPorServico");
+	       renderDestaque();
+	       renderHistorico();
+	     });
+
+	   })();
+	   </script>
+
+	   <script>
+	   function atualizarCardLucroPorServico() {
+	     const listaLucro = document.getElementById("listaLucroServicos");
+	     const lucroGeralValor = document.getElementById("lucroGeralValor");
+	     const lucroGeralIcone = document.getElementById("lucroGeralIcone");
+	     if (!listaLucro) return;
+
+	     const custos = JSON.parse(localStorage.getItem("custoPorServico") || "[]");
+
+	     if (!custos.length) {
+	       listaLucro.innerHTML = "<em>Nenhum cálculo disponível.</em>";
+	       lucroGeralValor.textContent = "R$ 0,00";
+	       lucroGeralIcone.className = "bi bi-dash-lg text-secondary";
+	       return;
+	     }
+
+	     // Agrupa lucro por serviço
+	     const mapa = new Map();
+	     custos.forEach(c => {
+	       const nome = c.servico || "Sem nome";
+	       const lucro = parseFloat(c.lucro || 0);
+	       mapa.set(nome, (mapa.get(nome) || 0) + lucro);
+	     });
+
+	     // Monta lista
+	     let html = "<ul class='list-unstyled mb-0'>";
+	     let lucroGeral = 0;
+	     mapa.forEach((lucro, nome) => {
+	       lucroGeral += lucro;
+	       const cor = lucro >= 0 ? "text-success fw-bold" : "text-danger fw-bold";
+	       html += `<li>${nome}: <span class="${cor}">${formatarMoeda(lucro.toFixed(2))}</span></li>`;
+	     });
+	     html += "</ul>";
+	     listaLucro.innerHTML = html;
+
+	     // Mostra lucro total e ícone visual
+	     lucroGeralValor.textContent = formatarMoeda(lucroGeral.toFixed(2));
+	     if (lucroGeral > 0) {
+	       lucroGeralIcone.className = "bi bi-arrow-up-circle text-success";
+	     } else if (lucroGeral < 0) {
+	       lucroGeralIcone.className = "bi bi-arrow-down-circle text-danger";
+	     } else {
+	       lucroGeralIcone.className = "bi bi-dash-circle text-secondary";
+	     }
+	   }
+
+	   // Atualiza ao abrir a página
+	   document.addEventListener("DOMContentLoaded", atualizarCardLucroPorServico);
+
+	   // Atualiza sempre que custoPorServico mudar
+	   window.addEventListener("lschange", (e) => {
+	     if (e.detail.key === "custoPorServico") {
+	       atualizarCardLucroPorServico();
+	     }
+	   });
+	   </script>
+
+
+	
+	<!-- ✅ Biblioteca html2pdf -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+	<script src="/app_agendamento/painel/topbar.js"></script>
+</body>
+
+</html>

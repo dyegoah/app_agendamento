@@ -1,0 +1,349 @@
+:root {
+  --sidebar-width: 230px;
+  --primary-color: #0d6efd;
+  --transition-speed: 0.3s;
+  --bg-dark: #121212;
+  --text-light: #f5f5f5;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+/* MODO ESCURO */
+body.dark-mode {
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+}
+
+body.dark-mode .card {
+  background-color: #1f1f1f;
+  color: var(--text-light);
+}
+
+.logo { width: 80px; height: auto; max-width: 100%; object-fit: contain; }
+
+
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--primary-color);
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  transition: width var(--transition-speed);
+  z-index: 100;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+.sidebar .nav-link {
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px; /* menos espaçamento interno */
+  border-radius: 8px;
+  margin: 2px 5px;   /* reduzido para caber mais itens */
+  white-space: nowrap;
+  font-size: 0.9rem; /* texto levemente menor */
+  
+}
+
+.sidebar.collapsed .nav-link span,
+.sidebar.collapsed #colorPanel {
+  display: none;
+}
+
+.color-option {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #fff;
+  transition: transform 0.2s;
+}
+
+.color-option:hover {
+  transform: scale(1.2);
+}
+
+.topbar {
+  height: 60px;
+  background-color: var(--primary-color);
+  color: white;
+  position: fixed;
+  left: var(--sidebar-width);
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: left var(--transition-speed);
+  
+}
+
+.sidebar .sidebar-footer {
+  padding: 8px; /* reduzido para economizar espaço */
+}
+
+.topbar { z-index: 1050; }
+
+.sidebar.collapsed + .topbar {
+  left: 70px;
+}
+
+.content {
+  margin-left: var(--sidebar-width);
+  margin-top: 60px;
+  transition: margin-left var(--transition-speed);
+}
+
+.sidebar {
+  width: 200px; /* reduzido de 230px */
+  padding-top: 8px;
+}
+
+/* Gradiente dinâmico */
+.sidebar.gradient {
+  background: linear-gradient(135deg, var(--primary-color), #6610f2);
+}
+
+.topbar.gradient {
+  background: linear-gradient(135deg, var(--primary-color), #6610f2);
+}
+
+/* 🌈 Estende o gradiente para cabeçalhos e cards */
+.sidebar.gradient,
+.topbar.gradient,
+.card-header.gradient,
+.card.gradient {
+  background: linear-gradient(135deg, var(--primary-color), #6610f2) !important;
+  color: white;
+}
+
+
+.sidebar.collapsed ~ .content {
+  margin-left: 70px;
+}
+
+.stats-card {
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    left: -230px;
+  }
+  .sidebar.show {
+    left: 0;
+  }
+  .topbar {
+    left: 0;
+  }
+  .content {
+    margin-left: 0;
+  }
+  
+  iframe {
+    width: 100%;
+    border: none;
+    display: block;
+  }
+
+}
+
+/* ===========================================================
+   🔹 Estilo para logo + nome da marca
+   =========================================================== */
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brand-name {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+}
+
+.brand-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+/* 🔹 Ajuste da logo */
+.logo {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+/* ===========================================================
+   🔹 Estilo para logo + nome da marca
+   =========================================================== */
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.brand-name {
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.3rem;
+  letter-spacing: 0.5px;
+}
+
+.brand-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+/* 🔹 Ajuste da logo */
+.logo {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+@media (max-width: 768px) {
+  .brand-subtitle {
+    display: none;
+  }
+}
+
+/* ===========================================================
+   🔹 TEMAS: Modo Claro e Escuro
+   =========================================================== */
+
+/* 🌙 Modo escuro */
+body.dark-mode {
+  background-color: #0f1115;
+  color: #ffffff;
+}
+
+/* Topbar */
+body.dark-mode .topbar-modern {
+  background: linear-gradient(135deg, #1e1f26, #292b33);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+}
+
+/* Texto e subtítulo */
+body.dark-mode .brand-name,
+body.dark-mode .brand-subtitle {
+  color: #ffffff;
+}
+
+/* Cards */
+body.dark-mode .card {
+  background-color: #1b1e24 !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Tabelas */
+body.dark-mode .table {
+  background-color: #1e2128;
+  color: #fff;
+}
+body.dark-mode .table thead {
+  background-color: #2a2d35;
+}
+body.dark-mode .table tbody tr:hover {
+  background-color: #2f333c;
+}
+
+/* Inputs */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background-color: #1f2329 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Logo com filtro para destacar no dark mode */
+body.dark-mode .logo {
+  filter: brightness(1.15);
+}
+
+/* ☀️ Modo claro */
+body.light-mode {
+  background-color: #f9f9fb;
+  color: #222;
+}
+
+body.light-mode .topbar-modern {
+  background: linear-gradient(135deg, #a3a8ff, #6610f2);
+}
+
+body.light-mode .brand-name {
+  color: #ffffff;
+}
+
+body.light-mode .brand-subtitle {
+  color: rgba(255,255,255,0.9);
+}
+
+body.light-mode .card {
+  background-color: #ffffff !important;
+  color: #222 !important;
+  border-color: #ddd;
+}
+
+body.light-mode .table {
+  background-color: #fff;
+  color: #222;
+}
+
+
+/*<!-- 🔹 Fase futura (templates): substituição Thymeleaf código para copiar para todas as páginas para
+ficar com o sidebar e topbar padrões. copia depois do <body> no cabeçario da página, quando o sistema for para a pasta template-->
+	<div th:replace="~{componentes/sidebar :: sidebar}"></div>
+	<div th:replace="~{componentes/topbar :: topbar}"></div>*/

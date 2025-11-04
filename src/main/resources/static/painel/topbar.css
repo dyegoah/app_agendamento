@@ -1,0 +1,245 @@
+/* ===========================================================
+   🔹 TOPBAR MODERNA - ESTILO PADRÃO PARA TODO O SISTEMA
+   =========================================================== */
+:root {
+  --primary-color: #6366f1;
+}
+
+body {
+  padding-top: 70px; /* espaço para topbar fixa */
+}
+
+/* ===========================================================
+   🔹 Estrutura geral
+   =========================================================== */
+.topbar-modern {
+  background: linear-gradient(135deg, var(--primary-color), #6610f2);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  height: 70px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+}
+
+/* Logo e nome */
+.topbar-modern .logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.topbar-modern .logo {
+  width: 55px;
+  height: 55px;
+  object-fit: contain;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease;
+}
+.topbar-modern .logo:hover { transform: scale(1.05); }
+
+.brand-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+.brand-name { color: #fff; font-weight: 600; font-size: 1.25rem; }
+.brand-subtitle { color: rgba(255,255,255,0.85); font-size: 0.8rem; }
+
+/* ===========================================================
+   🔹 Navegação
+   =========================================================== */
+.topbar-modern .nav-section {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+}
+
+.topbar-modern .nav-item {
+  color: rgba(255,255,255,0.85);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.topbar-modern .nav-item:hover,
+.topbar-modern .nav-item.active {
+  background-color: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+/* ===========================================================
+   🔹 Efeitos pulse e tooltip
+   =========================================================== */
+@keyframes pulse {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.2); filter: brightness(1.5); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+.topbar-modern .nav-item:hover i {
+  animation: pulse 0.5s ease;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255,255,255,0.6),
+               0 0 12px rgba(102, 16, 242, 0.5);
+}
+
+.topbar-modern .nav-item span {
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  pointer-events: none;
+  transition: all 0.25s ease;
+}
+
+.topbar-modern .nav-item:hover span {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+  bottom: -30px;
+}
+
+/* ===========================================================
+   🔹 Área de usuário e modo escuro
+   =========================================================== */
+.topbar-modern .user-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.topbar-modern .theme-toggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.topbar-modern .theme-toggle:hover i {
+  animation: pulse 0.5s ease;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.6),
+               0 0 14px rgba(99,102,241,0.6);
+}
+
+.topbar-modern .theme-toggle::after {
+  content: "Tema";
+  position: absolute;
+  bottom: -25px;
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  transition: all 0.25s ease;
+}
+
+.topbar-modern .theme-toggle:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+  bottom: -30px;
+}
+
+/* Usuário */
+.topbar-modern .user-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.topbar-modern .user-menu:hover {
+  background-color: rgba(255,255,255,0.1);
+  transform: scale(1.05);
+}
+
+.topbar-modern .user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===========================================================
+   🌙 Dark Mode
+   =========================================================== */
+body.dark-mode .topbar-modern {
+  background: linear-gradient(135deg, #1a1d29, #2d1b69);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+body.dark-mode .brand-name,
+body.dark-mode .brand-subtitle {
+  color: #ffffff;
+}
+body.dark-mode .nav-item span,
+body.dark-mode .theme-toggle::after {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+
+/* 💚 BOTÃO WHATSAPP FIXO COM ANIMAÇÃO PULSE */
+#btnCopiarLinkTopo {
+  background-color: #25d366 !important;
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+/* Efeito hover suave */
+#btnCopiarLinkTopo:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(37, 211, 102, 0.5);
+}
+
+/* 🔹 Animação pulse igual à dos ícones da topbar */
+@keyframes pulseWhats {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.25); filter: brightness(1.5); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+#btnCopiarLinkTopo:hover i {
+  animation: pulseWhats 0.6s ease;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6),
+               0 0 12px rgba(37, 211, 102, 0.6);
+}
+

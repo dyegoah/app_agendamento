@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Lojas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+  <h3 class="mb-3">Lojas</h3>
+
+  <form id="formNovaLoja" class="row g-2">
+    <div class="col-md-3"><input class="form-control" name="nome" placeholder="Nome" required></div>
+    <div class="col-md-3"><input class="form-control" name="responsavel" placeholder="Responsável" required></div>
+    <div class="col-md-3"><input class="form-control" name="email" placeholder="E-mail" required></div>
+    <div class="col-md-2"><input class="form-control" name="cidade" placeholder="Cidade"></div>
+    <div class="col-md-1"><input class="form-control form-control-color" name="corPrimaria" value="#0d6efd" title="Cor"></div>
+    <div class="col-12"><button class="btn btn-primary">Salvar Loja</button></div>
+  </form>
+
+  <table class="table table-striped mt-4">
+    <thead class="table-dark"><tr><th>Nome</th><th>Responsável</th><th>Email</th><th>Cidade</th><th>Data</th></tr></thead>
+    <tbody id="tabelaLojas"></tbody>
+  </table>
+</div>
+
+<script>
+  function carregar(){
+    fetch('/api/admin/lojas').then(r=>r.json()).then(lojas=>{
+      const tb = document.getElementById('tabelaLojas'); tb.innerHTML='';
+      lojas.forEach(l=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${l.nome}</td><td>${l.responsavel||'-'}</td><td>${l.email||'-'}</td><td>${l.cidade||'-'}</td><td>${l.dataCadastro||'-'}</td>`;
+        tb.appendChild(tr);
+      });
+    });
+  }
+  document.getElementById('formNovaLoja').addEventListener('submit', e=>{
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    fetch('/api/admin/lojas',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+      .then(r=>r.json()).then(_=>{ e.target.reset(); carregar(); alert('✅ Loja criada! Usuário com senha 123456.'); });
+  });
+
+  carregar();
+</script>
+</body>
+</html>

@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Configuração de Agendamentos</title>
+	<!-- CSS principal (painel) -->
+	<link rel="stylesheet" href="dashboard8.0.css">
+	
+	<!-- Importa todos os estilos do painelGerencia -->
+	<!-- Bootstrap -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+	<link rel="stylesheet" href="/app_agendamento/painel/topbar.css">
+
+
+
+	<!-- CSS interno adicional -->
+	<style>
+		body {
+			background-color: #f9fafb;
+		}
+
+		.card {
+			border: 0;
+			border-radius: 12px;
+			box-shadow: 0 10px 28px rgba(0, 0, 0, .08), 0 2px 6px rgba(0, 0, 0, .06);
+		}
+
+		.calendar-container {
+			background-color: #fff;
+			border-radius: 12px;
+			box-shadow: 0 10px 28px rgba(0, 0, 0, .08), 0 2px 6px rgba(0, 0, 0, .06);
+			padding: 20px;
+			margin-bottom: 1rem;
+			width: 100%;
+		}
+
+		.calendar-grid {
+			display: grid;
+			grid-template-columns: repeat(7, 1fr);
+			gap: 6px;
+			text-align: center;
+		}
+
+		.day-name {
+			font-weight: 600;
+			color: #495057;
+			padding: 8px 0;
+			background-color: rgb(192, 192, 192);
+			border-radius: 8px;
+		}
+
+		.calendar-day {
+			padding: 12px 0;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: all .2s ease;
+			border: 1px solid #e9ecef;
+		}
+
+		.calendar-day:hover {
+			background-color: rgba(13, 110, 253, .08);
+		}
+
+		.calendar-day.selected {
+			background-color: #0b5d1e;
+			color: #fff;
+			font-weight: bold;
+		}
+
+		.radio-compacto label {
+			font-size: 0.9rem;
+			color: #333;
+		}
+
+		.radio-compacto .form-check-input {
+			transform: scale(0.9);
+			margin-right: 4px;
+		}
+
+		.muted {
+			opacity: .4;
+			pointer-events: none;
+		}
+
+		/* 🔹 ESTILO DO MODAL (baseado no agendamentoServico.html) */
+		.hora-disponivel,
+		.hora-ocupada,
+		.hora-indisponivel {
+			padding: 10px;
+			border-radius: 8px;
+			margin: 4px 0;
+			text-align: center;
+			cursor: pointer;
+			transition: 0.2s;
+		}
+
+		.hora-disponivel {
+			background-color: #d4edda;
+			color: #000;
+		}
+
+		.hora-disponivel:hover {
+			background-color: #0d6efd;
+			color: #fff;
+		}
+
+		.hora-ocupada {
+			background-color: #f8d7da;
+			color: #6b0000;
+			cursor: not-allowed;
+		}
+
+		.hora-indisponivel {
+			background-color: #f1f3f4;
+			color: #6c757d;
+		}
+
+		/* Status personalizados */
+		.badge-cancelado {
+			background-color: #f5bcbc !important;
+			color: #6b0000 !important;
+		}
+
+		.blinking {
+			animation: piscar 1s infinite;
+		}
+
+		@keyframes piscar {
+
+			0%,
+			50%,
+			100% {
+				opacity: 1;
+			}
+
+			25%,
+			75% {
+				opacity: 0.2;
+			}
+		}
+
+		#btnResetFiltro {
+			font-size: 0.8rem;
+			white-space: nowrap;
+		}
+
+		.btn-success.me-1 {
+			transform: scale(1.15);
+			font-weight: 600;
+		}
+
+		#btnSalvarPadroes,
+		#btnLimparRadios {
+			padding: 4px 10px;
+			font-size: 0.8rem;
+			white-space: nowrap;
+		}
+
+		.radio-compacto label {
+			font-size: 0.8rem;
+		}
+
+		.radio-compacto .form-check {
+			margin-bottom: 0 !important;
+		}
+
+		#btnSalvarPadroes,
+		#btnLimparRadios {
+			padding: 3px 10px;
+			font-size: 0.8rem;
+		}
+
+		#btnEnviarParaAgendamento {
+			font-size: 0.8rem;
+			padding: 4px 10px;
+		}
+
+		.modal-content {
+			font-size: 0.9rem;
+			padding: 4px;
+		}
+
+		.modal-body p,
+		.modal-body label {
+			font-size: 0.85rem;
+		}
+
+		.modal-body select,
+		.modal-body button {
+			font-size: 0.85rem;
+		}
+
+		.tooltip {
+			font-size: 0.8rem;
+		}
+
+		.badge.bg-info {
+			background-color: #0dcaf0 !important;
+			color: #000;
+		}
+
+		.badge.bg-secondary {
+			background-color: #adb5bd !important;
+			color: #fff;
+		}
+		
+			
+		/* 🌙 MODO ESCURO PREMIUM - CONFIGAGENDAMENTO */
+		body.dark-mode {
+		  background-color: #0f1117;
+		  color: #e4e6eb;
+		}
+
+		/* Topbar moderno no dark */
+		body.dark-mode .topbar-modern {
+		  background: linear-gradient(135deg, #1a1d29, #2d1b69);
+		  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+		  border-bottom: 1px solid rgba(255,255,255,0.1);
+		}
+
+		/* Cards com gradiente sutil e bordas */
+		body.dark-mode .card {
+		  background: linear-gradient(145deg, #1a1d29, #161922) !important;
+		  border: 1px solid rgba(255,255,255,0.08);
+		  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+		}
+
+		body.dark-mode .card-header {
+		  background: linear-gradient(135deg, #1f2230, #252837) !important;
+		  border-bottom: 1px solid rgba(255,255,255,0.1);
+		  color: #e4e6eb !important;
+		}
+
+		body.dark-mode .card-header.bg-success {
+		  background: linear-gradient(135deg, #059669, #047857) !important;
+		}
+
+		/* Calendário moderno no dark */
+		body.dark-mode .calendar-container {
+		  background: linear-gradient(145deg, #1a1d29, #161922);
+		  border: 1px solid rgba(255,255,255,0.08);
+		  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+		}
+
+		body.dark-mode .day-name {
+		  background: linear-gradient(135deg, #2d1b69, #3c296b) !important;
+		  color: #e4e6eb !important;
+		  border: 1px solid rgba(255,255,255,0.1);
+		}
+
+		body.dark-mode .calendar-day {
+		  background: rgba(255,255,255,0.05);
+		  border: 1px solid rgba(255,255,255,0.08);
+		  color: #e4e6eb;
+		  transition: all 0.3s ease;
+		}
+
+		body.dark-mode .calendar-day:hover {
+		  background: rgba(99, 102, 241, 0.15);
+		  border-color: rgba(99, 102, 241, 0.3);
+		  transform: scale(1.05);
+		}
+
+		body.dark-mode .calendar-day.selected {
+		  background: linear-gradient(135deg, #059669, #047857);
+		  color: white;
+		  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+		}
+
+		body.dark-mode .calendar-day.muted {
+		  background: rgba(255,255,255,0.02);
+		  color: #6b7280;
+		  border-color: rgba(255,255,255,0.05);
+		}
+
+		/* Botões modernos no dark */
+		body.dark-mode .btn {
+		  transition: all 0.3s ease;
+		}
+
+		body.dark-mode .btn-light {
+		  background: rgba(255,255,255,0.1);
+		  border-color: rgba(255,255,255,0.2);
+		  color: #e4e6eb;
+		}
+
+		body.dark-mode .btn-light:hover {
+		  background: rgba(255,255,255,0.15);
+		  border-color: rgba(255,255,255,0.3);
+		}
+
+		body.dark-mode .btn-outline-light {
+		  border-color: rgba(255,255,255,0.3);
+		  color: rgba(255,255,255,0.8);
+		}
+
+		body.dark-mode .btn-outline-light:hover {
+		  background: rgba(255,255,255,0.1);
+		  border-color: rgba(255,255,255,0.5);
+		}
+
+		body.dark-mode .btn-success {
+		  background: linear-gradient(135deg, #059669, #047857);
+		  border: none;
+		  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+		}
+
+		body.dark-mode .btn-success:hover {
+		  background: linear-gradient(135deg, #047857, #065f46);
+		  transform: translateY(-2px);
+		  box-shadow: 0 6px 16px rgba(5, 150, 105, 0.4);
+		}
+
+		body.dark-mode .btn-outline-primary {
+		  background: rgba(99, 102, 241, 0.1);
+		  border: 1px solid rgba(99, 102, 241, 0.3);
+		  color: #a5b4fc;
+		}
+
+		body.dark-mode .btn-outline-primary:hover {
+		  background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(139, 92, 246, 0.2));
+		  border-color: #6366f1;
+		  color: white;
+		}
+
+		body.dark-mode .btn-outline-secondary {
+		  background: rgba(255,255,255,0.05);
+		  border: 1px solid rgba(255,255,255,0.2);
+		  color: #e4e6eb;
+		}
+
+		body.dark-mode .btn-outline-secondary:hover {
+		  background: rgba(255,255,255,0.1);
+		  border-color: rgba(255,255,255,0.3);
+		}
+
+		body.dark-mode .btn-outline-danger {
+		  background: rgba(239, 68, 68, 0.1);
+		  border: 1px solid rgba(239, 68, 68, 0.3);
+		  color: #fca5a5;
+		}
+
+		body.dark-mode .btn-outline-danger:hover {
+		  background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.2));
+		  border-color: #ef4444;
+		  color: white;
+		}
+
+		/* Modal moderno no dark */
+		body.dark-mode .modal-content {
+		  background: linear-gradient(145deg, #1a1d29, #161922);
+		  border: 1px solid rgba(255,255,255,0.1);
+		  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+		}
+
+		body.dark-mode .modal-header {
+		  background: linear-gradient(135deg, #1f2230, #252837);
+		  border-bottom: 1px solid rgba(255,255,255,0.1);
+		  color: #e4e6eb;
+		}
+
+		body.dark-mode .modal-header.bg-primary {
+		  background: linear-gradient(135deg, #6366f1, #8b5cf6) !important;
+		}
+
+		body.dark-mode .modal-header.bg-warning {
+		  background: linear-gradient(135deg, #d97706, #b45309) !important;
+		}
+
+		body.dark-mode .modal-footer {
+		  border-top: 1px solid rgba(255,255,255,0.1);
+		  background: rgba(255,255,255,0.02);
+		}
+
+		/* Horários no modal */
+		body.dark-mode .hora-disponivel {
+		  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1));
+		  border: 1px solid rgba(16, 185, 129, 0.3);
+		  color: #a7f3d0;
+		}
+
+		body.dark-mode .hora-disponivel:hover {
+		  background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.2));
+		  border-color: #10b981;
+		  color: white;
+		}
+
+		body.dark-mode .hora-ocupada {
+		  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.1));
+		  border: 1px solid rgba(239, 68, 68, 0.3);
+		  color: #fca5a5;
+		}
+
+		body.dark-mode .hora-indisponivel {
+		  background: rgba(255,255,255,0.05);
+		  border: 1px solid rgba(255,255,255,0.1);
+		  color: #9ca3af;
+		}
+
+		/* Badges modernos */
+		body.dark-mode .badge.bg-info {
+		  background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+		  color: white !important;
+		}
+
+		body.dark-mode .badge.bg-secondary {
+		  background: linear-gradient(135deg, #6b7280, #4b5563) !important;
+		  color: white !important;
+		}
+
+		/* Formulários e inputs */
+		body.dark-mode .form-check-input {
+		  background-color: #1a1d29;
+		  border: 1px solid rgba(255,255,255,0.2);
+		}
+
+		body.dark-mode .form-check-input:checked {
+		  background-color: #6366f1;
+		  border-color: #6366f1;
+		}
+
+		body.dark-mode .form-check-label {
+		  color: #e4e6eb;
+		}
+
+		body.dark-mode .text-muted {
+		  color: #9ca3af !important;
+		}
+
+		body.dark-mode .text-primary {
+		  color: #6366f1 !important;
+		}
+
+		body.dark-mode .fw-bold.text-primary {
+		  color: #a5b4fc !important;
+		  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+		}
+
+		/* Tooltips */
+		body.dark-mode .tooltip .tooltip-inner {
+		  background: rgba(0,0,0,0.8);
+		  color: white;
+		}
+
+		body.dark-mode .tooltip .tooltip-arrow::before {
+		  border-top-color: rgba(0,0,0,0.8);
+		}
+
+		/* Efeitos de hover nos ícones da topbar */
+		body.dark-mode .topbar-modern .nav-item:hover i {
+		  animation: pulse 0.5s ease;
+		  color: #a5b4fc;
+		  text-shadow: 0 0 8px rgba(165, 180, 252, 0.6),
+		               0 0 12px rgba(99, 102, 241, 0.5);
+		}
+
+		body.dark-mode .topbar-modern .theme-toggle:hover i {
+		  animation: pulse 0.5s ease;
+		  color: #a5b4fc;
+		  text-shadow: 0 0 8px rgba(165, 180, 252, 0.6),
+		               0 0 12px rgba(99, 102, 241, 0.6);
+		}
+
+		body.dark-mode .topbar-modern .user-menu:hover .user-avatar i {
+		  animation: pulse 0.5s ease;
+		  color: #a5b4fc;
+		  text-shadow: 0 0 10px rgba(165, 180, 252, 0.6),
+		               0 0 14px rgba(99, 102, 241, 0.5);
+		}
+
+		/* Animação de pulsar */
+		@keyframes pulse {
+		  0% { transform: scale(1); filter: brightness(1); }
+		  50% { transform: scale(1.2); filter: brightness(1.5); }
+		  100% { transform: scale(1); filter: brightness(1); }
+		}
+		
+		
+	</style>
+
+</head>
+
+<body class="p-3 p-md-4">
+
+	<header class="topbar-modern">
+	  <div class="logo-section">
+	    <img id="logoCliente" 
+	         src="/app_agendamento/imagens/logo%20Jamille.png"
+	         alt="Logo Jamille Higino"
+	         class="logo"
+	         onerror="this.onerror=null; this.src='/app_agendamento/imagens/logo-padrao.png';">
+	    <div class="brand-info">
+	      <div class="brand-name">Jamille Higino</div>
+	      <div class="brand-subtitle">Enfermagem e Estética</div>
+	    </div>
+	  </div>
+
+	  <nav class="nav-section">
+	    <a href="/app_agendamento/painel/painelGerencia.html" class="nav-item"><i class="bi bi-house-door"></i><span>Home</span></a>
+	    <a href="/app_agendamento/painel/agendamentoServico.html" class="nav-item"><i class="bi bi-calendar-check"></i><span>Agendamento</span></a>
+	    <a href="/app_agendamento/painel/configAgendamento.html" class="nav-item"><i class="bi bi-gear"></i><span>Configuração</span></a>
+	    <a href="/app_agendamento/painel/relatorioAgendamento.html" class="nav-item"><i class="bi bi-bar-chart"></i><span>Relatórios</span></a>
+	    <a href="/app_agendamento/painel/agendamentoDespesa.html" class="nav-item"><i class="bi bi-cash-coin"></i><span>Despesas</span></a>
+	  </nav>
+
+	  <div class="user-section">
+	    <button id="btnModo" class="theme-toggle"><i class="bi bi-moon-stars"></i></button>
+	    <div class="user-menu" id="userMenuDropdown">
+	      <div class="user-avatar"><i class="bi bi-person"></i></div>
+	      <span>Admin</span>
+	    </div>
+	  </div>
+	</header>
+
+
+	<div class="container-fluid">
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h3 class="fw-bold text-primary"><i class="bi bi-gear-fill me-2"></i>Configuração de Agendamentos</h3>
+			<a href="/app_agendamento/painel/painelGerencia.html" class="btn btn-outline-secondary"
+				data-bs-toggle="tooltip" data-bs-placement="top" title="Retorna ao painel administrativo.">
+				<i class="bi bi-arrow-left-circle"></i> Voltar
+			</a>
+		</div>
+
+		<!-- SEÇÃO 1: Calendário -->
+		<div class="card mb-4">
+			<div class="card-header bg-success text-white d-flex align-items-center justify-content-between">
+				<div class="d-flex align-items-center gap-2">
+					<button id="btnPrevMonth" class="btn btn-light btn-sm text-success"><i
+							class="bi bi-chevron-left"></i></button>
+					<h5 class="mb-0" id="lblTituloMes"><i class="bi bi-calendar-week"></i> Selecione os dias disponíveis
+					</h5>
+					<button id="btnNextMonth" class="btn btn-light btn-sm text-success"><i
+							class="bi bi-chevron-right"></i></button>
+				</div>
+				<div class="d-flex align-items-center gap-2">
+					<button id="btnLiberarProxAno" class="btn btn-outline-light btn-sm" data-bs-toggle="tooltip"
+						data-bs-placement="top" title="Libera o calendário do próximo ano para marcação.">
+						<i class="bi bi-unlock"></i> Liberar próximo ano
+					</button>
+				</div>
+			</div>
+
+			<div class="card-body" id="areaCalendario">
+				<div class="calendar-container">
+					<div class="calendar-grid" id="calendarGrid"></div>
+				</div>
+
+				<!-- 🔹 Rádios + limpar -->
+				<div class="mt-2 radio-compacto d-flex flex-wrap align-items-center justify-content-between">
+					<div class="d-flex flex-wrap align-items-center gap-2">
+						<label class="fw-semibold small text-muted me-2">Aplicar padrão:</label>
+						<div class="form-check form-check-inline mb-1">
+							<input class="form-check-input" type="radio" name="padraoGeral" id="padraoSemana">
+							<label class="form-check-label" for="padraoSemana">Semana atual</label>
+						</div>
+						<div class="form-check form-check-inline mb-1">
+							<input class="form-check-input" type="radio" name="padraoGeral" id="padraoMes">
+							<label class="form-check-label" for="padraoMes">Mês atual</label>
+						</div>
+						<div class="form-check form-check-inline mb-1">
+							<input class="form-check-input" type="radio" name="padraoGeral" id="padraoAnoRestante">
+							<label class="form-check-label" for="padraoAnoRestante">Ano restante</label>
+						</div>
+					</div>
+
+					<!-- 🔹 Botões compactos -->
+					<div class="d-flex gap-2">
+						<button id="btnSalvarPadroes" class="btn btn-success btn-sm" data-bs-toggle="tooltip"
+							data-bs-placement="top"
+							title="Salva as configurações de semana, mês e horário de almoço no calendário.">
+							<i class="bi bi-save2"></i> Salvar
+						</button>
+						<button id="btnLimparRadios" class="btn btn-outline-danger btn-sm" data-bs-toggle="tooltip"
+							data-bs-placement="top" title="Remove todas as marcações feitas no calendário.">
+							<i class="bi bi-x-circle"></i> Limpar
+						</button>
+					</div>
+				</div>
+
+				<!-- 🔹 Radios de almoço -->
+				<div class="mt-2 radio-compacto d-flex flex-wrap align-items-center gap-2">
+					<label class="fw-semibold small text-muted me-2">Almoço:</label>
+					<div class="form-check form-check-inline mb-1">
+						<input class="form-check-input" type="radio" name="horarioAlmoco" id="almoco11">
+						<label class="form-check-label" for="almoco11">11:00</label>
+					</div>
+					<div class="form-check form-check-inline mb-1">
+						<input class="form-check-input" type="radio" name="horarioAlmoco" id="almoco12">
+						<label class="form-check-label" for="almoco12">12:00</label>
+					</div>
+					<div class="form-check form-check-inline mb-1">
+						<input class="form-check-input" type="radio" name="horarioAlmoco" id="almoco13">
+						<label class="form-check-label" for="almoco13">13:00</label>
+					</div>
+					<div class="form-check form-check-inline mb-1">
+						<input class="form-check-input" type="radio" name="horarioAlmoco" id="almocoNenhum" checked>
+						<label class="form-check-label" for="almocoNenhum">Nenhum</label>
+					</div>
+				</div>
+
+
+				<!-- 🔹 BOTÃO: Enviar configurações para Agendamento de Serviços -->
+				<div class="text-end mt-3">
+					<button id="btnEnviarParaAgendamento" class="btn btn-outline-primary btn-sm"
+						data-bs-toggle="tooltip" data-bs-placement="top"
+						title="Envia todas as configurações de disponibilidade para o agendamento de serviços.">
+						<i class="bi bi-upload"></i> Enviar
+					</button>
+				</div>
+
+			</div>
+
+
+			<!--////////botão de pesquisar escondido/////////  -->
+			<!-- ⚙️ Espaço estrutural substituto do antigo <th> (mantém o layout válido e o DOM estável) -->
+			<div id="espaco-placeholder" class="d-none"></div>
+
+
+			<!-- MODAL: Configurar horários do dia (ATUALIZADO - igual ao agendamentoServico.html) -->
+			<div class="modal fade" id="modalHorariosDia" tabindex="-1" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered modal-sm">
+					<div class="modal-content">
+						<div class="modal-header bg-primary text-white">
+							<h5 class="modal-title"><i class="bi bi-clock-history me-2"></i>Horários disponíveis</h5>
+							<button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+						</div>
+						<div class="modal-body">
+							<p id="tituloDiaSelecionado" class="fw-bold text-primary"></p>
+
+							<!-- 🔹 Legenda -->
+							<div class="d-flex justify-content-center gap-3 small mb-2">
+								<div class="d-flex align-items-center">
+									<span class="rounded-circle me-1"
+										style="width:12px;height:12px;background-color:#28a745;display:inline-block;"></span>
+									<span>Horário ativo</span>
+								</div>
+								<div class="d-flex align-items-center">
+									<span class="rounded-circle me-1"
+										style="width:12px;height:12px;background-color:#dc3545;display:inline-block;"></span>
+									<span>Horário desativado</span>
+								</div>
+							</div>
+
+
+							<!-- 🔹 Campo informativo (mantém o espaço e visual) -->
+							<div class="mb-3 text-center">
+								<small class="text-muted fst-italic">Selecione manualmente os horários desejados
+									abaixo.</small>
+							</div>
+
+							<div id="gradeHoras" class="d-flex flex-column gap-2"
+								style="max-height: 380px; overflow-y: auto;"></div>
+						</div>
+						<div class="modal-footer d-flex justify-content-between">
+
+							<div class="d-flex gap-2">
+								<button id="btnZerarHorariosDia" class="btn btn-outline-danger btn-sm">
+									<i class="bi bi-x-circle"></i> Zerar
+								</button>
+								<button class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+								<button id="btnSalvarHorariosDia" class="btn btn-success">
+									<i class="bi bi-save"></i> Salvar
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- MODAL: Liberar próximo ano -->
+			<div class="modal fade" id="modalLiberarAno" tabindex="-1" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header bg-warning">
+							<h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Liberar próximo ano
+							</h5>
+							<button class="btn-close" data-bs-dismiss="modal"></button>
+						</div>
+						<div class="modal-body">
+							Deseja liberar o calendário do ano <span id="anoParaLiberar" class="fw-bold"></span>?<br>
+							(Você pode liberar até 10 anos à frente. Anos não liberados permanecem inativos.)
+						</div>
+						<div class="modal-footer">
+							<button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+							<button id="btnConfirmarLiberarAno" class="btn btn-warning">Liberar</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+			<script>
+				/* ======================================================
+				   🔹 BLOCO 1 — VARIÁVEIS GERAIS E CONSTANTES
+				   ====================================================== */
+				const calendarGrid = document.getElementById("calendarGrid");
+				const lblTituloMes = document.getElementById("lblTituloMes");
+				const btnPrevMonth = document.getElementById("btnPrevMonth");
+				const btnNextMonth = document.getElementById("btnNextMonth");
+				const btnLiberarProxAno = document.getElementById("btnLiberarProxAno");
+				const modalLiberarAno = new bootstrap.Modal(document.getElementById("modalLiberarAno"));
+				const anoParaLiberarSpan = document.getElementById("anoParaLiberar");
+				const btnConfirmarLiberarAno = document.getElementById("btnConfirmarLiberarAno");
+				const modalHorariosDia = new bootstrap.Modal(document.getElementById("modalHorariosDia"));
+				const gradeHoras = document.getElementById("gradeHoras");
+				const tituloDiaSelecionado = document.getElementById("tituloDiaSelecionado");
+				const selectServico = document.getElementById("servicoDiaSelect");
+
+				const today = new Date();
+				let viewYear = today.getFullYear();
+				let viewMonth = today.getMonth();
+				let diaSelecionado = null;
+				let horariosSelecionados = [];
+
+				const BASE_YEAR = today.getFullYear();
+				const MAX_YEARS_AHEAD = 10;
+				const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+				/* ======================================================
+				   🔹 BLOCO 2 — LOCAL STORAGE E ANOS LIBERADOS
+				   ====================================================== */
+				function getActiveYearMax() {
+					return parseInt(localStorage.getItem("activeYearMax") || String(BASE_YEAR), 10);
+				}
+				function setActiveYearMax(y) {
+					localStorage.setItem("activeYearMax", String(y));
+				}
+				if (!localStorage.getItem("activeYearMax")) setActiveYearMax(BASE_YEAR);
+
+				function keyScoped(y, m, d) {
+					return `horarios-${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+				}
+
+
+
+				const ALMOCO_KEY = "horarioAlmocoSelecionado";
+
+				/* 🔹 Salvar seleção do rádio de almoço sempre que mudar */
+				document.querySelectorAll("input[name='horarioAlmoco']").forEach(radio => {
+					radio.addEventListener("change", () => {
+						localStorage.setItem(ALMOCO_KEY, radio.id);
+					});
+				});
+
+				/* 🔹 Restaurar seleção ao carregar a página */
+				document.addEventListener("DOMContentLoaded", () => {
+					const salvo = localStorage.getItem(ALMOCO_KEY);
+					if (salvo && document.getElementById(salvo)) {
+						document.getElementById(salvo).checked = true;
+					} else {
+						document.getElementById("almocoNenhum").checked = true;
+					}
+				});
+
+
+				/* ======================================================
+				   🔹 BLOCO 3 — RENDERIZAÇÃO DO CALENDÁRIO
+				   ====================================================== */
+
+				/* ✅ Substitua todo o conteúdo da função renderMonth existente por este bloco.
+				   Ele garante que todas as marcações, incluindo as de almoço, persistam corretamente após F5. */
+
+				function renderMonth(year, month) {
+					lblTituloMes.innerHTML = `<i class="bi bi-calendar-week"></i> ${monthNames[month]} / ${year}`;
+					const activeMax = getActiveYearMax();
+					calendarGrid.innerHTML = "";
+
+					["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].forEach(d => {
+						const el = document.createElement("div");
+						el.className = "day-name";
+						el.textContent = d;
+						calendarGrid.appendChild(el);
+					});
+
+					const first = new Date(year, month, 1);
+					const last = new Date(year, month + 1, 0);
+					for (let i = 0; i < first.getDay(); i++) calendarGrid.appendChild(document.createElement("div"));
+
+					for (let d = 1; d <= last.getDate(); d++) {
+						const cell = document.createElement("div");
+						cell.className = "calendar-day";
+						cell.textContent = d;
+
+						if (year > activeMax) cell.classList.add("muted");
+						else {
+							const chave = keyScoped(year, month + 1, d);
+							const dadosSalvos = JSON.parse(localStorage.getItem(chave) || "null");
+
+							if (dadosSalvos && dadosSalvos.horarios) {
+								const horarios = dadosSalvos.horarios;
+								const temHorarios = Array.isArray(horarios)
+									? horarios.length > 0
+									: Object.values(horarios).some(h => h.ativo);
+								if (temHorarios) cell.classList.add("selected");
+							}
+
+							const dataClicada = new Date(year, month, d);
+							const hoje = new Date();
+							hoje.setHours(0, 0, 0, 0);
+							if (dataClicada >= hoje) {
+								cell.onclick = () => abrirModalHorarios(d, year, month);
+							} else {
+								cell.classList.add("muted");
+							}
+						}
+
+						calendarGrid.appendChild(cell);
+					}
+				}
+
+				/* ✅ Substitua também o bloco final do DOMContentLoaded existente por este, logo antes de renderMonth(viewYear, viewMonth) */
+
+				document.addEventListener("DOMContentLoaded", () => {
+					renderMonth(viewYear, viewMonth);
+					Object.keys(localStorage)
+						.filter(k => k.startsWith("horarios-"))
+						.forEach(k => {
+							const match = k.match(/horarios-(\d+)-(\d+)-(\d+)/);
+							if (!match) return;
+							const [_, ano, mes, dia] = match.map(Number);
+							const cell = Array.from(document.querySelectorAll(".calendar-day")).find(
+								c => parseInt(c.textContent) === dia
+							);
+							if (cell && ano === viewYear && mes === viewMonth + 1) {
+								cell.classList.add("selected");
+							}
+						});
+				});
+
+
+
+
+
+				/* ======================================================
+				   🔹 BLOCO 4 — MODAL DE HORÁRIOS (ATUALIZADO)
+				   ====================================================== */
+				function abrirModalHorarios(dia, year, month) {
+					diaSelecionado = dia;
+					tituloDiaSelecionado.textContent = `📅 ${String(dia).padStart(2, "0")}/${String(month + 1).padStart(2, "0")}/${year}`;
+
+					const dados = JSON.parse(localStorage.getItem(keyScoped(year, month + 1, dia)) || "null") || {horarios: {}};
+					horariosSelecionados = dados.horarios || {};
+					renderGradeHorarios();
+
+					/* ======================================================
+					   🔹 BLOCO — CARREGAR SERVIÇOS DO BACKEND (AJUSTADO)
+					   ====================================================== */
+					async function carregarServicosBackend() {
+						const selectServico = document.getElementById("servicoDiaSelect");
+						if (!selectServico) return;
+
+						// Limpa o select e adiciona a opção padrão
+						selectServico.innerHTML = `<option value="Livre" selected>Serviço livre</option>`;
+
+						try {
+							// 🔗 Chama o endpoint do backend que traz os serviços da tabela de despesas
+							const lojaId = localStorage.getItem("lojaId");
+							if (!lojaId) {
+								console.warn("⚠️ Nenhuma loja logada. Exibindo apenas opção 'Livre'.");
+								return;
+							}
+
+							const response = await fetch(window.location.origin + `/app_agendamento/api/agendamento-despesa/servico/${lojaId}`);
+							if (!response.ok) throw new Error("Erro ao buscar serviços do backend.");
+
+							const servicos = await response.json(); // lista de serviços [{id, servico, valor, item, valorUnitario, ...}]
+							servicos.forEach(s => {
+								const nome = s.servico || s.item || "Serviço sem nome";
+								const valor = s.valor || s.valorUnitario || 0;
+								const opt = document.createElement("option");
+								opt.value = nome;
+								opt.textContent = `${nome} — R$ ${valor.toFixed(2).replace('.', ',')}`;
+								selectServico.appendChild(opt);
+							});
+
+							console.log("📋 Serviços carregados no modal:", servicos);
+						} catch (erro) {
+							console.error("⚠️ Erro ao carregar serviços:", erro);
+							alert("⚠️ Não foi possível carregar os serviços cadastrados do backend.");
+						}
+					}
+
+
+					// ✅ Chama a função assim que o modal for aberto
+					carregarServicosBackend(); // 🔹 carrega serviços sempre que abrir o modal
+
+					modalHorariosDia.show();
+				}
+
+
+
+
+				function renderGradeHorarios() {
+					gradeHoras.innerHTML = "";
+
+					// 🔹 Lista de 01:00 até 24:00
+					const horasDia = [];
+					for (let h = 1; h <= 24; h++) {
+						horasDia.push(`${String(h).padStart(2, "0")}:00`);
+					}
+
+					// 🔹 Horário de almoço selecionado
+					const almocoSelecionado = document.querySelector("input[name='horarioAlmoco']:checked")?.id;
+					const horaAlmoco =
+						almocoSelecionado === "almoco11"
+							? 11
+							: almocoSelecionado === "almoco12"
+								? 12
+								: almocoSelecionado === "almoco13"
+									? 13
+									: null;
+
+					horasDia.forEach(h => {
+						const horaNum = parseInt(h.split(":")[0], 10);
+						const dado = horariosSelecionados[h];
+						const temRegistro = !!dado;
+						const servicoSalvo = temRegistro ? dado.servico : "Livre";
+						const ativoInicial = temRegistro ? dado.ativo : (horaNum >= 7 && horaNum <= 17);
+
+						// ⏰ Ajusta horários de almoço (força inativo)
+						let ativo = ativoInicial;
+						if (horaAlmoco && (horaNum === horaAlmoco || horaNum === horaAlmoco + 1)) {
+							ativo = false;
+						}
+
+						const servicoParaBadge = temRegistro ? (servicoSalvo || "Livre") : "Livre";
+
+						// 🔹 Monta linha (sem checkbox)
+						const row = document.createElement("div");
+						row.className =
+							(ativo ? "hora-disponivel" : "hora-indisponivel") +
+							" d-flex justify-content-between align-items-center px-2";
+
+						const hourSpan = document.createElement("span");
+						hourSpan.textContent = h;
+						hourSpan.style.cursor = "pointer";
+
+						const badge = document.createElement("span");
+						badge.className = `badge bg-${servicoParaBadge === "Livre" ? "secondary" : "info"}`;
+						badge.textContent = servicoParaBadge;
+
+						row.appendChild(hourSpan);
+						row.appendChild(badge);
+
+						// 🔹 Clique direto → ativa/desativa horário
+						hourSpan.addEventListener("click", () => {
+							const jaAtivo = row.classList.contains("hora-disponivel");
+
+							if (jaAtivo) {
+								const confirmar = confirm(`Deseja desativar o horário ${h}?`);
+								if (confirmar) {
+									row.classList.remove("hora-disponivel");
+									row.classList.add("hora-indisponivel");
+									delete horariosSelecionados[h];
+									badge.className = "badge bg-secondary";
+									badge.textContent = "Livre";
+								}
+							} else {
+								const confirmar = confirm(`Deseja ativar o horário ${h}?`);
+								if (confirmar) {
+									row.classList.remove("hora-indisponivel");
+									row.classList.add("hora-disponivel");
+									horariosSelecionados[h] = {ativo: true, servico: "Livre"};
+									badge.className = "badge bg-secondary";
+									badge.textContent = "Livre";
+								}
+							}
+						});
+
+						gradeHoras.appendChild(row);
+					});
+
+					// 🔽 Modal começa focando em 07:00
+					setTimeout(() => {
+						const alvo = Array.from(gradeHoras.children).find(el => el.textContent.includes("07:00"));
+						if (alvo) alvo.scrollIntoView({behavior: "smooth", block: "start"});
+					}, 100);
+				}
+
+
+
+
+
+
+				/* ======================================================
+				   🔹 BLOCO 5 — SALVAR HORÁRIOS DO DIA (PERSISTÊNCIA COMPLETA)
+				   ====================================================== */
+				document.getElementById("btnSalvarHorariosDia").onclick = () => {
+					const estadoFinal = {};
+
+					// percorre cada linha (hora) do modal
+					document.querySelectorAll("#gradeHoras > div").forEach(row => {
+						const hora = row.querySelector("span").textContent.trim(); // o primeiro <span> é a hora
+						const ativo = row.classList.contains("hora-disponivel");
+						const servico = row.querySelector(".badge").textContent.trim() || "Livre";
+						estadoFinal[hora] = {ativo, servico: ativo ? servico : "Livre"};
+					});
+
+					const chave = keyScoped(viewYear, viewMonth + 1, diaSelecionado);
+					localStorage.setItem(chave, JSON.stringify({horarios: estadoFinal}));
+
+					modalHorariosDia.hide();
+
+					// marca o dia no calendário
+					document.querySelectorAll(".calendar-day").forEach(c => {
+						if (parseInt(c.textContent) === diaSelecionado) c.classList.add("selected");
+					});
+				};;
+
+
+				/* ======================================================
+				   🔹 BLOCO 6 — LIBERAR PRÓXIMO ANO
+				   ====================================================== */
+				btnLiberarProxAno.addEventListener("click", () => {
+					const atual = getActiveYearMax();
+					const proximo = atual + 1;
+					if (proximo > BASE_YEAR + MAX_YEARS_AHEAD) {
+						alert(`Limite de ${MAX_YEARS_AHEAD} anos atingido.`);
+						return;
+					}
+					anoParaLiberarSpan.textContent = proximo;
+					btnConfirmarLiberarAno.onclick = () => {
+						setActiveYearMax(proximo);
+						modalLiberarAno.hide();
+						alert(`✅ Ano ${proximo} liberado!`);
+						renderMonth(viewYear, viewMonth);
+					};
+					modalLiberarAno.show();
+				});
+
+				/* ======================================================
+				   🔹 BLOCO 7 — NAVEGAÇÃO ENTRE MESES
+				   ====================================================== */
+				btnPrevMonth.onclick = () => {
+					if (viewMonth === 0) {if (viewYear - 1 < BASE_YEAR) return; viewYear--; viewMonth = 11;}
+					else viewMonth--;
+					renderMonth(viewYear, viewMonth);
+				};
+				btnNextMonth.onclick = () => {
+					if (viewMonth === 11) {
+						const nextYear = viewYear + 1;
+						if (nextYear > getActiveYearMax()) {
+							alert("Ano ainda não liberado. Use o botão 'Liberar próximo ano'.");
+							return;
+						}
+						viewYear = nextYear; viewMonth = 0;
+					} else viewMonth++;
+					renderMonth(viewYear, viewMonth);
+				};
+
+				/* ======================================================
+				   🔹 BLOCO 8 — ENVIO PARA AGENDAMENTO DE SERVIÇOS
+				   ====================================================== */
+
+				document.getElementById("btnEnviarParaAgendamento").addEventListener("click", () => {
+					const todasChaves = Object.keys(localStorage).filter(k => k.startsWith("horarios-"));
+					if (todasChaves.length === 0) {
+						alert("⚠️ Nenhuma configuração encontrada para enviar.");
+						return;
+					}
+
+					// Coleta e formata todos os dias salvos com estrutura completa (ativo + serviço)
+					const configuracoes = todasChaves.map(k => {
+						const dados = JSON.parse(localStorage.getItem(k));
+						const [_, ano, mes, dia] = k.split("-");
+						const data = `${dia.padStart(2, "0")}/${mes.padStart(2, "0")}/${ano}`;
+						return {chave: k, data, dados};
+					});
+
+					// 🔹 Salva globalmente — o agendamentoServico.html lerá diretamente
+					localStorage.setItem("configServicos", JSON.stringify(configuracoes));
+
+					alert("✅ Configurações sincronizadas com o Agendamento de Serviços!");
+				});
+
+
+				/* ======================================================
+				   🔹 BLOCO 10 — LIMPAR MARCAÇÃO DO CALENDÁRIO
+				   ====================================================== */
+				document.getElementById("btnLimparRadios").addEventListener("click", () => {
+					// Limpa todos os dados de horários salvos no localStorage
+					Object.keys(localStorage)
+						.filter(k => k.startsWith("horarios-"))
+						.forEach(k => localStorage.removeItem(k));
+
+					// Remove marcações visuais do calendário
+					document.querySelectorAll(".calendar-day.selected").forEach(d => d.classList.remove("selected"));
+
+					alert("🧹 Todas as marcações foram limpas do calendário!");
+				});
+
+
+
+
+				// Gera array de horas para um dia específico (2ª–6ª = 07–17 c/ almoço; sábado = 07–12)
+				function gerarHorasParaDia(diaSemana, almocoId) {
+					// domingo (0) não tem agenda
+					if (diaSemana === 0) return [];
+
+					// sábado (6) sempre 07–12
+					if (diaSemana === 6) {
+						const out = [];
+						for (let h = 7; h <= 12; h++) out.push(`${String(h).padStart(2, "0")}:00`);
+						return out;
+					}
+
+					// 2ª–6ª
+					const almocoHora = almocoId === "almoco11" ? 11 : almocoId === "almoco12" ? 12
+						: almocoId === "almoco13" ? 13 : null;
+
+					const ativo = new Set();
+					// manhã até 17, em faixas, excluindo 2h de almoço quando houver
+					for (let h = 7; h <= 17; h++) {
+						if (almocoHora && (h === almocoHora || h === almocoHora + 1)) continue; // 2h de almoço
+						ativo.add(`${String(h).padStart(2, "0")}:00`);
+					}
+					return Array.from(ativo);
+				}
+
+				// Salva no localStorage no mesmo formato já esperado pelo outro arquivo
+				function salvarHorasDoDia(ano, mes1, dia, horas) {
+					const chave = `horarios-${ano}-${String(mes1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+					localStorage.setItem(chave, JSON.stringify({horarios: horas, servico: "Livre"}));
+				}
+
+
+
+				/* ======================================================
+				   🔹 BLOCO 11 — PADRÕES DE DISPONIBILIDADE (ATUALIZADO)
+				   ====================================================== */
+				function aplicarPadraoSemana() {
+					const hoje = new Date();
+					const diaSemana = hoje.getDay(); // 0=Dom, 6=Sáb
+					const almoco = document.querySelector("input[name='horarioAlmoco']:checked")?.id;
+					const horaAlmoco = almoco === "almoco11" ? 11 : almoco === "almoco12" ? 12 : almoco === "almoco13" ? 13 : null;
+
+					const inicioSemana = new Date(hoje);
+					inicioSemana.setDate(hoje.getDate() - (diaSemana === 0 ? 6 : diaSemana - 1)); // Segunda
+
+					for (let i = 0; i < 6; i++) {
+						const data = new Date(inicioSemana);
+						data.setDate(inicioSemana.getDate() + i);
+
+						// ❌ Ignora dias antes do dia atual
+						if (data < hoje.setHours(0, 0, 0, 0)) continue;
+
+						const dia = data.getDay();
+						if (dia === 0) continue; // pula domingo
+
+						const chave = keyScoped(data.getFullYear(), data.getMonth() + 1, data.getDate());
+						let horarios = [];
+
+						if (dia >= 1 && dia <= 5) {
+							// Segunda a sexta
+							if (horaAlmoco === 11) {
+								// Almoço às 11:00 → manhã até 10h, depois 13h–17h
+								for (let h = 7; h <= 10; h++) horarios.push(`${String(h).padStart(2, "0")}:00`);
+								for (let h = 13; h <= 17; h++) horarios.push(`${String(h).padStart(2, "0")}:00`);
+							} else if (horaAlmoco === 12) {
+								// Almoço às 12:00 → manhã até 11h, depois 13h–17h
+								for (let h = 7; h <= 11; h++) horarios.push(`${String(h).padStart(2, "0")}:00`);
+								for (let h = 13; h <= 17; h++) horarios.push(`${String(h).padStart(2, "0")}:00`);
+							} else if (horaAlmoco === 13) {
+								// Almoço às 13:00 → manhã até 12h, depois 13h–17h
+								for (let h = 7; h <= 12; h++) horarios.push(`${String(h).padStart(2, "0")}:00`);
+								for (let h = 13; h <= 17; h++) horarios.push(`${String(h).padStart(2, "0")}:00`);
+							} else {
+								// Nenhum almoço → 07:00–17:00 contínuo
+								for (let h = 7; h <= 17; h++) horarios.push(`${String(h).padStart(2, "0")}:00`);
+							}
+						} else if (dia === 6) {
+							// Sábado sempre 07:00–12:00
+							for (let h = 7; h <= 12; h++) horarios.push(`${String(h).padStart(2, "0")}:00`);
+						}
+
+						localStorage.setItem(chave, JSON.stringify({horarios, servico: "Livre"}));
+					}
+
+
+					renderMonth(viewYear, viewMonth);
+				}
+
+				/* ======================================================
+				   🔹 Reativar funcionamento dos rádios de almoço
+				   ====================================================== */
+				document.querySelectorAll("input[name='horarioAlmoco']").forEach(radio => {
+					radio.addEventListener("change", () => {
+						// Se o modal estiver aberto, atualiza a grade de horários em tempo real
+						if (document.getElementById("modalHorariosDia").classList.contains("show")) {
+							renderGradeHorarios();
+						}
+					});
+				});
+
+
+
+				function aplicarPadraoMes() {
+					const hoje = new Date();
+					hoje.setHours(0, 0, 0, 0);
+					const diasNoMes = new Date(viewYear, viewMonth + 1, 0).getDate();
+					const almocoSelecionado = document.querySelector("input[name='horarioAlmoco']:checked")?.id || "almocoNenhum";
+
+					for (let d = 1; d <= diasNoMes; d++) {
+						const data = new Date(viewYear, viewMonth, d);
+						const data0 = new Date(viewYear, viewMonth, d); data0.setHours(0, 0, 0, 0);
+
+						if (data0 < hoje) continue;              // ignora passados
+						const diaSemana = data.getDay();
+						if (diaSemana === 0) continue;           // ignora domingo
+
+						const horas = gerarHorasParaDia(diaSemana, almocoSelecionado);
+						if (horas.length > 0) salvarHorasDoDia(viewYear, viewMonth + 1, d, horas);
+					}
+
+					renderMonth(viewYear, viewMonth);
+				}
+
+
+
+
+
+				function aplicarPadraoAnoRestante() {
+					const hoje = new Date();
+					hoje.setHours(0, 0, 0, 0);
+					const ano = hoje.getFullYear();
+					const almocoSelecionado = document.querySelector("input[name='horarioAlmoco']:checked")?.id || "almocoNenhum";
+
+					for (let m = hoje.getMonth(); m < 12; m++) {
+						const diasNoMes = new Date(ano, m + 1, 0).getDate();
+						for (let d = 1; d <= diasNoMes; d++) {
+							const data = new Date(ano, m, d);
+							const data0 = new Date(ano, m, d); data0.setHours(0, 0, 0, 0);
+
+							if (data0 < hoje) continue;           // ignora passados
+							const diaSemana = data.getDay();
+							if (diaSemana === 0) continue;        // ignora domingo
+
+							const horas = gerarHorasParaDia(diaSemana, almocoSelecionado);
+							if (horas.length > 0) salvarHorasDoDia(ano, m + 1, d, horas);
+						}
+					}
+
+					renderMonth(viewYear, viewMonth);
+				}
+
+
+
+				document.getElementById("padraoSemana").addEventListener("change", () => { });
+				document.getElementById("padraoMes").addEventListener("change", () => { });
+				document.getElementById("padraoAnoRestante").addEventListener("change", () => { });
+
+
+
+
+				/* ======================================================
+				   🔹 BLOCO 12 — SALVAR ALTERAÇÕES DOS RÁDIOS
+				   ====================================================== */
+				document.getElementById("btnSalvarPadroes").addEventListener("click", () => {
+					const padraoSemana = document.getElementById("padraoSemana").checked;
+					const padraoMes = document.getElementById("padraoMes").checked;
+					const padraoAnoRestante = document.getElementById("padraoAnoRestante").checked;
+					const almocoSelecionado = document.querySelector("input[name='horarioAlmoco']:checked")?.id;
+
+					// Aplica conforme o padrão escolhido
+					if (padraoSemana) aplicarPadraoSemana();
+					else if (padraoMes) aplicarPadraoMes();
+					else if (padraoAnoRestante) aplicarPadraoAnoRestante();
+					else {
+						alert("⚠️ Escolha um padrão de disponibilidade antes de salvar!");
+						return;
+					}
+
+					// Remove o horário de almoço das marcações, se aplicável
+					if (almocoSelecionado && almocoSelecionado !== "almocoNenhum") {
+						const horaAlmoco = document.getElementById(almocoSelecionado).nextElementSibling.textContent.trim();
+						const chaves = Object.keys(localStorage).filter(k => k.startsWith("horarios-"));
+						chaves.forEach(k => {
+							const dados = JSON.parse(localStorage.getItem(k));
+							if (dados && Array.isArray(dados.horarios)) {
+								dados.horarios = dados.horarios.filter(h => h !== horaAlmoco);
+								localStorage.setItem(k, JSON.stringify(dados));
+							}
+						});
+					}
+
+					alert("💾 Alterações salvas e replicadas no calendário!");
+					renderMonth(viewYear, viewMonth);
+				});
+
+
+				/* ======================================================
+				   🔹 BLOCO 14 - BOTÃO — ZERAR MARCAÇÕES E SERVIÇOS DO DIA
+				   ====================================================== */
+				document.getElementById("btnZerarHorariosDia").addEventListener("click", () => {
+					if (!confirm("Tem certeza que deseja limpar todas as marcações deste dia?")) return;
+
+					// Remove todos os horários e serviços salvos
+					horariosSelecionados = {};
+					renderGradeHorarios();
+
+					// Atualiza armazenamento local
+					localStorage.setItem(
+						keyScoped(viewYear, viewMonth + 1, diaSelecionado),
+						JSON.stringify({horarios: {}})
+					);
+
+					alert("🧹 Todas as marcações e serviços deste dia foram zeradas!");
+				});
+
+
+
+				/* ======================================================
+				   🔹 BLOCO 13 - ATIVAÇÃO GLOBAL DOS TOOLTIPS (Bootstrap)
+				   ====================================================== */
+				document.addEventListener("DOMContentLoaded", function () {
+					const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+					tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+						new bootstrap.Tooltip(tooltipTriggerEl);
+					});
+				});
+
+
+				/* ✅ Adicione este bloco logo **antes** da linha final:
+					document.addEventListener("DOMContentLoaded", () => renderMonth(viewYear, viewMonth));
+					Ele garante que as marcações salvas permaneçam após o F5. */
+
+				document.addEventListener("DOMContentLoaded", () => {
+					Object.keys(localStorage)
+						.filter(k => k.startsWith("horarios-"))
+						.forEach(k => {
+							const match = k.match(/horarios-(\d+)-(\d+)-(\d+)/);
+							if (!match) return;
+							const [_, ano, mes, dia] = match.map(Number);
+							const cell = Array.from(document.querySelectorAll(".calendar-day")).find(
+								c => parseInt(c.textContent) === dia
+							);
+							if (cell && ano === viewYear && mes === viewMonth + 1) {
+								cell.classList.add("selected");
+							}
+						});
+				});
+
+
+				/* ======================================================
+				   🔹 BLOCO 9 — NÃO PODE ACABAR COM ESSE BLOCO
+				   ====================================================== */
+				document.addEventListener("DOMContentLoaded", () => renderMonth(viewYear, viewMonth));
+
+			</script>
+			<script src="/app_agendamento/painel/topbar.js"></script>
+
+</body>
+
+</html>

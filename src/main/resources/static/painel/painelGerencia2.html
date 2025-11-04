@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+	<style id="tabela-clientes-recentes-ajustes">
+		table.table {
+			font-size: .88rem;
+		}
+
+		table.table tr>* {
+			vertical-align: middle;
+		}
+
+		#tabelaClientesRecentes th:nth-child(1),
+		#tabelaClientesRecentes td:nth-child(1) {
+			width: px;
+			text-align: center;
+			white-space: nowrap;
+		}
+
+		#tabelaClientesRecentes th:nth-child(2),
+		#tabelaClientesRecentes td:nth-child(2) {
+			min-width: 200px;
+			max-width: 280px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		#tabelaClientesRecentes th:nth-child(3),
+		#tabelaClientesRecentes td:nth-child(3) {
+			min-width: 260px;
+			max-width: 380px;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			border-bottom: 2px solid #dee2e6;
+		}
+
+		#tabelaClientesRecentes th:nth-child(4),
+		#tabelaClientesRecentes td:nth-child(4) {
+			max-width: 220px;
+			white-space: normal;
+			word-wrap: break-word;
+		}
+
+		#tabelaClientesRecentes th:nth-child(5),
+		#tabelaClientesRecentes td:nth-child(5) {
+			max-width: 120px;
+			white-space: normal;
+			word-wrap: break-word;
+		}
+
+		.paginacao-wrapper {
+			display: flex;
+			justify-content: center;
+			margin: .75rem 0 0;
+		}
+
+		.paginacao-wrapper .pagination.pagination-sm .page-link {
+			padding: 4px 10px;
+			font-size: .85rem;
+		}
+
+		.paginacao-wrapper .page-link {
+			color: #6c757d;
+		}
+
+		.paginacao-wrapper .page-item.disabled .page-link {
+			background: #f8f9fa;
+			color: #6c757d;
+			border-color: #dee2e6;
+		}
+
+		.container-fluid {
+			position: relative;
+			/* Necessário para o deslocamento funcionar */
+			top: -20px;
+			/* Move o conteúdo 20px para cima */
+		}
+
+		/* Caso prefira empurrar para baixo, use valor positivo */
+		.container-fluid.baixo {
+			top: 40px;
+			/* Move 40px para baixo */
+		}
+
+
+		.badge-cancelado {
+			background-color: #f5bcbc !important;
+			color: #6b0000 !important;
+		}
+
+		.blinking {
+			animation: piscar 1s infinite;
+		}
+
+		@keyframes piscar {
+
+			0%,
+			50%,
+			100% {
+				opacity: 1;
+			}
+
+			25%,
+			75% {
+				opacity: 0.3;
+			}
+		}
+
+
+
+		#filtroDataAgendamento {
+			background-image: url('https://cdn-icons-png.flaticon.com/512/747/747310.png');
+			background-repeat: no-repeat;
+			background-position: 6px center;
+			background-size: 16px;
+			padding-left: 28px;
+		}
+
+
+		#btnHoje {
+			padding: 0.3rem 0.55rem;
+			line-height: 1;
+		}
+
+		#btnHoje i {
+			font-size: 1rem;
+		}
+		
+		/* ============================ */
+		/* 🔹 Padronização de Cards do PainelGerencia */
+		/* ============================ */
+
+		/* Força todos os cards da primeira linha a terem o mesmo tamanho */
+		.row.g-3.mb-3 .card {
+		  height: 200px;               /* altura fixa igual */
+		  min-height: 200px;
+		  width: 100%;                 /* garante que ocupem toda a coluna */
+		  display: flex;
+		  flex-direction: column;
+		  justify-content: center;     /* centraliza verticalmente */
+		  align-items: center;         /* centraliza horizontalmente */
+		  text-align: center;
+		  border-radius: 14px;
+		  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+		}
+
+		/* Remove min-height inline (tem prioridade menor que inline) */
+		#cardAgendamentosPainel,
+		#cardFinanceiroPainel {
+		  min-height: unset !important;
+		}
+
+		/* Garante colunas iguais mesmo se o conteúdo interno variar */
+		.row.g-3.mb-3 > [class*="col-"] {
+		  display: flex;
+		  align-items: stretch;
+		}
+
+		/* Ajuste de ícones e textos */
+		.row.g-3.mb-3 .card i {
+		  font-size: 2rem;
+		  margin-bottom: 0.5rem;
+		}
+
+		/* Responsividade para telas pequenas */
+		@media (max-width: 768px) {
+		  .row.g-3.mb-3 .card {
+		    height: 160px;
+		  }
+		}
+
+		
+		/* 🔹 Área dos cards superiores */
+		.card {
+		  height: 180px;              /* altura fixa e igual para todos */
+		  display: flex;              /* centraliza verticalmente o conteúdo */
+		  flex-direction: column;
+		  justify-content: center;
+		  align-items: center;
+		  text-align: center;
+
+		  /* estética */
+		  border-radius: 12px;         /* cantos arredondados */
+		  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		}
+
+		/* 🔹 Ajuste de responsividade — cards menores em telas pequenas */
+		@media (max-width: 768px) {
+		  .card {
+		    height: 150px;
+		  }
+		}
+
+		/* 🔹 Espaçamento entre os cards */
+		.row .col {
+		  margin-bottom: 15px;
+		}
+
+	</style>
+
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Painel Administrativo 8.0</title>
+	<link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css}" rel="stylesheet">
+	<link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css}" rel="stylesheet">
+	<link th:href="@{/css/dashboard8.0.css}" rel="stylesheet">
+	<!-- Bootstrap CSS -->
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<!-- Ícones Bootstrap -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+	<!-- CSS principal -->
+	<link rel="stylesheet" href="/app_agendamento/painel/dashboard8.0.css">
+
+
+	<script>
+		const lojas = JSON.parse(localStorage.getItem("lojasCadastradas") || "[]");
+		const lojaAtual = lojas.find(l => l.nomeLoja === "Minha Loja");
+
+		if (lojaAtual && lojaAtual.status === "em atraso") {
+			localStorage.setItem("clienteStatus", "bloqueado");
+			alert("Acesso bloqueado por atraso no pagamento.");
+			const ctx = "/" + location.pathname.split("/")[1];
+			window.location.href = `${ctx}/loginAcesso.html`;
+		} else {
+			localStorage.setItem("clienteStatus", "ativo");
+		}
+	</script>
+
+</head>
+
+<body>
+
+
+	<!-- SIDEBAR -->
+	<div id="sidebar" class="sidebar">
+		<div class="sidebar-header text-center p-3 border-bottom border-light">
+			<img id="logoCliente" th:src="@{/imagens/logo-padrao.png}" alt="Logo" class="logo mb-2">
+			<h6 id="nomeCliente" class="fw-semibold">Minha Loja</h6>
+		</div>
+
+		<button id="toggleSidebar" class="btn btn-outline-light btn-sm toggle-btn" title="Expandir/Recolher">
+			<i class="bi bi-list"></i>
+		</button>
+
+		<ul class="nav flex-column mt-3">
+			<li class="nav-item">
+				<a th:href="@{/painel/gerencia}" class="nav-link active">
+					<i class="bi bi-house-door"></i><span>Início</span>
+				</a>
+			</li>
+
+			<!--<li class="nav-item">
+		<a class="nav-link" data-bs-toggle="collapse" href="#submenuAgendamento" role="button" aria-expanded="false"
+			aria-controls="submenuAgendamento">
+			<i class="bi bi-calendar-check"></i><span>Agendamento</span>
+			<i class="bi bi-chevron-down ms-auto"></i>
+		</a>
+		<div class="collapse ps-4" id="submenuAgendamento">
+		</div>-->
+			</li>
+
+			<li class="nav-item">
+				<a href="/app_agendamento/painel/agendamentoServico.html" class="nav-link"><i
+						class="bi bi-calendar-check"></i><span>Agendamento</span></a>
+
+			</li>
+
+			<li class="nav-item">
+				<a href="/app_agendamento/painel/configAgendamento.html" class="nav-link"><i
+						class="bi bi-calendar-check"></i><span>ConfigAgendamento</span></a>
+			</li>
+
+			<li class="nav-item">
+				<a href="/app_agendamento/painel/relatorioAgendamento.html" class="nav-link"><i
+						class="bi bi-bar-chart"></i><span>Relatório</span></a>
+			</li>
+
+
+			<li class="nav-item">
+				<a href="/app_agendamento/painel/agendamentoDespesa.html" class="nav-link"><i
+						class="bi bi-cash-coin"></i><span>Despesas</span></a>
+			</li>
+
+			<li class="nav-item">
+				<a href="#" class="nav-link"><i class="bi bi-gear"></i><span>Configurações</span></a>
+			</li>
+		</ul>
+
+		<button id="btnSair" class="btn btn-blue text-white btn-sm fw-semibold">
+			<i class="bi bi-box-arrow-right"></i> Sair
+		</button>
+	</div>
+
+	<main>
+		<!-- CONTEÚDO -->
+		<main class="content p-3 p-md-4">
+			<div class="container-fluid">
+				<div class="row mb-3">
+					<div class="col">
+						<h4 class="fw-bold mb-1 text-primary">Bem-vindo ao Painel Administrativo 8.0</h4>
+						<p class="text-muted mb-0">Acompanhe a movimentação de serviços e produtos.</p>
+					</div>
+				</div>
+
+				<!-- ============================ -->
+				<!-- LINHA 1: CARDS DE AGENDAMENTO -->
+				<!-- ============================ -->
+				<div class="row g-3 mb-3">
+
+					<!-- Total de Agendamentos -->
+					<!-- 🔹 Card Unificado: Agendamentos Totais e do Dia -->
+					<div class="col-6 col-md-3">
+						<div id="cardAgendamentosPainel" class="card stats-card text-white text-center p-3"
+							style="background-color: var(--primary-color); min-height: 155px; position: relative;">
+							<i class="bi bi-calendar2-event mb-1" style="font-size: 1.8rem;"></i>
+							<div class="fw-bold text-uppercase" style="font-size: 0.85rem;">Agendamentos</div>
+							<div id="totalAgendamentosPainel" class="fw-bold fs-2 mt-1" style="line-height: 1;">0</div>
+							<div id="totalAgendamentosHojePainel" class="text-light small mt-1 opacity-75">Hoje: 0</div>
+
+							<!-- Barra de progresso -->
+							<div class="progress mt-2"
+								style="height: 6px; background-color: rgba(255,255,255,0.2); border-radius: 3px;">
+								<div id="barraAgendamentosPainel" class="progress-bar"
+									style="width: 0%; transition: width 0.8s ease, background-color 0.8s ease;"></div>
+							</div>
+						</div>
+					</div>
+
+					<!-- (Preparo futuro) Card livre para outra métrica -->
+					<div class="col-6 col-md-3">
+						<div class="card stats-card text-dark bg-light border border-secondary-subtle">
+							<i class="bi bi-bar-chart"></i>
+							<div class="number fw-bold" id="placeholderCardPainel">Em breve</div>
+							<div>Indicador Personalizado</div>
+						</div>
+					</div>
+
+					<!-- Próximos Vencimentos -->
+					<div class="col-6 col-md-3">
+						<div id="cardVencimentoPainel"
+							class="card stats-card text-dark bg-warning-subtle border border-warning-subtle">
+							<i class="bi bi-alarm"></i>
+							<div class="fs-6 fw-bold mb-1" id="qtdItensVencimentoPainel">0 itens</div>
+							<div class="fs-6 fw-bold" id="dataMaisProximaPainel">—</div>
+							<small class="text-muted d-block mt-1">Próximo a Vencer</small>
+						</div>
+					</div>
+
+					<!-- Card Unificado: Balanço Financeiro -->
+					<div class="col-6 col-md-3">
+						<div id="cardFinanceiroPainel" class="card stats-card text-white text-center p-3"
+							style="background-color: var(--primary-color); min-height: 155px; position: relative;">
+							<i class="bi bi-cash-stack mb-1" style="font-size: 1.8rem;"></i>
+							<div class="fw-bold text-uppercase" style="font-size: 0.85rem;">Balanço Financeiro R$</div>
+							<div id="valorReceitaTotalPainel" class="fw-bold fs-2 mt-1" style="line-height: 1;">0,00
+							</div>
+							<div id="valorDespesasMensaisPainel" class="text-light small mt-1 opacity-75">Despesas: R$
+								0,00</div>
+
+							<!-- Barra de progresso -->
+							<div class="progress mt-2"
+								style="height: 6px; background-color: rgba(255,255,255,0.2); border-radius: 3px;">
+								<div id="barraFinanceiraPainel" class="progress-bar"
+									style="width: 0%; transition: width 0.8s ease, background-color 0.8s ease;"></div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+
+
+				<!-- AGENDAMENTOS RECEBIDOS -->
+				<div class="card mt-4">
+					<div class="card-header bg-info text-white text-center">
+						<h5 class="mb-0"><i class="bi bi-person-lines-fill"></i> Agendamentos Recebidos</h5>
+					</div>
+					<div class="card-body">
+
+						<!-- 🔹 Seletor de Data -->
+						<div class="d-flex justify-content-between align-items-center mb-3">
+							<h6 class="text-secondary fw-semibold mb-0">
+								📅 Data selecionada: <span id="dataSelecionadaLabel"></span>
+							</h6>
+
+							<div class="d-flex align-items-center gap-2">
+								<input type="date" id="filtroDataAgendamento"
+									class="form-control form-control-sm w-auto">
+								<button id="btnHoje" class="btn btn-outline-primary btn-sm" title="Ir para hoje">
+									<i class="bi bi-calendar-day"></i>
+								</button>
+							</div>
+						</div>
+
+						<!-- 🔍 Campo de busca -->
+						<div class="mb-2">
+							<div class="input-group input-group-sm">
+								<span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+								<input type="text" id="filtroBusca" class="form-control"
+									placeholder="Pesquisar por serviço, nome ou status...">
+							</div>
+						</div>
+
+						<!-- 🧾 Tabela de agendamentos -->
+						<div class="table-responsive">
+							<table class="table table-bordered align-middle">
+								<thead class="table-light text-center align-middle">
+									<tr>
+										<th>Data</th>
+										<th>Horário</th>
+										<th>Nome</th>
+										<th>Telefone</th>
+										<th>Serviço</th>
+										<th>Status</th>
+										<th>Ações</th>
+									</tr>
+								</thead>
+								<tbody id="tabelaAgendamentos"></tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<!-- ===================================================== -->
+				<!-- 🔹 SCRIPT DE CALENDÁRIO E FILTRAGEM DE AGENDAMENTOS -->
+				<!-- ===================================================== -->
+
+				<script>
+					async function carregarAgendamentosPorData(dataFiltro = "", filtroTexto = "") {
+						const tbody = document.getElementById("tabelaAgendamentos");
+						const label = document.getElementById("dataSelecionadaLabel");
+
+						const hoje = new Date();
+						const dataHojeISO = hoje.toISOString().split("T")[0];
+						const dataSelecionada = dataFiltro || dataHojeISO;
+
+						// 🔸 Atualiza o rótulo acima da tabela
+						const [ano, mes, dia] = dataSelecionada.split("-");
+						const dataBR = `${dia}/${mes}/${ano}`;
+						const hojeBR = hoje.toLocaleDateString("pt-BR");
+						label.textContent = (dataBR === hojeBR) ? `Hoje (${dataBR})` : dataBR;
+
+						try {
+							// 🔹 Busca os agendamentos do backend
+							const resp = await fetch("/app_agendamento/api/agendamento-servico");
+							if (!resp.ok) throw new Error(`Erro HTTP ${resp.status}`);
+							const agendamentos = await resp.json();
+
+							// 🔹 Conversão e filtragem exata
+							const filtrados = agendamentos.filter(a => {
+								if (!a.data) return false;
+
+								// --- Detectar formato da data (YYYY-MM-DD ou DD/MM/YYYY) ---
+								let dataBancoISO = "";
+								if (a.data.includes("-")) {
+									// formato americano vindo do banco
+									dataBancoISO = a.data;
+								} else if (a.data.includes("/")) {
+									// formato brasileiro vindo localmente
+									const [d, m, y] = a.data.split("/");
+									dataBancoISO = `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+								}
+
+								// 🔸 Filtro de data + texto de busca
+								const texto = filtroTexto.toLowerCase().trim();
+								return (
+									dataBancoISO === dataSelecionada &&
+									(
+										!texto ||
+										(a.servico || "").toLowerCase().includes(texto) ||
+										(a.nomeCliente || "").toLowerCase().includes(texto) ||
+										(a.status || "").toLowerCase().includes(texto)
+									)
+								);
+							});
+
+							// 🔹 Limpa a tabela e exibe apenas a data filtrada
+							tbody.innerHTML = "";
+							if (filtrados.length === 0) {
+								tbody.innerHTML = `
+	          <tr>
+	            <td colspan="7" class="text-center text-muted">
+	              Nenhum agendamento encontrado para ${dataBR === hojeBR ? "hoje" : "esta data"}.
+	            </td>
+	          </tr>`;
+								return;
+							}
+
+							// 🔹 Ordenar por horário
+							filtrados.sort((a, b) => (a.horario || "").localeCompare(b.horario || ""));
+
+							// 🔹 Renderizar os agendamentos da data selecionada
+							filtrados.forEach(a => {
+								const status = a.status || "Aguardando";
+								const classe =
+									status === "Atendido" ? "text-bg-success" :
+										status === "Cancelado" ? "badge-cancelado" :
+											"text-bg-warning";
+
+								// --- Converte a data para exibição BR ---
+								let dataBRformatada = a.data;
+								if (a.data.includes("-")) {
+									const [y, m, d] = a.data.split("-");
+									dataBRformatada = `${d}/${m}/${y}`;
+								}
+
+								tbody.insertAdjacentHTML("beforeend", `
+	          <tr>
+	            <td>${dataBRformatada}</td>
+	            <td>${a.horario || ""}</td>
+	            <td>${a.nomeCliente || ""}</td>
+	            <td>${a.telefone || ""}</td>
+	            <td>${a.servico || ""}</td>
+	            <td><span class="badge ${classe}">${status}</span></td>
+	            <td class="text-center">
+	              <button class="btn btn-sm btn-success me-1" onclick="confirmarAtendido('${a.id}')">
+	                <i class="bi bi-check2-circle"></i>
+	              </button>
+	              <button class="btn btn-sm btn-danger" onclick="confirmarCancelado('${a.id}')">
+	                <i class="bi bi-x-circle"></i>
+	              </button>
+	            </td>
+	          </tr>
+	        `);
+							});
+
+						} catch (e) {
+							console.error("Erro ao carregar agendamentos:", e);
+							tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">Erro ao carregar agendamentos.</td></tr>`;
+						}
+					}
+
+					// === Inicialização automática ===
+					document.addEventListener("DOMContentLoaded", () => {
+						const inputData = document.getElementById("filtroDataAgendamento");
+						const inputBusca = document.getElementById("filtroBusca");
+						const hoje = new Date();
+
+						// Define o valor padrão como a data atual (ISO)
+						inputData.value = hoje.toISOString().split("T")[0];
+
+						// Carrega os agendamentos do dia corrente
+						carregarAgendamentosPorData(inputData.value);
+
+						// Atualiza ao mudar data no calendário
+						inputData.addEventListener("change", e => {
+							carregarAgendamentosPorData(e.target.value, inputBusca.value);
+						});
+
+						// Atualiza ao digitar na busca
+						inputBusca.addEventListener("input", e => {
+							carregarAgendamentosPorData(inputData.value, e.target.value);
+						});
+					});
+				</script>
+
+
+				<!-- ===================================================== -->
+				<!-- ===============  SCRIPTS PRINCIPAIS LIMPOS =========== -->
+				<!-- ===================================================== -->
+
+				<script>
+					// =====================================================
+					// 🔹 BLOCO 1 - VALIDAÇÃO DE ACESSO
+					// =====================================================
+					(() => {
+						const lojas = JSON.parse(localStorage.getItem("lojasCadastradas") || "[]");
+						const lojaAtual = lojas.find(l => l.nomeLoja === "Minha Loja");
+						if (lojaAtual && lojaAtual.status === "em atraso") {
+							localStorage.setItem("clienteStatus", "bloqueado");
+							alert("Acesso bloqueado por atraso no pagamento.");
+							const ctx = "/" + location.pathname.split("/")[1];
+							window.location.href = `${ctx}/loginAcesso.html`;
+						} else {
+							localStorage.setItem("clienteStatus", "ativo");
+						}
+					})();
+				</script>
+
+				<!-- ===================================================== -->
+				<!-- 🔹 BLOCO ÚNICO — CALENDÁRIO + TABELA (com filtro de data real) -->
+				<!-- ===================================================== -->
+				<script>
+					// ===== Utilidades de data =====
+					function toISO(str) {
+						if (!str) return null;
+						let s = String(str).trim();
+						if (s.includes("T")) s = s.split("T")[0];              // corta tempo se vier "2025-10-31T00:00:00"
+						if (s.includes("-")) return s;                         // já está em ISO (YYYY-MM-DD)
+						if (s.includes("/")) {                                 // converte BR -> ISO
+							const [d, m, y] = s.split("/");
+							return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
+						}
+						return null;
+					}
+
+					function isoToBR(iso) {
+						if (!iso) return "";
+						const s = iso.includes("T") ? iso.split("T")[0] : iso;
+						const [y, m, d] = s.split("-");
+						if (!y || !m || !d) return iso;
+						return `${d}/${m}/${y}`;
+					}
+
+					// ===== Renderização da tabela com filtro de data =====
+					async function renderAgendamentosTabela(dateISO, filtroTexto = "") {
+						const tbody = document.getElementById("tabelaAgendamentos");
+						const label = document.getElementById("dataSelecionadaLabel");
+
+						const todayISO = new Date().toISOString().split("T")[0];
+						const alvoISO = dateISO || todayISO;
+						const alvoBR = isoToBR(alvoISO);
+
+						// Rótulo acima da tabela
+						label.textContent = (alvoISO === todayISO) ? `Hoje (${alvoBR})` : alvoBR;
+
+						try {
+							const resp = await fetch("/app_agendamento/api/agendamento-servico");
+							if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+							const dados = await resp.json();
+
+							const texto = (filtroTexto || "").toLowerCase().trim();
+
+							// 🔒 Filtro estrito pela data selecionada
+							const filtrados = dados
+								.filter(a => {
+									const itemISO = toISO(a.data);    // aceita "YYYY-MM-DD" ou "DD/MM/YYYY"
+									if (!itemISO) return false;
+									if (itemISO !== alvoISO) return false;
+
+									if (!texto) return true;
+									return (a.servico || "").toLowerCase().includes(texto)
+										|| (a.nomeCliente || "").toLowerCase().includes(texto)
+										|| (a.status || "").toLowerCase().includes(texto);
+								})
+								.sort((a, b) => (a.horario || "").localeCompare(b.horario || ""));
+
+							// Render
+							tbody.innerHTML = "";
+							if (filtrados.length === 0) {
+								tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">
+	          Nenhum agendamento para ${alvoISO === todayISO ? "hoje" : alvoBR}.
+	        </td></tr>`;
+								return;
+							}
+
+							filtrados.forEach(a => {
+								const status = a.status || "Aguardando";
+								const classe =
+									status === "Atendido" ? "text-bg-success" :
+										status === "Cancelado" ? "badge-cancelado" :
+											"text-bg-warning";
+
+								// Converte a data para BR na exibição da tabela
+								const dataExibir = isoToBR(toISO(a.data));
+
+								tbody.insertAdjacentHTML("beforeend", `
+	          <tr>
+	            <td>${dataExibir}</td>
+	            <td>${a.horario || ""}</td>
+	            <td>${a.nomeCliente || ""}</td>
+	            <td>${a.telefone || ""}</td>
+	            <td>${a.servico || ""}</td>
+	            <td><span class="badge ${classe}">${status}</span></td>
+	            <td class="text-center">
+	              <button class="btn btn-sm btn-success me-1" onclick="confirmarAtendido('${a.id}')">
+	                <i class="bi bi-check2-circle"></i>
+	              </button>
+	              <button class="btn btn-sm btn-danger" onclick="confirmarCancelado('${a.id}')">
+	                <i class="bi bi-x-circle"></i>
+	              </button>
+	            </td>
+	          </tr>
+	        `);
+							});
+
+						} catch (e) {
+							console.error("Erro ao carregar agendamentos:", e);
+							tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger">
+	        Erro ao carregar agendamentos.
+	      </td></tr>`;
+						}
+					}
+
+					// ===== Inicialização sincronizada com o calendário =====
+					document.addEventListener("DOMContentLoaded", () => {
+						const inputData = document.getElementById("filtroDataAgendamento");
+						const inputBusca = document.getElementById("filtroBusca");
+						const todayISO = new Date().toISOString().split("T")[0];
+
+						// Define data padrão (hoje) no input date
+						inputData.value = todayISO;
+
+						// Carrega somente os agendamentos da data corrente
+						renderAgendamentosTabela(todayISO);
+
+						// Ao mudar a data no calendário
+						inputData.addEventListener("change", (e) => {
+							renderAgendamentosTabela(e.target.value, inputBusca.value);
+						});
+
+						// Ao digitar no campo de busca (filtra dentro da data escolhida)
+						inputBusca.addEventListener("input", (e) => {
+							renderAgendamentosTabela(inputData.value, e.target.value);
+						});
+
+						// 🔁 Auto-refresh a cada 10s respeitando a data selecionada
+						setInterval(() => {
+							renderAgendamentosTabela(inputData.value, inputBusca.value);
+						}, 10000);
+					});
+				</script>
+
+
+				<script>
+					// =====================================================
+					// 🔹 BLOCO 2.1 — FUNÇÕES DE STATUS (Atendido / Cancelado) COM CONFIRMAÇÃO
+					// =====================================================
+
+					async function confirmarAtendido(id) {
+						const linha = event.target.closest("tr");
+						const celulaStatus = linha.querySelector("td:nth-child(6) span");
+
+						// 🔸 Mensagem de confirmação
+						const confirmar = confirm("✅ Tem certeza que deseja marcar este agendamento como ATENDIDO?");
+						if (!confirmar) return; // se clicar em 'Cancelar', apenas sai
+
+						// 🔸 Atualiza visualmente
+						celulaStatus.textContent = "Atendido!";
+						celulaStatus.className = "badge text-bg-success";
+
+						try {
+							// 🔸 Atualiza no banco
+							const resp = await fetch(`/app_agendamento/api/agendamento-servico/${id}/status`, {
+								method: "PUT",
+								headers: {"Content-Type": "application/json"},
+								body: JSON.stringify({status: "Atendido"})
+							});
+
+							if (!resp.ok) throw new Error("Erro ao salvar no banco");
+
+							// ✅ Atualiza tabela após salvar
+							await carregarAgendamentosBanco(document.getElementById("filtroBusca")?.value || "");
+
+							alert("✔️ Agendamento marcado como ATENDIDO com sucesso!");
+							console.log("✔️ Status alterado para ATENDIDO e persistido no banco.");
+						} catch (e) {
+							console.error("Erro ao atualizar status:", e);
+							alert("❌ Falha ao atualizar no banco. Verifique o backend.");
+						}
+					}
+
+					async function confirmarCancelado(id) {
+						const linha = event.target.closest("tr");
+						const celulaStatus = linha.querySelector("td:nth-child(6) span");
+
+						// 🔸 Mensagem de confirmação
+						const confirmar = confirm("⚠️ Tem certeza que deseja CANCELAR este agendamento?");
+						if (!confirmar) return; // se clicar em 'Cancelar', apenas sai
+
+						// 🔸 Atualiza visualmente
+						celulaStatus.textContent = "Cancelado!";
+						celulaStatus.className = "badge badge-cancelado";
+
+						try {
+							// 🔸 Atualiza no banco
+							const resp = await fetch(`/app_agendamento/api/agendamento-servico/${id}/status`, {
+								method: "PUT",
+								headers: {"Content-Type": "application/json"},
+								body: JSON.stringify({status: "Cancelado"})
+							});
+
+							if (!resp.ok) throw new Error("Erro ao salvar no banco");
+
+							// ✅ Atualiza tabela após salvar
+							await carregarAgendamentosBanco(document.getElementById("filtroBusca")?.value || "");
+
+							alert("🛑 Agendamento CANCELADO com sucesso!");
+							console.log("✔️ Status alterado para CANCELADO e persistido no banco.");
+						} catch (e) {
+							console.error("Erro ao atualizar status:", e);
+							alert("❌ Falha ao atualizar no banco. Verifique o backend.");
+						}
+					}
+				</script>
+
+
+				<script>
+					// =====================================================
+					// 🔹 BLOCO 3 - CARDS DE INDICADORES (BALANÇO / VENCIMENTOS / AGENDAMENTOS)
+					// =====================================================
+
+					function atualizarCardsPainel() {
+						atualizarCardFinanceiro();
+						atualizarCardVencimentos();
+						atualizarTotalAgendamentos();
+					}
+
+					async function atualizarCardFinanceiro() {
+						try {
+							// 🔹 1. Busca serviços cadastrados (com nome e valor)
+							const servicos = JSON.parse(localStorage.getItem("servicosAgendamento") || "[]");
+							const mapaServicos = {};
+							servicos.forEach(s => {
+								mapaServicos[s.nome?.trim().toLowerCase()] = parseFloat(s.valor) || 0;
+							});
+
+							// 🔹 2. Busca agendamentos do backend (com coluna 'servico')
+							const respAg = await fetch("/app_agendamento/api/agendamento-servico");
+							if (!respAg.ok) throw new Error("Erro ao buscar agendamentos.");
+							const ags = await respAg.json();
+
+							// 🔹 3. Conta quantos atendimentos de cada serviço existem
+							const contagem = {};
+							ags.forEach(a => {
+								if (a.status === "Atendido" && a.servico) {
+									const nome = a.servico.trim().toLowerCase();
+									contagem[nome] = (contagem[nome] || 0) + 1;
+								}
+							});
+
+							// 🔹 4. Calcula o total de receita (valor × quantidade)
+							let totalReceita = 0;
+							for (const servico in contagem) {
+								const valor = mapaServicos[servico] || 0;
+								totalReceita += valor * contagem[servico];
+							}
+
+							// 🔹 5. Calcula despesas (mantém lógica atual)
+							const despesasMensais = JSON.parse(localStorage.getItem("despesas") || "[]");
+							const totalDespesas = despesasMensais.reduce((s, d) => s + (parseFloat(d.valorTotal) || 0), 0);
+
+							// 🔹 6. Atualiza card no layout existente
+							const elCard = document.getElementById("cardFinanceiroPainel");
+							const elReceita = document.getElementById("valorReceitaTotalPainel");
+							const elDespesas = document.getElementById("valorDespesasMensaisPainel");
+							const elBarra = document.getElementById("barraFinanceiraPainel");
+
+							elReceita.textContent = totalReceita.toLocaleString("pt-BR", {minimumFractionDigits: 2});
+							elDespesas.textContent = "Despesas: R$ " + totalDespesas.toLocaleString("pt-BR", {minimumFractionDigits: 2});
+
+							const perc = totalReceita > 0 ? Math.min((totalDespesas / totalReceita) * 100, 150) : 0;
+							elBarra.style.width = perc + "%";
+							elBarra.style.backgroundColor = perc < 80 ? "#28a745" : perc <= 100 ? "#ffc107" : "#dc3545";
+
+							const diff = totalReceita - totalDespesas;
+							if (diff < 0) elCard.style.backgroundColor = "#dc3545";
+							else if (diff === 0) elCard.style.backgroundColor = "#ffc107";
+							else elCard.style.backgroundColor = "#198754";
+
+							console.log("💰 Total Receita calculada:", totalReceita);
+							console.log("📦 Contagem de serviços:", contagem);
+
+						} catch (erro) {
+							console.error("❌ Erro no cálculo do balanço financeiro:", erro);
+							document.getElementById("valorReceitaTotalPainel").textContent = "Erro";
+						}
+
+						const totalDespesas = despesasMensais.reduce((s, d) => s + (parseFloat(d.valorTotal) || 0), 0);
+						const obterValor = nome => (servicos.find(x => x.nome === nome)?.valor || 0);
+						const totalReceita = agendamentos.filter(a => a.status === "Atendido")
+							.reduce((t, a) => t + parseFloat(obterValor(a.servico) || 0), 0);
+
+						const elCard = document.getElementById("cardFinanceiroPainel");
+						const elReceita = document.getElementById("valorReceitaTotalPainel");
+						const elDespesas = document.getElementById("valorDespesasMensaisPainel");
+						const elBarra = document.getElementById("barraFinanceiraPainel");
+
+						elReceita.textContent = totalReceita.toLocaleString("pt-BR", {minimumFractionDigits: 2});
+						elDespesas.textContent = "Despesas: R$ " + totalDespesas.toLocaleString("pt-BR", {minimumFractionDigits: 2});
+						const perc = totalReceita > 0 ? Math.min((totalDespesas / totalReceita) * 100, 150) : 0;
+						elBarra.style.width = perc + "%";
+						elBarra.style.backgroundColor = perc < 80 ? "#28a745" : perc <= 100 ? "#ffc107" : "#dc3545";
+
+						const diff = totalReceita - totalDespesas;
+						if (diff < 0) elCard.style.backgroundColor = "#dc3545";
+						else if (diff === 0) elCard.style.backgroundColor = "#ffc107";
+						else elCard.style.backgroundColor = "#198754";
+					}
+
+					function atualizarCardVencimentos() {
+						const arr = JSON.parse(localStorage.getItem("despesasProfissionais") || "[]");
+						const hoje = new Date();
+						const futuras = arr
+							.map(d => ({...d, dataISO: d.vencimento ? d.vencimento.split("/").reverse().join("-") : null}))
+							.filter(d => d.dataISO && d.dataISO >= hoje.toISOString().slice(0, 10))
+							.sort((a, b) => a.dataISO.localeCompare(b.dataISO));
+
+						const elData = document.getElementById("dataMaisProximaPainel");
+						const elQtd = document.getElementById("qtdItensVencimentoPainel");
+						const elCard = document.getElementById("cardVencimentoPainel");
+
+						if (!futuras.length) {
+							elData.textContent = "—"; elQtd.textContent = "0 itens";
+							elCard.className = "card stats-card text-dark bg-light border border-secondary-subtle";
+							return;
+						}
+
+						const proxISO = futuras[0].dataISO;
+						const qtd = futuras.filter(x => x.dataISO === proxISO).length;
+						const prox = new Date(proxISO);
+						const diasRest = Math.ceil((prox - hoje) / (1000 * 60 * 60 * 24));
+
+						elData.textContent = proxISO.split("-").reverse().join("/");
+						elQtd.textContent = `${qtd} ${qtd > 1 ? "itens" : "item"}`;
+						elCard.className =
+							diasRest <= 3 ? "card stats-card text-white bg-danger border border-danger" :
+								diasRest <= 7 ? "card stats-card text-dark bg-warning-subtle border border-warning-subtle" :
+									"card stats-card text-dark bg-success-subtle border border-success-subtle";
+					}
+
+					async function atualizarTotalAgendamentos() {
+						try {
+							// 🔹 Busca todos os agendamentos do backend
+							const resp = await fetch("/app_agendamento/api/agendamento-servico");
+							if (!resp.ok) throw new Error("Erro ao buscar agendamentos no backend.");
+
+							const ags = await resp.json();
+
+							// 🔹 Total geral
+							const total = ags.length;
+
+							// 🔹 Data atual (formato ISO e BR)
+							const hojeISO = new Date().toISOString().slice(0, 10);
+							const hojeBR = new Date().toLocaleDateString("pt-BR");
+
+							// 🔹 Total do dia (verifica formatos diferentes)
+							const totalHoje = ags.filter(a => {
+								const d = (a.data || "").trim();
+								return d === hojeISO || d === hojeBR ||
+									d.startsWith(hojeISO) || d.startsWith(hojeBR);
+							}).length;
+
+							// 🔹 Atualiza elementos visuais existentes
+							document.getElementById("totalAgendamentosPainel").textContent = total;
+							document.getElementById("totalAgendamentosHojePainel").textContent = `Hoje: ${totalHoje}`;
+
+							// 🔹 Ajusta a barra e cores do card
+							const elCard = document.getElementById("cardAgendamentosPainel");
+							const elBarra = document.getElementById("barraAgendamentosPainel");
+
+							const perc = total > 0 ? Math.min((totalHoje / total) * 100, 100) : 0;
+							elBarra.style.width = perc + "%";
+							elBarra.style.backgroundColor =
+								perc < 30 ? "#dc3545" : perc < 70 ? "#ffc107" : "#28a745";
+
+							// 🔹 Mantém o mesmo estilo de fundo original, sem alterar layout
+							if (totalHoje === 0) elCard.style.backgroundColor = "#6c757d";
+							else if (totalHoje <= 3) elCard.style.backgroundColor = "#ffc107";
+							else elCard.style.backgroundColor = "#198754";
+
+							console.log(`📊 Agendamentos - Total: ${total} | Hoje: ${totalHoje}`);
+
+						} catch (erro) {
+							console.error("❌ Erro ao carregar agendamentos:", erro);
+							document.getElementById("totalAgendamentosPainel").textContent = "—";
+							document.getElementById("totalAgendamentosHojePainel").textContent = "Erro";
+						}
+					}
+
+					document.addEventListener("DOMContentLoaded", () => {
+						atualizarCardsPainel();
+						setInterval(atualizarCardsPainel, 60000);
+					});
+				</script>
+
+				<script>
+					// =====================================================
+					// 🔹 BLOCO 4 - BOTÃO SAIR
+					// =====================================================
+					document.getElementById("btnSair").addEventListener("click", () => {
+						if (!confirm("Deseja realmente sair do sistema?")) return;
+						localStorage.removeItem("clienteLogado");
+						alert("Sessão encerrada com sucesso.");
+						const ctx = "/" + location.pathname.split("/")[1];
+						window.location.href = `${ctx}/loginAcesso.html`;
+					});
+				</script>
+
+				<script>
+					// =====================================================
+						// 🔹 BLOCO  - BOTÃO IR PARA HOJE
+						// =====================================================
+					document.getElementById("btnHoje")?.addEventListener("click", () => {
+						const inputData = document.getElementById("filtroDataAgendamento");
+						const inputBusca = document.getElementById("filtroBusca");
+						const hojeISO = new Date().toISOString().split("T")[0];
+
+						inputData.value = hojeISO;
+						renderAgendamentosTabela(hojeISO, inputBusca.value);
+
+						// Breve destaque visual no botão
+						const btn = document.getElementById("btnHoje");
+						btn.classList.add("btn-success");
+						setTimeout(() => btn.classList.remove("btn-success"), 800);
+					});
+				</script>
+
+				<!-- Script do painel -->
+
+				<script
+					th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js}"></script>
+				<script th:src="@{/js/dashboard8.0.js}"></script>
+				<link th:href="@{/css/dashboard8.0.css}" rel="stylesheet">
+				<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+				<script src="/app_agendamento/painel/dashboard8.0.js"></script>
+</body>
+
+</html>
