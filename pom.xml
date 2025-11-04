@@ -21,7 +21,7 @@
 
 
     <properties>
-        <java.version>22</java.version>
+        <java.version>17</java.version>
         <postgresql.version>42.6.0</postgresql.version>
         <jasperreports.version>6.20.0</jasperreports.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
