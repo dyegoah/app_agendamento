@@ -1,6 +1,5 @@
 package br.com.higino.app_agendamento.repository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +12,7 @@ public interface AgendamentoServicoRepository extends JpaRepository<AgendamentoS
     List<AgendamentoServico> findByStatusIgnoreCase(String status);
     
    
-        List<AgendamentoServico> findByData(LocalDate data);
+    List<AgendamentoServico> findByData(String data);
+
     
 }
