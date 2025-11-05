@@ -8,7 +8,7 @@ public class PublicPageController {
 
 	@GetMapping("/agendamento-publico")
 	public String redirecionar() {
-	    return "redirect:/painel/agendamentoPublico.html";
+		 return "redirect:/agendamentoServico.html";
 	}
 
 }
