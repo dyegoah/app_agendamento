@@ -17,7 +17,7 @@ WORKDIR /app
 COPY --from=build /app/target/app_agendamento-0.0.1-SNAPSHOT.jar app.jar
 
 # Define a porta que o Render usará
-ENV PORT=8080
+
 EXPOSE 8080
 
 # Variáveis de ambiente para o Spring Boot
