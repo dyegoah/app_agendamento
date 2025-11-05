@@ -15,7 +15,7 @@ import br.com.higino.app_agendamento.model.CustoPorServico;
 import br.com.higino.app_agendamento.repository.CustoPorServicoRepository;
 
 @RestController
-@RequestMapping("/app_agendamento/api/custo-servico")
+@RequestMapping("/api/custo-servico")
 public class CustoPorServicoController {
 
     @Autowired

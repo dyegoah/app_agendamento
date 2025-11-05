@@ -138,7 +138,7 @@ public class LojaController {
     public void logoutDev(HttpServletRequest request, HttpServletResponse response) throws IOException {
         HttpSession s = request.getSession(false);
         if (s != null) s.invalidate();
-        response.sendRedirect("/app_agendamento/loginDesenvolvedor.html");
+        response.sendRedirect("/loginDesenvolvedor.html");
     }
 
 }

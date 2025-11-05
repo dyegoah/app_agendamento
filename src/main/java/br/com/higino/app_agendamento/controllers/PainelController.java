@@ -24,7 +24,7 @@ public class PainelController {
     @GetMapping("/sair")
     public String sair(HttpSession session) {
         session.invalidate();
-        return "redirect:/app_agendamento/loginAcesso.html";
+        return "redirect:/loginAcesso.html";
     }
     
     @GetMapping("/painel/agendamentoServico")
