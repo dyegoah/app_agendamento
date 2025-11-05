@@ -2,45 +2,36 @@ package br.com.higino.app_agendamento;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Libera recursos estáticos (CSS, JS, imagens, favicon etc.)
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                // 🔓 Páginas e APIs públicas
                 .requestMatchers(
-                    "/", 
-                    "/index.html",
-                    "/loginAcesso.html",
-                    "/loginDesenvolvedor.html",
-                    "/cadastroLojas.html",
-                    "/painelGerencia.html",
-                    "/agendamento-publico",
-                    "/api/agendamentoServico.html",
-                    "/agendamentoDespesa.html",
-                    // Se seus estáticos estão fora de common locations,
-                    // libere explicitamente com /** (e não com /**/**)
-                    "/css/**",
-                    "/js/**",
-                    "/images/**",
-                    "/favicon.ico",
-                    "/static/**"
+                    "/painel/agendamentoPublico.html",
+                    "/api/agendamento-servico/**",
+                    "/css/**", "/js/**", "/img/**", "/uploads/**"
                 ).permitAll()
-                // APIs públicas
-                .requestMatchers("/api/lojas/**", "/api/public/**").permitAll()
-                // Demais rotas
-                .anyRequest().permitAll()
+
+                // 🔒 Protege o resto
+                .anyRequest().authenticated()
             )
-            .formLogin(f -> f.disable())
-            .httpBasic(h -> h.disable());
+            .formLogin(login -> login
+                .loginPage("/login")
+                .defaultSuccessUrl("/painel/painelGerencia.html", true)
+                .permitAll()
+            )
+            .logout(logout -> logout.permitAll())
+            // 🚫 Desabilita CSRF apenas para a API pública
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/agendamento-servico/**"));
 
         return http.build();
     }
