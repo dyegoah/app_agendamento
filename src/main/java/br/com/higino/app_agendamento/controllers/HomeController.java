@@ -6,13 +6,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
 
+    // Quando acessar a raiz "/", redireciona para o login estático
     @GetMapping("/")
     public String redirecionarParaLogin() {
         return "redirect:/loginAcesso.html";
-    }
-    
-    @Controller
-    public class DashboardController {
-        
     }
 }
