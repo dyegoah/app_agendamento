@@ -2,6 +2,7 @@ package br.com.higino.app_agendamento;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -11,50 +12,34 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // usando fetch/SPA
-            .headers(h -> h
-                .frameOptions(f -> f.deny())
-                .contentSecurityPolicy(csp -> csp
-                    .policyDirectives("default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://code.jquery.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:;")
-                )
-            )
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // páginas públicas e assets (sem prefixo app_agendamento)
+                // Libera recursos estáticos (CSS, JS, imagens, favicon etc.)
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers(
                     "/", 
                     "/index.html",
                     "/loginAcesso.html",
                     "/loginDesenvolvedor.html",
                     "/cadastroLojas.html",
-                    "/**.css", "/**.js",
-                    "/**.png", "/**.jpg", "/**.jpeg",
-                    "/Estados.json", "/Cidades.json"
+                    "/painelGerencia.html",
+                    "/agendamentoServico.html",
+                    "/agendamentoDespesa.html",
+                    // Se seus estáticos estão fora de common locations,
+                    // libere explicitamente com /** (e não com /**/**)
+                    "/css/**",
+                    "/js/**",
+                    "/images/**",
+                    "/favicon.ico",
+                    "/static/**"
                 ).permitAll()
-
-                // APIs públicas de login e criação de loja
-                .requestMatchers(
-                    "/api/lojas/login",
-                    "/api/dev-login",
-                    "/api/lojas" // POST de cadastro
-                ).permitAll()
-
-                // painel do DEV só com ROLE_DEV
-                .requestMatchers(
-                    "/painelDesenvolvedor.html",
-                    "/api/**/dev/**",
-                    "/api/lojas/**" // ajuste se sua API de lojas é só dev
-                ).hasRole("DEV")
-
-                // painel de cliente logado
-                .requestMatchers("/painel/**").authenticated()
-
-                // o resto autenticado
-                .anyRequest().authenticated()
+                // APIs públicas
+                .requestMatchers("/api/lojas/**", "/api/public/**").permitAll()
+                // Demais rotas
+                .anyRequest().permitAll()
             )
-            // sem formulário padrão
             .formLogin(f -> f.disable())
-            // basic é útil para testes, mas não será usado pelo front
-            .httpBasic(h -> {});
+            .httpBasic(h -> h.disable());
 
         return http.build();
     }

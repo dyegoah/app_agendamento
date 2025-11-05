@@ -9,11 +9,10 @@ import jakarta.servlet.http.HttpSession;
 public class PainelController {
 
     // 🔹 Rota para acessar diretamente o painel (via navegador ou redirecionamento)
-    @GetMapping("/painelGerencia.html")
-    public String abrirPainelGerencia() {
-        // O Spring irá procurar o arquivo dentro de /static/
-        return "painelGerencia.html";
-    }
+	@GetMapping("/painelGerencia.html")
+	public String abrirPainelGerencia() {
+	    return "redirect:/painelGerencia.html";
+	}
 
     // 🔹 Rota alternativa amigável (opcional)
     @GetMapping("/painel/gerencia")
@@ -30,32 +29,32 @@ public class PainelController {
     
     @GetMapping("/painel/agendamentoServico")
     public String abrirAgendamentoServico() {
-        return "painel/agendamentoServico.html";
+        return "redirect:/painel/agendamentoServico.html";
     }
 
     @GetMapping("/painel/configAgendamento")
     public String abrirConfigAgendamento() {
-        return "painel/configAgendamento.html";
+        return "redirect:/painel/configAgendamento.html";
     }
-    
+
     @GetMapping("/painel/agendamentoDespesa")
     public String abrirAgendamentoDespesa() {
-        return "painel/agendamentoDespesa.html";
+        return "redirect:/painel/agendamentoDespesa.html";
     }
 
     @GetMapping("/painel/relatorioAgendamento")
     public String abrirRelatorioAgendamento() {
-        return "painel/relatorioAgendamento.html";
+        return "redirect:/painel/relatorioAgendamento.html";
     }
 
     @GetMapping("/painel/agendamentoCardapio")
     public String abrirAgendamentoCardapio() {
-        return "painel/agendamentoCardapio.html";
+        return "redirect:/painel/agendamentoCardapio.html";
     }
 
     @GetMapping("/painel/configServico")
     public String abrirConfigServico() {
-        return "painel/configServico.html";
+        return "redirect:/painel/configServico.html";
     }
 
 }
