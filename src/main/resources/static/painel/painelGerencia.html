@@ -11,7 +11,7 @@
   <!-- Ícones Bootstrap -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <!-- CSS principal -->
-  <link rel="stylesheet" href="/app_agendamento/painel/dashboard8.0.css">
+  <link rel="stylesheet" href=" /painel/dashboard8.0.css">
   
   <style>
     /* Estilos para o novo layout */
@@ -804,10 +804,10 @@
   <header class="topbar-modern">
 	<div class="logo-section">
 	  <img id="logoCliente" 
-	       src="/app_agendamento/imagens/logo%20Jamille.png" 
+	       src=" /imagens/logo%20Jamille.png" 
 	       alt="Logo Jamille Higino" 
 	       class="logo"
-	       onerror="this.onerror=null; this.src='/app_agendamento/imagens/logo-padrao.png';">
+	       onerror="this.onerror=null; this.src=' /imagens/logo-padrao.png';">
 
 	  <div class="brand-info">
 	    <div class="brand-name">Jamille Higino</div>
@@ -816,10 +816,10 @@
 	</div>
     
     <nav class="nav-section">
-      <a href="/app_agendamento/painel/painelGerencia.html" class="nav-item active">
+      <a href=" /painel/painelGerencia.html" class="nav-item active">
         <i class="bi bi-house-door"></i><span>Painel Inicial</span>
       </a>
-	<a href="/app_agendamento/painel/agendamentoServico.html" class="nav-item">
+	<a href=" /painel/agendamentoServico.html" class="nav-item">
 		<i class="bi bi-calendar-check"></i><span>Agendamento</span>
 	</a>
 	<!-- 🔗 Botão pequeno para copiar link de agendamento -->
@@ -827,13 +827,13 @@
 		<i class="bi bi-link-45deg"></i>
 	</button>
 			
-	  <a href="/app_agendamento/painel/configAgendamento.html" class="nav-item">
+	  <a href=" /painel/configAgendamento.html" class="nav-item">
         <i class="bi bi-gear"></i><span>Configurar Agenda</span>
       </a>
-      <a href="/app_agendamento/painel/relatorioAgendamento.html" class="nav-item">
+      <a href=" /painel/relatorioAgendamento.html" class="nav-item">
         <i class="bi bi-bar-chart"></i><span>Relatório</span>
       </a>
-      <a href="/app_agendamento/painel/agendamentoDespesa.html" class="nav-item">
+      <a href=" /painel/agendamentoDespesa.html" class="nav-item">
         <i class="bi bi-cash-coin"></i><span>Despesas</span>
       </a>
     </nav>
@@ -1191,7 +1191,7 @@
 
     // Envia para backend
     try {
-      const resp = await fetch(`/app_agendamento/api/agendamento-servico/${agendamentoSelecionadoId}/servico`, {
+      const resp = await fetch(` /api/agendamento-servico/${agendamentoSelecionadoId}/servico`, {
         method: "PUT",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ servico: textoFinal })
@@ -1261,7 +1261,7 @@
       label.textContent = (alvoISO === todayISO) ? `Hoje (${alvoBR})` : alvoBR;
 
       try {
-        const resp = await fetch("/app_agendamento/api/agendamento-servico");
+        const resp = await fetch(" /api/agendamento-servico");
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const dados = await resp.json();
 
@@ -1385,7 +1385,7 @@
 
       try {
         // 🔸 Atualiza no banco
-        const resp = await fetch(`/app_agendamento/api/agendamento-servico/${id}/status`, {
+        const resp = await fetch(` /api/agendamento-servico/${id}/status`, {
           method: "PUT",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({status: "Atendido"})
@@ -1418,7 +1418,7 @@
 
       try {
         // 🔸 Atualiza no banco
-        const resp = await fetch(`/app_agendamento/api/agendamento-servico/${id}/status`, {
+        const resp = await fetch(` /api/agendamento-servico/${id}/status`, {
           method: "PUT",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({status: "Cancelado"})
@@ -1441,7 +1441,7 @@
    <script>
   async function atualizarServico(id, novoServico) {
     try {
-      const resp = await fetch(`/app_agendamento/api/agendamento-servico/${id}/servico`, {
+      const resp = await fetch(` /api/agendamento-servico/${id}/servico`, {
         method: "PUT",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ servico: novoServico })
@@ -1470,7 +1470,7 @@
 	async function atualizarCardFinanceiro() {
 	  try {
 	    // 🔹 1. Busca todos os agendamentos do backend
-	    const respAg = await fetch("/app_agendamento/api/agendamento-servico");
+	    const respAg = await fetch(" /api/agendamento-servico");
 	    if (!respAg.ok) throw new Error("Erro ao buscar agendamentos.");
 	    const ags = await respAg.json();
 
@@ -1536,7 +1536,7 @@
     async function atualizarTotalAgendamentos() {
       try {
         // 🔹 Busca todos os agendamentos do backend
-        const resp = await fetch("/app_agendamento/api/agendamento-servico");
+        const resp = await fetch(" /api/agendamento-servico");
         if (!resp.ok) throw new Error("Erro ao buscar agendamentos no backend.");
 
         const ags = await resp.json();
@@ -1731,7 +1731,7 @@
 
     btnCopiarLinkTopo.addEventListener("click", async () => {
       const baseUrl = window.location.origin;
-      const linkAgendamento = `${baseUrl}/app_agendamento/painel/agendamentoServico.html`;
+      const linkAgendamento = `${baseUrl} /painel/agendamentoServico.html`;
 
       try {
         await navigator.clipboard.writeText(linkAgendamento);
@@ -1759,7 +1759,7 @@
 
   <!-- Script do painel -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/app_agendamento/painel/dashboard8.0.js"></script>
+  <script src=" /painel/dashboard8.0.js"></script>
 </body>
 
 </html>
