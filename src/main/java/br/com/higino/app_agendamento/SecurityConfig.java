@@ -19,28 +19,45 @@ public class SecurityConfig {
                 .requestMatchers(
                     "/", 
                     "/index.html",
-                    "/loginAcesso.html",
-                    "/loginDesenvolvedor.html",
-                    "/cadastroLojas.html",
-                    "/painelGerencia.html",
-                    "/agendamento-publico",
-                    "/agendamentoServico.html",
-                    "/agendamentoDespesa.html",
-                    // Se seus estáticos estão fora de common locations,
-                    // libere explicitamente com /** (e não com /**/**)
+                    "/loginAcesso.html", // Público para login
+                    "/loginDesenvolvedor.html", // Público para login
+                    "/agendamentoServico.html", // ✅ APENAS ESTE É PÚBLICO
+                    // Recursos estáticos
                     "/css/**",
                     "/js/**",
                     "/images/**",
                     "/favicon.ico",
                     "/static/**"
                 ).permitAll()
-                // APIs públicas
-                .requestMatchers("/api/lojas/**", "/api/public/**").permitAll()
-                // Demais rotas
-                .anyRequest().permitAll()
+                // APIs públicas (apenas agendamento-servico)
+                .requestMatchers(
+                    "/api/agendamento-servico/**", // ✅ API PÚBLICA para agendamentos
+                    "/api/lojas/**", 
+                    "/api/public/**"
+                ).permitAll()
+                // 🔒 DEMIAS ROTAS PRECISAM DE AUTENTICAÇÃO
+                .requestMatchers(
+                    "/painel/**", // Painel administrativo PROTEGIDO
+                    "/cadastroLojas.html",
+                    "/painelGerencia.html", 
+                    "/agendamentoDespesa.html",
+                    "/configAgendamento.html",
+                    "/relatorioAgendamento.html"
+                ).authenticated()
+                // Demais requisições
+                .anyRequest().authenticated()
             )
-            .formLogin(f -> f.disable())
-            .httpBasic(h -> h.disable());
+            .formLogin(form -> form
+                .loginPage("/loginAcesso.html") // Página de login personalizada
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/painel/painelGerencia.html", true)
+                .permitAll()
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/loginAcesso.html")
+                .permitAll()
+            );
 
         return http.build();
     }
