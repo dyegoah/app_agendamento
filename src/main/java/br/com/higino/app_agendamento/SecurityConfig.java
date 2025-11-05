@@ -4,9 +4,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
@@ -14,49 +16,50 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // Libera recursos estáticos (CSS, JS, imagens, favicon etc.)
+                // 🔓 ROTAS PÚBLICAS
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers(
-                    "/", 
+                    "/",
                     "/index.html",
-                    "/loginAcesso.html", // Público para login
-                    "/loginDesenvolvedor.html", // Público para login
-                    "/agendamentoServico.html", // ✅ APENAS ESTE É PÚBLICO
-                    // Recursos estáticos
+                    "/loginAcesso.html",
+                    "/loginDesenvolvedor.html", 
+                    "/agendamentoServico.html", // ✅ PÚBLICO
+                    "/agendamento-publico",     // ✅ PÚBLICO
                     "/css/**",
-                    "/js/**",
+                    "/js/**", 
                     "/images/**",
                     "/favicon.ico",
                     "/static/**"
                 ).permitAll()
-                // APIs públicas (apenas agendamento-servico)
+                // 🔓 APIs PÚBLICAS
                 .requestMatchers(
-                    "/api/agendamento-servico/**", // ✅ API PÚBLICA para agendamentos
-                    "/api/lojas/**", 
+                    "/api/agendamento-servico/**", // ✅ API PÚBLICA
+                    "/api/lojas/**",
                     "/api/public/**"
                 ).permitAll()
-                // 🔒 DEMIAS ROTAS PRECISAM DE AUTENTICAÇÃO
+                // 🔒 ROTAS PROTEGIDAS (requerem autenticação)
                 .requestMatchers(
-                    "/painel/**", // Painel administrativo PROTEGIDO
-                    "/cadastroLojas.html",
-                    "/painelGerencia.html", 
-                    "/agendamentoDespesa.html",
-                    "/configAgendamento.html",
-                    "/relatorioAgendamento.html"
+                    "/painel/**",
+                    "/cadastroLojas.html", 
+                    "/painelGerencia.html",
+                    "/agendamentoDespesa.html"
                 ).authenticated()
-                // Demais requisições
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/loginAcesso.html") // Página de login personalizada
-                .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/painel/painelGerencia.html", true)
+                .loginPage("/loginAcesso.html") // Página de login customizada
+                .loginProcessingUrl("/api/auth/login") // URL de processamento do login
+                .defaultSuccessUrl("/painel/painelGerencia.html", true) // Redirecionamento após login
+                .failureUrl("/loginAcesso.html?error=true") // Em caso de falha
                 .permitAll()
             )
             .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/loginAcesso.html")
+                .logoutUrl("/api/auth/logout")
+                .logoutSuccessUrl("/loginAcesso.html?logout=true")
                 .permitAll()
+            )
+            .exceptionHandling(exception -> exception
+                .accessDeniedPage("/loginAcesso.html") // Redireciona para login se não autenticado
             );
 
         return http.build();
