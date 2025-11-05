@@ -16,6 +16,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // Libera recursos estáticos (CSS, JS, imagens, favicon etc.)
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+
+                // ✅ ADICIONE ESTA LINHA ABAIXO:
+                .requestMatchers("/painel/**").permitAll()
+
                 .requestMatchers(
                     "/", 
                     "/index.html",
@@ -25,8 +29,6 @@ public class SecurityConfig {
                     "/painelGerencia.html",
                     "/agendamentoServico.html",
                     "/agendamentoDespesa.html",
-                    // Se seus estáticos estão fora de common locations,
-                    // libere explicitamente com /** (e não com /**/**)
                     "/css/**",
                     "/js/**",
                     "/images/**",
@@ -34,7 +36,7 @@ public class SecurityConfig {
                     "/static/**"
                 ).permitAll()
                 // APIs públicas
-                .requestMatchers("/api/lojas/**", "/api/public/**").permitAll()
+                .requestMatchers("/api/lojas/**", "/api/public/**", "/api/agendamento-servico/**").permitAll()
                 // Demais rotas
                 .anyRequest().permitAll()
             )
