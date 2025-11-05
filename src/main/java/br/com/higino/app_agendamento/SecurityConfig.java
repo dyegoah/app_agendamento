@@ -2,50 +2,45 @@ package br.com.higino.app_agendamento;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 
 @Configuration
-@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // 🔹 Controle de permissões por rota
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-
-                // === 🟢 ROTAS PÚBLICAS ===
+                // Libera recursos estáticos (CSS, JS, imagens, favicon etc.)
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                 .requestMatchers(
-                    "/login",
+                    "/", 
+                    "/index.html",
+                    "/loginAcesso.html",
+                    "/loginDesenvolvedor.html",
+                    "/cadastroLojas.html",
+                    "/painelGerencia.html",
+                    "/painel/agendamentoServico.html",
+                    "/api/agendamento-servico/**",
+                    "/agendamentoDespesa.html",
+                    // Se seus estáticos estão fora de common locations,
+                    // libere explicitamente com /** (e não com /**/**)
                     "/css/**",
                     "/js/**",
-                    "/img/**",
-                    "/uploads/**",
-                    "/painel/agendamentoServico.html",    // página pública de agendamento
-                    "/painel/painelDesenvolvedor.html",    // página pública de desenvolvedor
-                    "/api/agendamento-servico/**"          // APIs acessadas pela página pública
+                    "/images/**",
+                    "/favicon.ico",
+                    "/static/**"
                 ).permitAll()
-
-                // === 🔒 TODAS AS OUTRAS PÁGINAS EXIGEM LOGIN ===
-                .anyRequest().authenticated()
+                // APIs públicas
+                .requestMatchers("/api/lojas/**", "/api/public/**").permitAll()
+                // Demais rotas
+                .anyRequest().permitAll()
             )
-
-            // 🔹 Configuração da página de login
-            .formLogin(login -> login
-                .loginPage("/login")                // sua página de login personalizada
-                .defaultSuccessUrl("/painel", true) // redireciona após login bem-sucedido
-                .permitAll()
-            )
-
-            // 🔹 Permite logout normalmente
-            .logout(LogoutConfigurer::permitAll)
-
-            // 🔹 Desabilita CSRF para evitar bloqueio em fetch() públicos
-            .csrf(csrf -> csrf.disable());
+            .formLogin(f -> f.disable())
+            .httpBasic(h -> h.disable());
 
         return http.build();
     }
