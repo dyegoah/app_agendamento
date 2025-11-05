@@ -26,8 +26,8 @@ import jakarta.servlet.http.HttpSession;
 	    String path = request.getRequestURI();
 
 	    // Só vigie os HTML do painel
-	    boolean painelCliente = path.startsWith("/app_agendamento/painel/");
-	    boolean painelDev     = path.endsWith("/app_agendamento/painelDesenvolvedor.html");
+	    boolean painelCliente = path.startsWith("/painel/");
+	    boolean painelDev     = path.endsWith("/painelDesenvolvedor.html");
 
 	    if (!(painelCliente || painelDev)) {
 	      chain.doFilter(req, res);
@@ -36,7 +36,7 @@ import jakarta.servlet.http.HttpSession;
 
 	    HttpSession session = request.getSession(false);
 	    if (session == null || session.getAttribute("usuarioLogado") == null) {
-	      response.sendRedirect("/app_agendamento/loginAcesso.html");
+	      response.sendRedirect("/loginAcesso.html");
 	      return;
 	    }
 
@@ -44,7 +44,7 @@ import jakarta.servlet.http.HttpSession;
 	    if (painelDev) {
 	      Object role = session.getAttribute("role");
 	      if (role == null || !"DEV".equals(role.toString())) {
-	        response.sendRedirect("/app_agendamento/loginDesenvolvedor.html");
+	        response.sendRedirect("/loginDesenvolvedor.html");
 	        return;
 	      }
 	    }

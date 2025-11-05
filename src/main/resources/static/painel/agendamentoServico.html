@@ -452,7 +452,7 @@
       
       <div class="d-flex justify-content-between align-items-center">
         <h3 class="fw-bold text-white"><i class="bi bi-calendar-check me-2"></i>Agendamento de Serviços</h3>
-        <!--<a href="/app_agendamento/painel/painelGerencia.html" class="btn btn-light">
+        <!--<a href="/painel/painelGerencia.html" class="btn btn-light">
           <i class="bi bi-arrow-left-circle"></i> Voltar -->
         </a>
       </div>
@@ -838,7 +838,7 @@
 	  // 🔹 Busca agendamentos existentes
 	  let agendamentosBanco = [];
 	  try {
-	    const resp = await fetch("/app_agendamento/api/agendamento-servico");
+	    const resp = await fetch("/api/agendamento-servico");
 	    if (resp.ok) agendamentosBanco = await resp.json();
 	  } catch (e) {
 	    console.warn("⚠️ Não foi possível carregar agendamentos do banco.", e);
@@ -922,7 +922,7 @@
 	  };
 
 	  try {
-	    const resp = await fetch("/app_agendamento/api/agendamento-servico", {
+	    const resp = await fetch("/api/agendamento-servico", {
 	      method: "POST",
 	      headers: { "Content-Type": "application/json" },
 	      body: JSON.stringify(novoAgendamento)
@@ -951,7 +951,7 @@
 	  }
 		 
 	   alert(`✅ Agendamento confirmado...`);
-	  window.location.href = "/app_agendamento/painel/agendamentoServico.html";
+	  window.location.href = "/painel/agendamentoServico.html";
 
     };
 

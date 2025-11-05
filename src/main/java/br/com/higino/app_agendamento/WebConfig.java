@@ -14,10 +14,10 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/app_agendamento/").setViewName("forward:/index.html");
-        registry.addViewController("/app_agendamento/cadastroLojas").setViewName("forward:/cadastroLojas.html");
-        registry.addViewController("/app_agendamento/loginDesenvolvedor").setViewName("forward:/loginDesenvolvedor.html");
-        registry.addViewController("/app_agendamento/painelDesenvolvedor").setViewName("forward:/painelDesenvolvedor.html");
+        registry.addViewController("/").setViewName("forward:/index.html");
+        registry.addViewController("/cadastroLojas").setViewName("forward:/cadastroLojas.html");
+        registry.addViewController("/loginDesenvolvedor").setViewName("forward:/loginDesenvolvedor.html");
+        registry.addViewController("/painelDesenvolvedor").setViewName("forward:/painelDesenvolvedor.html");
     }
 
     // 🔐 Proteção de acesso ao painel do desenvolvedor
@@ -39,7 +39,7 @@ public class WebConfig implements WebMvcConfigurer {
                 // Protege somente o painel do desenvolvedor
                 if (uri.contains("/painelDesenvolvedor")) {
                     if (session == null || session.getAttribute("devAutenticado") == null) {
-                        res.sendRedirect(req.getContextPath() + "/app_agendamento/loginDesenvolvedor");
+                        res.sendRedirect(req.getContextPath() + "/loginDesenvolvedor");
                         return;
                     }
                 }
@@ -47,7 +47,7 @@ public class WebConfig implements WebMvcConfigurer {
                 // Logout: remove sessão
                 if (uri.contains("/logout-dev")) {
                     if (session != null) session.invalidate();
-                    res.sendRedirect(req.getContextPath() + "/app_agendamento/loginDesenvolvedor");
+                    res.sendRedirect(req.getContextPath() + "/loginDesenvolvedor");
                     return;
                 }
 
@@ -55,7 +55,7 @@ public class WebConfig implements WebMvcConfigurer {
             }
         });
 
-        registration.addUrlPatterns("/app_agendamento/*");
+        registration.addUrlPatterns("/*");
         registration.setName("devSecurityFilter");
         registration.setOrder(1);
 

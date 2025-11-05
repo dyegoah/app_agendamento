@@ -213,7 +213,7 @@
 	<!-- Ícones Bootstrap -->
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 	<!-- CSS principal -->
-	<link rel="stylesheet" href="/app_agendamento/painel/dashboard8.0.css">
+	<link rel="stylesheet" href="/painel/dashboard8.0.css">
 
 
 	<script>
@@ -264,24 +264,24 @@
 			</li>
 
 			<li class="nav-item">
-				<a href="/app_agendamento/painel/agendamentoServico.html" class="nav-link"><i
+				<a href="/painel/agendamentoServico.html" class="nav-link"><i
 						class="bi bi-calendar-check"></i><span>Agendamento</span></a>
 
 			</li>
 
 			<li class="nav-item">
-				<a href="/app_agendamento/painel/configAgendamento.html" class="nav-link"><i
+				<a href="/painel/configAgendamento.html" class="nav-link"><i
 						class="bi bi-calendar-check"></i><span>ConfigAgendamento</span></a>
 			</li>
 
 			<li class="nav-item">
-				<a href="/app_agendamento/painel/relatorioAgendamento.html" class="nav-link"><i
+				<a href="/painel/relatorioAgendamento.html" class="nav-link"><i
 						class="bi bi-bar-chart"></i><span>Relatório</span></a>
 			</li>
 
 
 			<li class="nav-item">
-				<a href="/app_agendamento/painel/agendamentoDespesa.html" class="nav-link"><i
+				<a href="/painel/agendamentoDespesa.html" class="nav-link"><i
 						class="bi bi-cash-coin"></i><span>Despesas</span></a>
 			</li>
 
@@ -446,7 +446,7 @@
 
 						try {
 							// 🔹 Busca os agendamentos do backend
-							const resp = await fetch("/app_agendamento/api/agendamento-servico");
+							const resp = await fetch("/api/agendamento-servico");
 							if (!resp.ok) throw new Error(`Erro HTTP ${resp.status}`);
 							const agendamentos = await resp.json();
 
@@ -619,7 +619,7 @@
 						label.textContent = (alvoISO === todayISO) ? `Hoje (${alvoBR})` : alvoBR;
 
 						try {
-							const resp = await fetch("/app_agendamento/api/agendamento-servico");
+							const resp = await fetch("/api/agendamento-servico");
 							if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
 							const dados = await resp.json();
 
@@ -735,7 +735,7 @@
 
 						try {
 							// 🔸 Atualiza no banco
-							const resp = await fetch(`/app_agendamento/api/agendamento-servico/${id}/status`, {
+							const resp = await fetch(`/api/agendamento-servico/${id}/status`, {
 								method: "PUT",
 								headers: {"Content-Type": "application/json"},
 								body: JSON.stringify({status: "Atendido"})
@@ -768,7 +768,7 @@
 
 						try {
 							// 🔸 Atualiza no banco
-							const resp = await fetch(`/app_agendamento/api/agendamento-servico/${id}/status`, {
+							const resp = await fetch(`/api/agendamento-servico/${id}/status`, {
 								method: "PUT",
 								headers: {"Content-Type": "application/json"},
 								body: JSON.stringify({status: "Cancelado"})
@@ -810,7 +810,7 @@
 							});
 
 							// 🔹 2. Busca agendamentos do backend (com coluna 'servico')
-							const respAg = await fetch("/app_agendamento/api/agendamento-servico");
+							const respAg = await fetch("/api/agendamento-servico");
 							if (!respAg.ok) throw new Error("Erro ao buscar agendamentos.");
 							const ags = await respAg.json();
 
@@ -916,7 +916,7 @@
 					async function atualizarTotalAgendamentos() {
 						try {
 							// 🔹 Busca todos os agendamentos do backend
-							const resp = await fetch("/app_agendamento/api/agendamento-servico");
+							const resp = await fetch("/api/agendamento-servico");
 							if (!resp.ok) throw new Error("Erro ao buscar agendamentos no backend.");
 
 							const ags = await resp.json();
@@ -1007,7 +1007,7 @@
 				<script th:src="@{/js/dashboard8.0.js}"></script>
 				<link th:href="@{/css/dashboard8.0.css}" rel="stylesheet">
 				<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-				<script src="/app_agendamento/painel/dashboard8.0.js"></script>
+				<script src="/painel/dashboard8.0.js"></script>
 </body>
 
 </html>
