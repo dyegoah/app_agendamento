@@ -23,8 +23,8 @@ public class SecurityConfig {
                     "/loginDesenvolvedor.html",
                     "/cadastroLojas.html",
                     "/painelGerencia.html",
-                    "painel/agendamento-publico",
-                    "api/agendamentoServico.html",
+                    "/agendamento-publico",
+                    "/agendamentoServico.html",
                     "/agendamentoDespesa.html",
                     // Se seus estáticos estão fora de common locations,
                     // libere explicitamente com /** (e não com /**/**)
