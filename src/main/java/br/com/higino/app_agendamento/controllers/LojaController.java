@@ -42,6 +42,21 @@ public class LojaController {
     public List<Loja> listarTodas() {
         return repository.findAll();
     }
+    
+    @GetMapping("/api/lojas")
+    public List<Loja> listarTodasAsLojas() {
+        System.out.println("🗄️ Carregando lojas do banco em uso: " + System.getenv("DATABASE_URL"));
+        List<Loja> lojas;
+		try {
+			lojas = LojaRepository.findAll();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        System.out.println("✅ Total de lojas retornadas: " + lojas.size());
+        return lojas;
+    }
+
 
     // 🔹 Buscar loja por ID
     @GetMapping("/{id}")
