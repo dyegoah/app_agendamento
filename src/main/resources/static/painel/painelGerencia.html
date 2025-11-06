@@ -819,7 +819,7 @@
       <a href=" /painel/painelGerencia.html" class="nav-item active">
         <i class="bi bi-house-door"></i><span>Painel Inicial</span>
       </a>
-	<a href=" /painel/agendamentoServico.html" class="nav-item">
+	<a href=" /publico/agendamentoServico.html" class="nav-item">
 		<i class="bi bi-calendar-check"></i><span>Agendamento</span>
 	</a>
 	<!-- 🔗 Botão pequeno para copiar link de agendamento -->
@@ -1731,7 +1731,7 @@
 
     btnCopiarLinkTopo.addEventListener("click", async () => {
       const baseUrl = window.location.origin;
-      const linkAgendamento = `${baseUrl} /painel/agendamentoServico.html`;
+      const linkAgendamento = `${baseUrl} /publico/agendamentoServico.html`;
 
       try {
         await navigator.clipboard.writeText(linkAgendamento);
