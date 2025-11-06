@@ -480,6 +480,19 @@
 		}
 		
 		
+					  /* 🌙 Ajuste para modo escuro */
+					  body.dark-mode .card-header.bg-success {
+					    background: linear-gradient(135deg, #047857, #065f46) !important;
+					    color: #e4e6eb !important;
+					    border-bottom: 1px solid rgba(255,255,255,0.1);
+					  }
+					  body.dark-mode .card-body {
+					    background: linear-gradient(145deg, #1a1d29, #161922);
+					    border: 1px solid rgba(255,255,255,0.08);
+					    color: #d1d5db;
+					  }
+					
+		
 	</style>
 
 </head>
@@ -518,8 +531,58 @@
 
 
 	<div class="container-fluid">
+		<!-- 🔹 INFORMATIVO DE USO DA PÁGINA -->
+		<div class="card mb-4 shadow-sm border-0" style="border-radius: 12px;">
+							  <div class="card-header bg-gradient bg-success text-white d-flex align-items-center">
+							    <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+							    <h6 class="mb-0 fw-semibold">Sobre esta página</h6>
+							  </div>
+							  <div class="card-body" style="font-size: 0.95rem; line-height: 1.5;">
+							    <p class="mb-2">
+							      <strong>Página de configuração do calendário de atendimento.</strong> Aqui você informa as datas e horários 
+							      disponíveis para que seus pacientes possam realizar agendamentos na página <em>Agendamento</em>.
+							    </p>
+							    <p class="mb-2">
+							      Comece definindo como deseja aplicar as marcações: por <strong>semana</strong>, <strong>mês</strong> ou 
+							      <strong>ano restante</strong>. Assim, o sistema replica automaticamente os horários padrões, 
+							      evitando que você precise liberar manualmente todos os dias.
+							    </p>
+							    <p class="mb-2">
+							      Em seguida, escolha o <strong>horário de almoço</strong>. Por exemplo, se marcar a opção 
+							      <strong>11:00</strong>, o sistema ativará os horários de <strong>07:00 às 10:00</strong> e retomará 
+							      automaticamente após o almoço às <strong>13:00</strong>. Você pode editar manualmente qualquer horário ou data 
+							      clicando sobre o dia no calendário.
+							    </p>
+							    <p class="mb-0">
+							      <em>Dica:</em> Utilize esta página para organizar sua rotina e manter o fluxo de agendamentos sempre atualizado. 
+							      Suas configurações ficam salvas automaticamente e podem ser enviadas para a página de <strong>Agendamento de Serviços</strong> 
+							      clicando no botão <span class="text-primary fw-semibold">“Enviar”</span>.
+							    </p>
+								<hr class="my-3">
+								<p class="mb-2">
+								  Após definir suas preferências, escolha as opções dos grupos de <strong>“Aplicar padrão”</strong> e 
+								  <strong>“Almoço”</strong>, e em seguida clique no botão <strong>“Salvar”</strong>. 
+								  Essa ação aplicará automaticamente as configurações escolhidas na tabela de calendário.
+								</p>
+								<p class="mb-2">
+								  Depois de revisar as datas e horários marcados, clique em <strong>“Enviar”</strong>. 
+								  Esse botão envia as configurações para a página de <em>Agendamento de Serviços</em>, 
+								  tornando os horários disponíveis para os pacientes.
+								</p>
+								<p class="mb-2">
+								  O botão <strong>“Liberar próximo ano”</strong> serve para antecipar o planejamento: 
+								  em dezembro, por exemplo, você pode liberar as datas do próximo ano e começar o calendário já organizado.
+								</p>
+								<p class="mb-0">
+								  <em>Essa ferramenta foi criada para facilitar seu planejamento, reduzir tempo de contato com pacientes 
+								  e garantir uma rotina de atendimentos bem estruturada ao longo da jornada empreendedora.</em>
+								</p>
+							  </div>
+							</div>
+		
 		<div class="d-flex justify-content-between align-items-center mb-4">
 			<h3 class="fw-bold text-primary"><i class="bi bi-gear-fill me-2"></i>Configuração de Agendamentos</h3>
+						
 			<a href="/painel/painelGerencia.html" class="btn btn-outline-secondary"
 				data-bs-toggle="tooltip" data-bs-placement="top" title="Retorna ao painel administrativo.">
 				<i class="bi bi-arrow-left-circle"></i> Voltar
