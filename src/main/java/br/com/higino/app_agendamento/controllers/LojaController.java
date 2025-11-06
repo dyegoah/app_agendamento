@@ -43,6 +43,8 @@ public class LojaController {
         return repository.findAll();
     }
     
+    @Autowired
+    private LojaRepository lojaRepository;
     @GetMapping("/api/lojas")
     public List<Loja> listarTodasAsLojas() {
         System.out.println("🗄️ Carregando lojas do banco em uso: " + System.getenv("DATABASE_URL"));
