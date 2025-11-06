@@ -19,6 +19,7 @@ public class SecurityConfig {
 
                 // ✅ ADICIONE ESTA LINHA ABAIXO:
                 .requestMatchers("/painel/**").permitAll()
+                
 
                 .requestMatchers(
                     "/", 
@@ -33,7 +34,8 @@ public class SecurityConfig {
                     "/js/**",
                     "/images/**",
                     "/favicon.ico",
-                    "/static/**"
+                    "/static/**",
+                    "/publico/**" // ✅ nova linha
                 ).permitAll()
                 // APIs públicas
                 .requestMatchers("/api/lojas/**", "/api/public/**", "/api/agendamento-servico/**").permitAll()
