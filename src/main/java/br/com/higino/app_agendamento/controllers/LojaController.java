@@ -1,6 +1,5 @@
 package br.com.higino.app_agendamento.controllers;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,11 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.higino.app_agendamento.model.Loja;
 import br.com.higino.app_agendamento.repository.LojaRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 @RestController
-@RequestMapping("/api/lojas") // ✅ rota completa usada pelo front
+@RequestMapping("/api/lojas")
 @CrossOrigin(origins = "*")
 public class LojaController {
 
@@ -58,7 +56,7 @@ public class LojaController {
     }
 
     // =====================================================
-    // 🔹 LOGIN DO CLIENTE (LOJA)
+    // 🔹 LOGIN DO CLIENTE (LOJA) - APENAS ESTE MÉTODO DE LOGIN
     // =====================================================
     @PostMapping("/login")
     public ResponseEntity<?> loginLoja(@RequestBody Map<String, String> credenciais, HttpServletRequest request) {
@@ -66,7 +64,6 @@ public class LojaController {
             String email = credenciais.get("email");
             String senha = credenciais.get("senha");
 
-            // Busca loja por email (precisa existir em LojaRepository)
             Optional<Loja> lojaOpt = repository.findByEmailIgnoreCase(email);
             if (lojaOpt.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha incorretos.");
@@ -74,23 +71,19 @@ public class LojaController {
 
             Loja loja = lojaOpt.get();
 
-            // Validação de senha simples (ideal: usar BCrypt futuramente)
             if (!loja.getSenha().equals(senha)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha incorretos.");
             }
 
-            // Verifica status da loja
             if ("INADIMPLENTE".equalsIgnoreCase(loja.getStatus())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Conta em atraso. Verifique com o suporte.");
             }
 
-            // Cria sessão
             HttpSession session = request.getSession(true);
             session.setAttribute("usuarioLogado", loja.getId());
             session.setAttribute("role", "CLIENTE");
-            session.setMaxInactiveInterval(60 * 60 * 8); // 8 horas
+            session.setMaxInactiveInterval(60 * 60 * 8);
 
-            // Retorna dados essenciais para o front
             Map<String, Object> resposta = new HashMap<>();
             resposta.put("id", loja.getId());
             resposta.put("nomeComprador", loja.getNomeComprador());
@@ -106,39 +99,5 @@ public class LojaController {
         }
     }
 
-    // =====================================================
-    // 🔹 LOGIN DO DESENVOLVEDOR
-    // =====================================================
-    @PostMapping("/dev-login")
-    public ResponseEntity<?> loginDev(@RequestBody Map<String, String> cred, HttpServletRequest request) {
-        try {
-            String usuario = cred.get("usuario");
-            String senha = cred.get("senha");
-
-            // Credenciais padrão do desenvolvedor
-            if ("dyegoah".equals(usuario) && "dy142434".equals(senha)) {
-                HttpSession session = request.getSession(true);
-                session.setAttribute("usuarioLogado", "DEV_USER");
-                session.setAttribute("role", "DEV");
-                session.setMaxInactiveInterval(60 * 60 * 8); // 8 horas
-                return ResponseEntity.ok(Map.of("ok", true));
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário ou senha incorretos!");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro no login do desenvolvedor.");
-        }
-    }
-
-    // =====================================================
-    // 🔹 LOGOUT DO DESENVOLVEDOR
-    // =====================================================
-    @GetMapping("/logout-dev")
-    public void logoutDev(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        HttpSession s = request.getSession(false);
-        if (s != null) s.invalidate();
-        response.sendRedirect("/loginDesenvolvedor.html");
-    }
-
+    // ❌ NÃO TERÁ MAIS MÉTODO dev-login AQUI
 }

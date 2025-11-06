@@ -1731,7 +1731,7 @@
 
     btnCopiarLinkTopo.addEventListener("click", async () => {
       const baseUrl = window.location.origin;
-      const linkAgendamento = `${baseUrl} /publico/agendamentoServico.html`;
+      const linkAgendamento = `${baseUrl}/publico/agendamentoServico.html`;
 
       try {
         await navigator.clipboard.writeText(linkAgendamento);

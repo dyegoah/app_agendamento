@@ -64,7 +64,7 @@
   <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2><i class="bi bi-tools"></i> Painel do Desenvolvedor</h2>
-	  <a href="loginDesenvolvedor.html" onclick="logoutDev()" class="btn btn-outline-danger btn-sm">
+	  <a id="btnSair" href="loginDesenvolvedor.html" onclick="logoutDev(event)" class="btn btn-outline-danger btn-sm">
 	    <i class="bi bi-box-arrow-right"></i> Sair
 	  </a>
     </div>
@@ -74,9 +74,9 @@
         <h6 class="text-secondary fw-semibold mb-0">Gerenciamento de Lojas e Clientes</h6>
       </div>
       <div>
-        <a href="cadastroLojas.html" class="btn btn-success btn-sm me-2" onclick="alerta('Iniciando cadastro de nova loja')">
-          <i class="bi bi-person-plus"></i> Nova Loja
-        </a>
+		<a id="linkCadastroLojas" href="cadastroLojas.html" class="btn btn-success btn-sm me-2" onclick="alerta('Iniciando cadastro de nova loja')">
+		  <i class="bi bi-person-plus"></i> Nova Loja
+		</a>
         <button class="btn btn-primary btn-sm" onclick="exportarCSV()">
           <i class="bi bi-download"></i> Exportar Relatório
         </button>
@@ -120,9 +120,12 @@
   async function carregarLojas() {
     try {
       const base = window.location.pathname.includes("/app_agendamento") ? "/app_agendamento" : "";
-      const resp = await fetch(`${base}/api/lojas`, { credentials: "include" });
+	  const resp = await fetch(`${base}/api/lojas`, { credentials: "include" });
 
-      if (!resp.ok) throw new Error("Erro ao buscar lojas");
+	  // Se sessão expirar no backend (futuro), volta pro login
+	  if (resp.status === 401) { window.location.replace(`${base}/loginDesenvolvedor.html`); return; }
+
+	  if (!resp.ok) throw new Error("Erro ao buscar lojas");
       lojas = await resp.json();
 
       renderizar(); // ✅ exibe na tabela
@@ -270,7 +273,44 @@
   }
   </script>
 
-  
+  <script>
+    // Base global para contexto (não remove outras ocorrências de base)
+    const base = window.location.pathname.includes("/app_agendamento") ? "/app_agendamento" : "";
+
+    // 🚧 Bloqueia acesso ao painel sem sessão ativa
+    (async function enforceSession() {
+      try {
+        const r = await fetch(`${base}/api/dev-session`, { credentials: "include" });
+        if (!r.ok) {
+          window.location.replace(`${base}/loginDesenvolvedor.html`);
+          return;
+        }
+      } catch (e) {
+        window.location.replace(`${base}/loginDesenvolvedor.html`);
+        return;
+      }
+    })();
+
+    // 🔗 Corrige links para respeitarem o contexto
+    document.addEventListener("DOMContentLoaded", () => {
+      const aCadastro = document.getElementById("linkCadastroLojas");
+      if (aCadastro) aCadastro.href = `${base}/cadastroLojas.html`;
+
+      const aSair = document.getElementById("btnSair");
+      if (aSair) aSair.href = `${base}/logout-dev`;
+    });
+  </script>
+
+  <script>
+    function logoutDev(ev) {
+      if (ev) ev.preventDefault(); // evita seguir o href antes do JS
+      if (confirm("Deseja realmente sair do painel do desenvolvedor?")) {
+        const base = window.location.pathname.includes("/app_agendamento") ? "/app_agendamento" : "";
+        window.location.href = `${base}/logout-dev`;
+      }
+    }
+  </script>
+
   
 </body>
 </html>
