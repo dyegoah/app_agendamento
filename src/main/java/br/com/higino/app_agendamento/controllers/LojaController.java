@@ -24,7 +24,7 @@ import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping("/api/lojas")
-@CrossOrigin(origins = "*")
+
 public class LojaController {
 
     @Autowired

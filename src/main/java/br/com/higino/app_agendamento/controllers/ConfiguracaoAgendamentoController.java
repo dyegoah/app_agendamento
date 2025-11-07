@@ -18,7 +18,7 @@ import br.com.higino.app_agendamento.repository.ConfiguracaoAgendamentoRepositor
 
 @RestController
 @RequestMapping("/api/config-agendamento")
-@CrossOrigin(origins = "*")
+
 public class ConfiguracaoAgendamentoController {
 
     @Autowired

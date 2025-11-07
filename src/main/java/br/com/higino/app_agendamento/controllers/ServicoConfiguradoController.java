@@ -18,7 +18,7 @@ import br.com.higino.app_agendamento.repository.ServicoConfiguradoRepository;
 
 @RestController
 @RequestMapping("/api/servicos-configurados")
-@CrossOrigin(origins = "*")
+
 public class ServicoConfiguradoController {
 
     @Autowired

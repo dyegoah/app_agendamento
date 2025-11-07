@@ -17,7 +17,7 @@ import br.com.higino.app_agendamento.repository.AgendamentoDespesaRepository;
 
 @RestController
 @RequestMapping("/api/agendamento-despesa")
-@CrossOrigin(origins = "*")
+
 public class AgendamentoDespesaController {
 
     @Autowired
