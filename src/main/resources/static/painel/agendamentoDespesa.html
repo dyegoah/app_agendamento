@@ -2380,6 +2380,22 @@
 	   });
 	   </script>
 
+	   <script>
+		async function salvarDespesaBanco(despesa) {
+		  try {
+		    await fetch("/api/despesas", {
+		      method: "POST",
+		      headers: { "Content-Type": "application/json" },
+		      body: JSON.stringify(despesa)
+		    });
+		    console.log("💾 Despesa sincronizada com o servidor");
+		  } catch (e) {
+		    console.warn("⚠️ Não foi possível salvar despesa no servidor (modo offline)");
+		  }
+		}
+
+		
+	   </script>
 
 	
 	<!-- ✅ Biblioteca html2pdf -->

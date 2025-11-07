@@ -1191,7 +1191,7 @@
 
     // Envia para backend
     try {
-      const resp = await fetch(` /api/agendamento-servico/${agendamentoSelecionadoId}/servico`, {
+      const resp = await fetch(`/api/agendamento-servico/${agendamentoSelecionadoId}/servico`, {
         method: "PUT",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ servico: textoFinal })
@@ -1261,7 +1261,7 @@
       label.textContent = (alvoISO === todayISO) ? `Hoje (${alvoBR})` : alvoBR;
 
       try {
-        const resp = await fetch(" /api/agendamento-servico");
+        const resp = await fetch("/api/agendamento-servico");
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const dados = await resp.json();
 
@@ -1385,7 +1385,7 @@
 
       try {
         // 🔸 Atualiza no banco
-        const resp = await fetch(` /api/agendamento-servico/${id}/status`, {
+        const resp = await fetch(`/api/agendamento-servico/${id}/status`, {
           method: "PUT",
           headers: {"Content-Type": "application/json"},
           body: JSON.stringify({status: "Atendido"})
@@ -1489,7 +1489,20 @@
 	    });
 
 	    // 🔹 3. Calcula despesas (mantém lógica atual)
-	    const despesasMensais = JSON.parse(localStorage.getItem("despesas") || "[]");
+		let despesasMensais = [];
+		try {
+		  const resp = await fetch("/api/despesas");
+		  if (resp.ok) {
+		    despesasMensais = await resp.json();
+		    console.log("💰 Despesas vindas do servidor:", despesasMensais);
+		  } else {
+		    despesasMensais = JSON.parse(localStorage.getItem("despesas") || "[]");
+		    console.warn("⚠️ Usando despesas do localStorage (sem conexão)");
+		  }
+		} catch (e) {
+		  despesasMensais = JSON.parse(localStorage.getItem("despesas") || "[]");
+		  console.warn("⚠️ Usando despesas do localStorage (erro de rede)");
+		}
 	    const totalDespesas = despesasMensais.reduce((s, d) => s + (parseFloat(d.valorTotal) || 0), 0);
 
 	    // 🔹 4. Atualiza card com total somado de todos os valores dos modais
@@ -1570,8 +1583,11 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       atualizarCardsPainel();
-	  const valorInicial = document.getElementById("valorReceitaTotalPainel").textContent.replace(/[^\d,]/g, '').replace(',', '.');
-	  totalFinanceiro = parseFloat(valorInicial) || 0;
+	  const valorInicial = parseFloat(
+	    (document.getElementById("valorReceitaTotalPainel").textContent || "0")
+	      .replace(/[^\d,]/g, '').replace(',', '.')
+	  ) || 0;
+	  let totalFinanceiro = valorInicial;
 
       setInterval(atualizarCardsPainel, 60000);
     });
