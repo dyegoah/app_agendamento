@@ -1,4 +1,4 @@
-package br.com.higino.app_agendamento;
+package br.com.higino.app_agendamento.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
