@@ -36,26 +36,32 @@
     <h4 class="text-center text-primary fw-bold mb-3">Acesso ao Sistema 8.0</h4>
     <p class="text-center text-muted mb-4">Insira suas credenciais para continuar</p>
 
-    <form id="formLogin">
+    <!-- 
+      Importante:
+      - action="login" (sem barra inicial) respeita o context-path automaticamente
+      - name="email" e name="senha" casam com o SecurityConfig
+    -->
+    <form id="formLogin" method="post" action="login">
       <div class="mb-3">
         <label class="form-label fw-semibold">E-mail</label>
-        <input type="email" id="emailLogin" class="form-control" placeholder="exemplo@email.com" required>
+        <input type="email" id="emailLogin" name="email" class="form-control" placeholder="exemplo@email.com" required>
       </div>
 
       <div class="mb-3">
         <label class="form-label fw-semibold">Senha</label>
-        <input type="password" id="senhaLogin" class="form-control" placeholder="Digite sua senha" required>
+        <input type="password" id="senhaLogin" name="senha" class="form-control" placeholder="Digite sua senha" required>
       </div>
 
       <div class="text-center mb-2">
         <div id="msgErro" class="alert alert-danger alerta"></div>
+        <div id="msgInfo" class="alert alert-info alerta"></div>
       </div>
 
       <button type="submit" class="btn btn-primary btn-custom mb-2">
         <i class="bi bi-box-arrow-in-right"></i> Entrar
       </button>
 
-      <button type="button" class="btn btn-outline-secondary btn-custom" onclick="primeiroAcesso()">
+      <button type="button" class="btn btn-outline-secondary btn-custom" id="btnPrimeiroAcesso">
         <i class="bi bi-person-plus"></i> Primeiro Acesso
       </button>
     </form>
@@ -64,65 +70,50 @@
     <p class="text-center small text-muted mb-0">© 2025 - Sistema 8.0</p>
   </div>
 
-  
-
   <script>
-  document.getElementById("formLogin").addEventListener("submit", async function (e) {
-    e.preventDefault();
+    // Exibe mensagens vindas do Spring Security (?error, ?logout)
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const erro = params.get('error');
+      const logout = params.get('logout');
 
-    const email = document.getElementById("emailLogin").value.trim().toLowerCase();
-    const senha = document.getElementById("senhaLogin").value.trim();
-    const msg = document.getElementById("msgErro");
+      const msgErro = document.getElementById('msgErro');
+      const msgInfo = document.getElementById('msgInfo');
 
-    msg.style.display = "none";
-
-    // 🔹 Detecta automaticamente o contexto correto (app_agendamento)
-    const base = window.location.pathname.includes("/app_agendamento") ? "/app_agendamento" : "";
-
-    try {
-      const resp = await fetch(`${base}/api/lojas/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-		credentials: "include", // 👈 importante
-        body: JSON.stringify({ email: email, senha: senha })
-      });
-
-      if (resp.ok) {
-        const loja = await resp.json();
-        localStorage.setItem("clienteLogado", JSON.stringify(loja));
-        alert(`Bem-vindo(a), ${loja.nomeComprador}!`);
-
-        // 🔹 Redireciona corretamente para o painel
-        window.location.href = `${base}/painel/painelGerencia.html`;
-      } 
-      else if (resp.status === 401) {
-        const erro = await resp.text();
-        msg.textContent = erro || "Usuário ou senha incorretos.";
-        msg.style.display = "block";
-      } 
-      else if (resp.status === 403) {
-        msg.textContent = "Conta em atraso. Verifique com o suporte.";
-        msg.style.display = "block";
-      } 
-      else {
-        msg.textContent = "Erro ao conectar com o servidor.";
-        msg.style.display = "block";
+      if (erro) {
+        msgErro.textContent = "Usuário ou senha inválidos. Verifique suas credenciais.";
+        msgErro.style.display = "block";
       }
-    } 
-    catch (err) {
-      console.error(err);
-      msg.textContent = "Erro de conexão com o servidor.";
-      msg.style.display = "block";
-    }
-  });
+      if (logout) {
+        msgInfo.textContent = "Você saiu do sistema com sucesso.";
+        msgInfo.style.display = "block";
+      }
+    })();
 
-  function primeiroAcesso() {
-    const base = window.location.pathname.includes("/app_agendamento") ? "/app_agendamento" : "";
-    window.location.href = `${base}/cadastroLojas.html`;
-  }
+    // Navega para o cadastro respeitando o context-path automaticamente
+    document.getElementById('btnPrimeiroAcesso').addEventListener('click', function () {
+      // usar caminho relativo sem barra inicial para honrar o context-path (/app_agendamento, se houver)
+      window.location.href = 'cadastroLojas.html';
+    });
   </script>
-
-
+  
+  <script>
+    // Se não existir loja/senha → manda para o cadastro
+    (async () => {
+      try {
+        const r = await fetch(`${window.location.origin}/api/lojas/existe`);
+        if (r.ok) {
+          const { existe } = await r.json();
+          if (!existe) {
+            window.location.href = 'cadastroLojas.html';
+          }
+        }
+      } catch(e) {
+        // Silencioso: se der erro de rede, mantém no login
+        console.warn('Falha ao checar primeiro acesso:', e);
+      }
+    })();
+  </script>
 
 </body>
 </html>

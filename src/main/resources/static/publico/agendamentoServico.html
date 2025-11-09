@@ -576,14 +576,15 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   
-  <!-- Script para carregar serviços -->
+ 
   <script>
-  // =====================================================
-  // 🔹 CARREGAR SERVIÇOS OFERTADOS
-  // =====================================================
+  
   // =====================================================
   // 🔹 CARREGAR SERVIÇOS OFERTADOS - ESTÉTICA
   // =====================================================
+  
+ 
+  
   document.addEventListener("DOMContentLoaded", () => {
       const servicosGrid = document.getElementById("servicosGrid");
       
@@ -676,6 +677,59 @@
   </script>
 
   <script>
+  // === CONFIGURAÇÕES CARREGADAS DO SERVIDOR (cache em memória) ===
+  const CONFIG_MAP = new Map();
+  // chave: "YYYY-MM-DD"  valor: [{hora: "07:00", ativo: true, servico: "Livre"}, ...]
+
+  async function carregarConfiguracoesServidor() {
+    const resp = await fetch('/api/publico/configuracoes/ativas');
+    if (!resp.ok) throw new Error('Falha ao buscar configurações públicas.');
+    const lista = await resp.json();
+    // Esperado: [{ data: "dd/MM/yyyy", horario: "HH:mm|HH:mm:ss|7|07", ativo: true/false, servico: "..." }, ...]
+
+    CONFIG_MAP.clear();
+
+    // helper normalizador: retorna sempre "HH:mm"
+    const normHHMM = (valor) => {
+      if (valor == null) return "";
+      let s = typeof valor === "number" ? String(valor) : String(valor).trim();
+      // "HH:mm:ss" -> "HH:mm"
+      if (/^\d{1,2}:\d{2}:\d{2}$/.test(s)) return s.substring(0,5);
+      // "HH:mm" -> ok
+      if (/^\d{1,2}:\d{2}$/.test(s)) {
+        const [h, m] = s.split(':');
+        return `${h.padStart(2,'0')}:${m}`;
+      }
+      // "H" ou "HH" -> "HH:00"
+      if (/^\d{1,2}$/.test(s)) return `${s.padStart(2,'0')}:00`;
+      // fallback: tenta pegar primeiros 5 quando vier algo tipo "07:00 qualquer"
+      if (s.length >= 5 && s[2] === ':') return s.substring(0,5);
+      return s;
+    };
+
+    for (const c of lista) {
+      const [dd, mm, yyyy] = (c.data || "").split('/');
+      if (!dd || !mm || !yyyy) continue;
+      const key = `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+
+      if (!CONFIG_MAP.has(key)) CONFIG_MAP.set(key, []);
+      CONFIG_MAP.get(key).push({
+        hora: normHHMM(c.horario),
+        ativo: !!c.ativo,
+        servico: c.servico || "Livre"
+      });
+    }
+
+    // Ordena horas dentro de cada dia
+    for (const [k, arr] of CONFIG_MAP.entries()) {
+      arr.sort((a,b) => a.hora.localeCompare(b.hora));
+    }
+  }
+
+  </script>
+
+  
+  <script>
 	// =====================================================
 	// 🔹 BLOCO 2 — FUNÇÕES DO CALENDÁRIO (VERSÃO CORRIGIDA)
 	// =====================================================
@@ -748,47 +802,24 @@
 	// =====================================================
 	// 🔹 FUNÇÃO DEFINITIVA — Retorna todos os horários (ativos e inativos)
 	// =====================================================
+	// =====================================================
+	// 🔹 NOVA FUNÇÃO — Busca do servidor em vez de localStorage
+	// =====================================================
 	function getConfigDiaCompleta(year, month, day) {
-	  const key = `horarios-${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
-	  console.log(`🔍 Buscando configuração para: ${key}`);
+	  const key = `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+	  const arr = CONFIG_MAP.get(key) || [];
+	  if (arr.length === 0) return null;
 
-	  // Fonte 1: busca direta no localStorage
-	  let dados = JSON.parse(localStorage.getItem(key) || "null");
-
-	  // Fonte 2: busca no configServicos (enviado do configAgendamento)
-	  if (!dados) {
-	    const configs = JSON.parse(localStorage.getItem("configServicos") || "[]");
-	    const encontrado = configs.find(c => c.chave === key || c.data === `${String(day).padStart(2,'0')}/${String(month).padStart(2,'0')}/${year}`);
-	    if (encontrado) dados = encontrado.dados;
-	  }
-
-	  if (!dados) {
-	    console.warn("❌ Nenhuma configuração encontrada para este dia");
-	    return null;
-	  }
-
-	  // ✅ Normaliza estrutura de horários
-	  const horariosObj = dados.horarios || dados || {}; // garante compatibilidade
-	  let horariosCompletos = [];
-
-	  if (Array.isArray(horariosObj)) {
-	    // ex: ["07:00","08:00"]
-	    horariosCompletos = horariosObj.map(h => ({ hora: h, ativo: true }));
-	  } else if (typeof horariosObj === "object") {
-	    // ex: {"07:00":{ativo:true}, "08:00":{ativo:false}}
-	    horariosCompletos = Object.keys(horariosObj).map(h => ({
-	      hora: h,
-	      ativo: horariosObj[h]?.ativo ?? false
-	    }));
-	  }
-
-	  // 🔹 Ordena por hora crescente
-	  horariosCompletos.sort((a, b) => a.hora.localeCompare(b.hora));
-
-	  console.log("🕒 Todos os horários encontrados:", horariosCompletos);
-
-	  return { horarios: horariosCompletos };
+	  return {
+	    horarios: arr.map(h => ({
+	      hora: h.hora,                // "HH:mm" garantido pelo normalizador
+	      ativo: !!h.ativo,
+	      servico: h.servico || 'Livre'
+	    }))
+	  };
 	}
+
+
 	
 
 	// Renderiza todos os meses (ano corrente)
@@ -803,7 +834,15 @@
 	  }
 	}
 
-	renderYear();
+	(async () => {
+	  try {
+	    await carregarConfiguracoesServidor();
+	    renderYear();
+	  } catch (e) {
+	    console.error("❌ Erro ao carregar configurações:", e);
+	    alert("Não foi possível carregar os horários do servidor.");
+	  }
+	})();
 	
   </script>
 
@@ -845,29 +884,42 @@
 	  }
 
 	  // 🔹 Renderiza os horários disponíveis
+	  // 🔹 Renderiza os horários disponíveis (usa hora/ativo/servico normalizados)
 	  dadosDia.horarios.forEach(h => {
-	    const { hora, ativo } = typeof h === "string" ? { hora: h, ativo: true } : h;
+	    const hora = typeof h === "string" ? h : (h.hora || "");
+	    const ativo = typeof h === "string" ? true : !!h.ativo;
+	    const servicoDaFaixa = (typeof h === "object" && h.servico) ? h.servico : "Livre";
 
 	    const ocupadoBanco = agendamentosBanco.some(a => {
 	      const dataFormatada = a.data.split("-").reverse().join("/");
-	      return dataFormatada === dataSelecionada && a.horario.startsWith(hora);
+	      // a.horario pode ser "HH:mm" ou "HH:mm:ss"
+	      const horarioBanco = String(a.horario || "");
+	      const hhmmBanco = /^\d{1,2}:\d{2}/.test(horarioBanco) ? horarioBanco.substring(0,5) : horarioBanco;
+	      return dataFormatada === dataSelecionada && hhmmBanco === hora;
 	    });
 
 	    const div = document.createElement("div");
 	    if (ocupadoBanco) {
 	      div.className = "hora-ocupada";
 	    } else if (!ativo) {
-	      div.className = "hora-indisponivel"; // novo: exibe horários desativados
+	      div.className = "hora-indisponivel";
 	    } else {
 	      div.className = "hora-disponivel";
 	    }
 
-	    div.innerHTML = `<strong>${hora}</strong>`;
+	    // Exibe a hora e o serviço da faixa (badge)
+	    div.innerHTML = `
+	      <div class="d-flex justify-content-between align-items-center">
+	        <strong>${hora}</strong>
+	        <span class="badge ${servicoDaFaixa === 'Livre' ? 'bg-secondary' : 'bg-info'}">${servicoDaFaixa}</span>
+	      </div>
+	    `;
 
-	    if (!ocupadoBanco) {
+	    if (!ocupadoBanco && ativo) {
 	      div.onclick = () => {
 	        horaSelecionada = hora;
-	        servicoSelecionado = dadosDia.servico || "";
+	        // ✅ pega o serviço da FAIXA selecionada
+	        servicoSelecionado = servicoDaFaixa;
 	        document.getElementById("dataSelecionadaAgendamento").textContent = "📅 " + dataSelecionada;
 	        document.getElementById("horaSelecionadaAgendamento").textContent = "🕒 " + hora;
 	        document.getElementById("servicoSelecionado").value = servicoSelecionado;
@@ -951,7 +1003,7 @@
 	  }
 		 
 	   alert(`✅ Agendamento confirmado...`);
-	  window.location.href = "/painel/agendamentoServico.html";
+	  window.location.href = "/publico/agendamentoServico.html";
 
     };
 
@@ -1024,6 +1076,7 @@
   });
   </script>
 
+  
   
 </body>
 </html>

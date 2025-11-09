@@ -1,13 +1,10 @@
 package br.com.higino.app_agendamento.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import java.time.LocalDate;
-import java.util.List;
 
-@Data
 @Entity
-@Table(name = "configuracoes_agendamento")
+@Table(name = "configuracao_agendamento")
 public class ConfiguracaoAgendamento {
 
     @Id
@@ -15,43 +12,64 @@ public class ConfiguracaoAgendamento {
     private Long id;
 
     private LocalDate data;
+    private String horario;
+    private boolean ativo;
     private String servico;
 
-    @ElementCollection
-    @CollectionTable(name = "horarios_configurados", joinColumns = @JoinColumn(name = "configuracao_id"))
-    @Column(name = "horario")
-    private List<String> horarios;
+    // 🔹 NOVO RELACIONAMENTO com a requisição principal
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requisicao_id")
+    private RequisicaoAgendamento requisicao;
 
-	public Long getId() {
-		return id;
-	}
+    // =========================
+    // Getters e Setters
+    // =========================
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public LocalDate getData() {
-		return data;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setData(LocalDate data) {
-		this.data = data;
-	}
+    public LocalDate getData() {
+        return data;
+    }
 
-	public String getServico() {
-		return servico;
-	}
+    public void setData(LocalDate data) {
+        this.data = data;
+    }
 
-	public void setServico(String servico) {
-		this.servico = servico;
-	}
+    public String getHorario() {
+        return horario;
+    }
 
-	public List<String> getHorarios() {
-		return horarios;
-	}
+    public void setHorario(String horario) {
+        this.horario = horario;
+    }
 
-	public void setHorarios(List<String> horarios) {
-		this.horarios = horarios;
-	}
-          
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public String getServico() {
+        return servico;
+    }
+
+    public void setServico(String servico) {
+        this.servico = servico;
+    }
+
+    public RequisicaoAgendamento getRequisicao() {
+        return requisicao;
+    }
+
+    public void setRequisicao(RequisicaoAgendamento requisicao) {
+        this.requisicao = requisicao;
+    }
 }

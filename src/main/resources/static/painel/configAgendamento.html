@@ -514,7 +514,7 @@
 
 	  <nav class="nav-section">
 	    <a href="/painel/painelGerencia.html" class="nav-item"><i class="bi bi-house-door"></i><span>Home</span></a>
-	    <a href="/painel/agendamentoServico.html" class="nav-item"><i class="bi bi-calendar-check"></i><span>Agendamento</span></a>
+	    <a href="/publico/agendamentoServico.html" class="nav-item"><i class="bi bi-calendar-check"></i><span>Agendamento</span></a>
 	    <a href="/painel/configAgendamento.html" class="nav-item"><i class="bi bi-gear"></i><span>Configuração</span></a>
 	    <a href="/painel/relatorioAgendamento.html" class="nav-item"><i class="bi bi-bar-chart"></i><span>Relatórios</span></a>
 	    <a href="/painel/agendamentoDespesa.html" class="nav-item"><i class="bi bi-cash-coin"></i><span>Despesas</span></a>
@@ -669,11 +669,11 @@
 
 				<!-- 🔹 BOTÃO: Enviar configurações para Agendamento de Serviços -->
 				<div class="text-end mt-3">
-					<button id="btnEnviarParaAgendamento" class="btn btn-outline-primary btn-sm"
-						data-bs-toggle="tooltip" data-bs-placement="top"
-						title="Envia todas as configurações de disponibilidade para o agendamento de serviços.">
-						<i class="bi bi-upload"></i> Enviar
+					
+					<button title="Envia todas as configurações de disponibilidade para o agendamento de serviços."
+					class="btn btn-success" onclick="enviarParaServidor()">Enviar
 					</button>
+
 				</div>
 
 			</div>
@@ -910,7 +910,8 @@
 					const dados = JSON.parse(localStorage.getItem(keyScoped(year, month + 1, dia)) || "null") || {horarios: {}};
 					horariosSelecionados = dados.horarios || {};
 					renderGradeHorarios();
-
+					
+					
 					/* ======================================================
 					   🔹 BLOCO — CARREGAR SERVIÇOS DO BACKEND (AJUSTADO)
 					   ====================================================== */
@@ -957,98 +958,92 @@
 				}
 
 
-
-
 				function renderGradeHorarios() {
-					gradeHoras.innerHTML = "";
+				  gradeHoras.innerHTML = "";
 
-					// 🔹 Lista de 01:00 até 24:00
-					const horasDia = [];
-					for (let h = 1; h <= 24; h++) {
-						horasDia.push(`${String(h).padStart(2, "0")}:00`);
-					}
+				  // ✅ Mostra apenas o intervalo útil de horários (07:00–17:00)
+				  const horasDia = [];
+				  for (let h = 7; h <= 17; h++) {
+				    horasDia.push(`${String(h).padStart(2, "0")}:00`);
+				  }
 
-					// 🔹 Horário de almoço selecionado
-					const almocoSelecionado = document.querySelector("input[name='horarioAlmoco']:checked")?.id;
-					const horaAlmoco =
-						almocoSelecionado === "almoco11"
-							? 11
-							: almocoSelecionado === "almoco12"
-								? 12
-								: almocoSelecionado === "almoco13"
-									? 13
-									: null;
+				  // 🔹 Horário de almoço selecionado
+				  const almocoSelecionado = document.querySelector("input[name='horarioAlmoco']:checked")?.id;
+				  const horaAlmoco =
+				    almocoSelecionado === "almoco11"
+				      ? 11
+				      : almocoSelecionado === "almoco12"
+				        ? 12
+				        : almocoSelecionado === "almoco13"
+				          ? 13
+				          : null;
 
-					horasDia.forEach(h => {
-						const horaNum = parseInt(h.split(":")[0], 10);
-						const dado = horariosSelecionados[h];
-						const temRegistro = !!dado;
-						const servicoSalvo = temRegistro ? dado.servico : "Livre";
-						const ativoInicial = temRegistro ? dado.ativo : (horaNum >= 7 && horaNum <= 17);
+				  horasDia.forEach(h => {
+				    const horaNum = parseInt(h.split(":")[0], 10);
+				    const dado = horariosSelecionados[h];
+				    const temRegistro = !!dado;
+				    const servicoSalvo = temRegistro ? dado.servico : "Livre";
+				    const ativoInicial = temRegistro ? dado.ativo : (horaNum >= 7 && horaNum <= 17);
 
-						// ⏰ Ajusta horários de almoço (força inativo)
-						let ativo = ativoInicial;
-						if (horaAlmoco && (horaNum === horaAlmoco || horaNum === horaAlmoco + 1)) {
-							ativo = false;
-						}
+				    // ⏰ Ajusta horários de almoço (força inativo)
+				    let ativo = ativoInicial;
+				    if (horaAlmoco && (horaNum === horaAlmoco || horaNum === horaAlmoco + 1)) {
+				      ativo = false;
+				    }
 
-						const servicoParaBadge = temRegistro ? (servicoSalvo || "Livre") : "Livre";
+				    const servicoParaBadge = temRegistro ? (servicoSalvo || "Livre") : "Livre";
 
-						// 🔹 Monta linha (sem checkbox)
-						const row = document.createElement("div");
-						row.className =
-							(ativo ? "hora-disponivel" : "hora-indisponivel") +
-							" d-flex justify-content-between align-items-center px-2";
+				    // 🔹 Monta linha
+				    const row = document.createElement("div");
+				    row.className =
+				      (ativo ? "hora-disponivel" : "hora-indisponivel") +
+				      " d-flex justify-content-between align-items-center px-2";
 
-						const hourSpan = document.createElement("span");
-						hourSpan.textContent = h;
-						hourSpan.style.cursor = "pointer";
+				    const hourSpan = document.createElement("span");
+				    hourSpan.textContent = h;
+				    hourSpan.style.cursor = "pointer";
 
-						const badge = document.createElement("span");
-						badge.className = `badge bg-${servicoParaBadge === "Livre" ? "secondary" : "info"}`;
-						badge.textContent = servicoParaBadge;
+				    const badge = document.createElement("span");
+				    badge.className = `badge bg-${servicoParaBadge === "Livre" ? "secondary" : "info"}`;
+				    badge.textContent = servicoParaBadge;
 
-						row.appendChild(hourSpan);
-						row.appendChild(badge);
+				    row.appendChild(hourSpan);
+				    row.appendChild(badge);
 
-						// 🔹 Clique direto → ativa/desativa horário
-						hourSpan.addEventListener("click", () => {
-							const jaAtivo = row.classList.contains("hora-disponivel");
+				    // 🔹 Clique direto → ativa/desativa horário
+				    hourSpan.addEventListener("click", () => {
+				      const jaAtivo = row.classList.contains("hora-disponivel");
 
-							if (jaAtivo) {
-								const confirmar = confirm(`Deseja desativar o horário ${h}?`);
-								if (confirmar) {
-									row.classList.remove("hora-disponivel");
-									row.classList.add("hora-indisponivel");
-									delete horariosSelecionados[h];
-									badge.className = "badge bg-secondary";
-									badge.textContent = "Livre";
-								}
-							} else {
-								const confirmar = confirm(`Deseja ativar o horário ${h}?`);
-								if (confirmar) {
-									row.classList.remove("hora-indisponivel");
-									row.classList.add("hora-disponivel");
-									horariosSelecionados[h] = {ativo: true, servico: "Livre"};
-									badge.className = "badge bg-secondary";
-									badge.textContent = "Livre";
-								}
-							}
-						});
+				      if (jaAtivo) {
+				        const confirmar = confirm(`Deseja desativar o horário ${h}?`);
+				        if (confirmar) {
+				          row.classList.remove("hora-disponivel");
+				          row.classList.add("hora-indisponivel");
+				          delete horariosSelecionados[h];
+				          badge.className = "badge bg-secondary";
+				          badge.textContent = "Livre";
+				        }
+				      } else {
+				        const confirmar = confirm(`Deseja ativar o horário ${h}?`);
+				        if (confirmar) {
+				          row.classList.remove("hora-indisponivel");
+				          row.classList.add("hora-disponivel");
+				          horariosSelecionados[h] = { ativo: true, servico: "Livre" };
+				          badge.className = "badge bg-secondary";
+				          badge.textContent = "Livre";
+				        }
+				      }
+				    });
 
-						gradeHoras.appendChild(row);
-					});
+				    gradeHoras.appendChild(row);
+				  });
 
-					// 🔽 Modal começa focando em 07:00
-					setTimeout(() => {
-						const alvo = Array.from(gradeHoras.children).find(el => el.textContent.includes("07:00"));
-						if (alvo) alvo.scrollIntoView({behavior: "smooth", block: "start"});
-					}, 100);
+				  // 🔽 Modal começa focando em 07:00
+				  setTimeout(() => {
+				    const alvo = Array.from(gradeHoras.children).find(el => el.textContent.includes("07:00"));
+				    if (alvo) alvo.scrollIntoView({ behavior: "smooth", block: "start" });
+				  }, 100);
 				}
-
-
-
-
 
 
 				/* ======================================================
@@ -1075,6 +1070,27 @@
 						if (parseInt(c.textContent) === diaSelecionado) c.classList.add("selected");
 					});
 				};;
+
+				/* ======================================================
+				/* ======================================================
+				   🔹 BLOCO 5.1 — SALVAR CONFIGURAÇÃO NO PADRÃO UNIFICADO
+				   ====================================================== */
+				function salvarConfiguracaoPadrao(ano, mes, dia, horariosArrayOuObjeto) {
+				  const chave = `horarios-${ano}-${String(mes).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
+				  let estruturaHorarios = {};
+
+				  if (Array.isArray(horariosArrayOuObjeto)) {
+				    horariosArrayOuObjeto.forEach(h => {
+				      estruturaHorarios[h] = { ativo: true, servico: "Livre" };
+				    });
+				  } else {
+				    estruturaHorarios = horariosArrayOuObjeto;
+				  }
+
+				  const dados = { horarios: estruturaHorarios, atualizadoEm: new Date().toISOString() };
+				  localStorage.setItem(chave, JSON.stringify(dados));
+				  console.log("💾 Configuração salva:", chave, dados);
+				}
 
 
 				/* ======================================================
@@ -1121,27 +1137,10 @@
 				   🔹 BLOCO 8 — ENVIO PARA AGENDAMENTO DE SERVIÇOS
 				   ====================================================== */
 
-				document.getElementById("btnEnviarParaAgendamento").addEventListener("click", () => {
-					const todasChaves = Object.keys(localStorage).filter(k => k.startsWith("horarios-"));
-					if (todasChaves.length === 0) {
-						alert("⚠️ Nenhuma configuração encontrada para enviar.");
-						return;
-					}
-
-					// Coleta e formata todos os dias salvos com estrutura completa (ativo + serviço)
-					const configuracoes = todasChaves.map(k => {
-						const dados = JSON.parse(localStorage.getItem(k));
-						const [_, ano, mes, dia] = k.split("-");
-						const data = `${dia.padStart(2, "0")}/${mes.padStart(2, "0")}/${ano}`;
-						return {chave: k, data, dados};
-					});
-
-					// 🔹 Salva globalmente — o agendamentoServico.html lerá diretamente
-					localStorage.setItem("configServicos", JSON.stringify(configuracoes));
-
-					alert("✅ Configurações sincronizadas com o Agendamento de Serviços!");
-				});
-
+				   // ============================
+				   // Envio real para o servidor
+				   // ============================
+				
 
 				/* ======================================================
 				   🔹 BLOCO 10 — LIMPAR MARCAÇÃO DO CALENDÁRIO
@@ -1188,8 +1187,7 @@
 
 				// Salva no localStorage no mesmo formato já esperado pelo outro arquivo
 				function salvarHorasDoDia(ano, mes1, dia, horas) {
-					const chave = `horarios-${ano}-${String(mes1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
-					localStorage.setItem(chave, JSON.stringify({horarios: horas, servico: "Livre"}));
+					salvarConfiguracaoPadrao(ano, mes1, dia, horas);
 				}
 
 
@@ -1242,7 +1240,7 @@
 							for (let h = 7; h <= 12; h++) horarios.push(`${String(h).padStart(2, "0")}:00`);
 						}
 
-						localStorage.setItem(chave, JSON.stringify({horarios, servico: "Livre"}));
+						salvarConfiguracaoPadrao(data.getFullYear(), data.getMonth() + 1, data.getDate(), horarios);
 					}
 
 
@@ -1387,6 +1385,99 @@
 						new bootstrap.Tooltip(tooltipTriggerEl);
 					});
 				});
+
+				/* ======================================================
+				   🔹 FUNÇÃO — ENVIAR CONFIGURAÇÕES PARA O SERVIDOR
+				   ====================================================== */
+				
+				     // ...deixe todo o resto do arquivo como está...
+
+				     // 🔧 SUBSTITUA a função atual por esta aqui:
+				     window.enviarParaServidor = async function () {
+				       try {
+				         // Mostra o que existe no localStorage com nossas chaves
+				         const chaves = Object.keys(localStorage).filter(k =>
+				           k.startsWith("horarios-") || k.startsWith("config-") || k.startsWith("data-")
+				         );
+
+				         if (chaves.length === 0) {
+				           alert("⚠️ Nenhuma configuração encontrada no calendário. Clique em 'Salvar' antes de enviar.");
+				           return;
+				         }
+
+				         const listaParaEnviar = [];
+
+				         chaves.forEach(chave => {
+				           const bruto = localStorage.getItem(chave);
+				           if (!bruto) return;
+
+				           let dados;
+				           try { dados = JSON.parse(bruto); } catch { return; }
+
+				           const pedacos = chave.split("-"); // ["horarios", "YYYY", "MM", "DD"]
+				           if (pedacos.length < 4) return;
+
+				           const ano = pedacos[1];
+				           const mes = pedacos[2];
+				           const dia = pedacos[3];
+				           const data = `${dia}/${mes}/${ano}`;
+
+				           // Aceita tanto OBJETO { "07:00": {ativo, servico} } quanto ARRAY ["07:00", ...]
+				           if (dados && dados.horarios) {
+				             if (Array.isArray(dados.horarios)) {
+				               // array de horas simples
+				               dados.horarios.forEach(hora => {
+				                 listaParaEnviar.push({
+				                   data: data,
+				                   horario: hora,
+				                   ativo: true,
+				                   servico: (dados.servico || "Livre")
+				                 });
+				               });
+				             } else {
+				               // objeto de horas -> { "07:00": {ativo:true, servico:"..."} }
+				               Object.entries(dados.horarios).forEach(([hora, info]) => {
+				                 if (!hora) return;
+				                 const ativo = typeof info === "object" ? !!info.ativo : true;
+				                 const servico = typeof info === "object" ? (info.servico || "Livre") : (dados.servico || "Livre");
+				                 listaParaEnviar.push({ data, horario: hora, ativo, servico });
+				               });
+				             }
+				           }
+				         });
+
+				         if (listaParaEnviar.length === 0) {
+				           alert("⚠️ Nenhum horário marcado para enviar. Marque dias/horas e clique em 'Salvar'.");
+				           return;
+				         }
+
+				         // Confirmação rápida
+				         if (!confirm(`Enviar ${listaParaEnviar.length} horários para o servidor?`)) return;
+
+				         const baseUrl = window.location.origin;
+				         const resp = await fetch(`${baseUrl}/api/configuracao-agendamento/salvar`, {
+				           method: "POST",
+				           headers: { "Content-Type": "application/json;charset=utf-8" },
+				           body: JSON.stringify(listaParaEnviar),
+				           credentials: "same-origin" // garante cookie/sessão em mesmo domínio
+				         });
+
+				         const texto = await resp.text();
+				         if (!resp.ok) throw new Error(texto || "Falha ao salvar");
+
+				         alert("✅ Configurações enviadas com sucesso!");
+				         console.log("✅ Servidor respondeu:", texto);
+				       } catch (e) {
+				         console.error("❌ Erro no envio:", e);
+				         alert("❌ Falha ao enviar configurações: " + e.message);
+				       }
+				     };
+
+				     // ...deixe todo o resto do arquivo como está...
+				 
+
+
+
 
 
 				/* ✅ Adicione este bloco logo **antes** da linha final:

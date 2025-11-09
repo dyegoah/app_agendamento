@@ -1367,6 +1367,21 @@
   </script>
 
   <script>
+  async function carregarAgendamentos() {
+    const resposta = await fetch('/api/agendamentos');
+    const lista = await resposta.json();
+
+    const tabela = document.getElementById("tabelaAgendamentos");
+    tabela.innerHTML = lista.map(a =>
+      `<tr><td>${a.nome}</td><td>${a.data}</td><td>${a.horario}</td></tr>`
+    ).join('');
+  }
+
+  window.onload = carregarAgendamentos;
+  </script>
+
+  
+   <script>
     // =====================================================
     // 🔹 BLOCO 2.1 — FUNÇÕES DE STATUS (Atendido / Cancelado) COM CONFIRMAÇÃO
     // =====================================================

@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     btnCopiarLinkTopo.addEventListener("click", async () => {
       const baseUrl = window.location.origin;
-      const linkAgendamento = `${baseUrl}/painel/agendamentoServico.html`;
+      const linkAgendamento = `${baseUrl}/publico/agendamentoServico.html`;
 
       try {
         await navigator.clipboard.writeText(linkAgendamento);
