@@ -673,6 +673,13 @@
 					<button title="Envia todas as configurações de disponibilidade para o agendamento de serviços."
 					class="btn btn-success" onclick="enviarParaServidor()">Enviar
 					</button>
+					
+					<div class="text-end mt-3">
+					  <button id="btnApagarTudo" class="btn btn-outline-danger btn-sm">
+					    <i class="bi bi-trash3"></i> Apagar todas as configurações
+					  </button>
+					</div>
+
 
 				</div>
 
@@ -1393,85 +1400,75 @@
 				     // ...deixe todo o resto do arquivo como está...
 
 				     // 🔧 SUBSTITUA a função atual por esta aqui:
-				     window.enviarParaServidor = async function () {
-				       try {
-				         // Mostra o que existe no localStorage com nossas chaves
-				         const chaves = Object.keys(localStorage).filter(k =>
-				           k.startsWith("horarios-") || k.startsWith("config-") || k.startsWith("data-")
-				         );
+					 window.enviarParaServidor = async function () {
+					   try {
+					     const chaves = Object.keys(localStorage).filter(k =>
+					       k.startsWith("horarios-") || k.startsWith("config-") || k.startsWith("data-")
+					     );
 
-				         if (chaves.length === 0) {
-				           alert("⚠️ Nenhuma configuração encontrada no calendário. Clique em 'Salvar' antes de enviar.");
-				           return;
-				         }
+					     if (chaves.length === 0) {
+					       alert("⚠️ Nenhuma configuração encontrada no calendário. Clique em 'Salvar' antes de enviar.");
+					       return;
+					     }
 
-				         const listaParaEnviar = [];
+					     const listaParaEnviar = [];
 
-				         chaves.forEach(chave => {
-				           const bruto = localStorage.getItem(chave);
-				           if (!bruto) return;
+					     chaves.forEach(chave => {
+					       const bruto = localStorage.getItem(chave);
+					       if (!bruto) return;
 
-				           let dados;
-				           try { dados = JSON.parse(bruto); } catch { return; }
+					       let dados;
+					       try { dados = JSON.parse(bruto); } catch { return; }
 
-				           const pedacos = chave.split("-"); // ["horarios", "YYYY", "MM", "DD"]
-				           if (pedacos.length < 4) return;
+					       const pedacos = chave.split("-");
+					       if (pedacos.length < 4) return;
 
-				           const ano = pedacos[1];
-				           const mes = pedacos[2];
-				           const dia = pedacos[3];
-				           const data = `${dia}/${mes}/${ano}`;
+					       const ano = pedacos[1];
+					       const mes = pedacos[2];
+					       const dia = pedacos[3];
+					       const data = `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}`; // formato ISO correto
 
-				           // Aceita tanto OBJETO { "07:00": {ativo, servico} } quanto ARRAY ["07:00", ...]
-				           if (dados && dados.horarios) {
-				             if (Array.isArray(dados.horarios)) {
-				               // array de horas simples
-				               dados.horarios.forEach(hora => {
-				                 listaParaEnviar.push({
-				                   data: data,
-				                   horario: hora,
-				                   ativo: true,
-				                   servico: (dados.servico || "Livre")
-				                 });
-				               });
-				             } else {
-				               // objeto de horas -> { "07:00": {ativo:true, servico:"..."} }
-				               Object.entries(dados.horarios).forEach(([hora, info]) => {
-				                 if (!hora) return;
-				                 const ativo = typeof info === "object" ? !!info.ativo : true;
-				                 const servico = typeof info === "object" ? (info.servico || "Livre") : (dados.servico || "Livre");
-				                 listaParaEnviar.push({ data, horario: hora, ativo, servico });
-				               });
-				             }
-				           }
-				         });
+					       if (dados && dados.horarios) {
+					         if (Array.isArray(dados.horarios)) {
+					           dados.horarios.forEach(hora => {
+					             listaParaEnviar.push({ data, horario: hora, ativo: true });
+					           });
+					         } else {
+					           Object.entries(dados.horarios).forEach(([hora, info]) => {
+					             if (!hora) return;
+					             const ativo = typeof info === "object" ? !!info.ativo : true;
+					             listaParaEnviar.push({ data, horario: hora, ativo });
+					           });
+					         }
+					       }
+					     });
 
-				         if (listaParaEnviar.length === 0) {
-				           alert("⚠️ Nenhum horário marcado para enviar. Marque dias/horas e clique em 'Salvar'.");
-				           return;
-				         }
+					     if (listaParaEnviar.length === 0) {
+					       alert("⚠️ Nenhum horário marcado para enviar. Marque dias/horas e clique em 'Salvar'.");
+					       return;
+					     }
 
-				         // Confirmação rápida
-				         if (!confirm(`Enviar ${listaParaEnviar.length} horários para o servidor?`)) return;
+					     if (!confirm(`Enviar ${listaParaEnviar.length} horários para o servidor?`)) return;
 
-				         const baseUrl = window.location.origin;
-				         const resp = await fetch(`${baseUrl}/api/configuracao-agendamento/salvar`, {
-				           method: "POST",
-				           headers: { "Content-Type": "application/json;charset=utf-8" },
-				           body: JSON.stringify(listaParaEnviar),
-				           credentials: "same-origin" // garante cookie/sessão em mesmo domínio
-				         });
+					     const baseUrl = window.location.origin;
+					     const resp = await fetch(`${baseUrl}/api/configuracao-agendamento/salvar`, {
+					       method: "POST",
+					       headers: { "Content-Type": "application/json;charset=utf-8" },
+					       body: JSON.stringify(listaParaEnviar),
+					       credentials: "same-origin"
+					     });
 
-				         const texto = await resp.text();
-				         if (!resp.ok) throw new Error(texto || "Falha ao salvar");
+					     const texto = await resp.text();
+					     if (!resp.ok) throw new Error(texto || "Falha ao salvar");
 
-				         alert("✅ Configurações enviadas com sucesso!");
-				         console.log("✅ Servidor respondeu:", texto);
-				       } catch (e) {
-				         console.error("❌ Erro no envio:", e);
-				         alert("❌ Falha ao enviar configurações: " + e.message);
-				       }
-				     };
+					     alert("✅ Configurações enviadas com sucesso!");
+					     console.log("✅ Servidor respondeu:", texto);
+					   } catch (e) {
+					     console.error("❌ Erro no envio:", e);
+					     alert("❌ Falha ao enviar configurações: " + e.message);
+					   }
+					 };
+;
 
 				     // ...deixe todo o resto do arquivo como está...
 				 
@@ -1509,6 +1506,32 @@
 			</script>
 			<script src="/painel/topbar.js"></script>
 
+			<script>
+			document.getElementById("btnApagarTudo").addEventListener("click", async () => {
+			  if (!confirm("⚠️ Tem certeza que deseja apagar TODAS as configurações de agendamento? Essa ação não pode ser desfeita.")) {
+			    return;
+			  }
+
+			  try {
+			    const baseUrl = window.location.origin;
+			    const resp = await fetch(`${baseUrl}/api/configuracao-agendamento/apagar-tudo`, {
+			      method: "DELETE"
+			    });
+
+			    if (resp.ok) {
+			      alert("✅ Todas as configurações foram apagadas com sucesso!");
+			      location.reload();
+			    } else {
+			      alert("❌ Falha ao apagar as configurações. Verifique o servidor.");
+			    }
+			  } catch (e) {
+			    console.error("Erro ao apagar configurações:", e);
+			    alert("❌ Erro inesperado ao tentar apagar as configurações.");
+			  }
+			});
+			</script>
+
+			
 </body>
 
 </html>

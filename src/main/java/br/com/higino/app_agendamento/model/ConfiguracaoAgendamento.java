@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "configuracao_agendamento")
+@Table(name = "configuracoes_agendamentos")
 public class ConfiguracaoAgendamento {
 
     @Id
@@ -14,8 +14,7 @@ public class ConfiguracaoAgendamento {
     private LocalDate data;
     private String horario;
     private boolean ativo;
-    private String servico;
-
+    
     // 🔹 NOVO RELACIONAMENTO com a requisição principal
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requisicao_id")
@@ -57,13 +56,7 @@ public class ConfiguracaoAgendamento {
         this.ativo = ativo;
     }
 
-    public String getServico() {
-        return servico;
-    }
-
-    public void setServico(String servico) {
-        this.servico = servico;
-    }
+  
 
     public RequisicaoAgendamento getRequisicao() {
         return requisicao;

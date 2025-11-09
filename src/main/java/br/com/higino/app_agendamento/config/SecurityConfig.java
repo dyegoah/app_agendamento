@@ -40,11 +40,13 @@ public class SecurityConfig {
                     "/api/lojas", "/api/lojas/existe",
                     "/api/publico/**",
                     "/css/**", "/js/**", "/images/**", "/fonts/**", "/favicon.ico"
+                    
                 ).permitAll()
                 // Privado
                 .requestMatchers("/painel/**").authenticated()
                 // Dev
                 .requestMatchers("/dev_login.html", "/dev_painel.html", "/api/dev/**").permitAll()
+                .requestMatchers("/api/configuracao-agendamento/apagar-tudo").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

@@ -682,49 +682,44 @@
   // chave: "YYYY-MM-DD"  valor: [{hora: "07:00", ativo: true, servico: "Livre"}, ...]
 
   async function carregarConfiguracoesServidor() {
-    const resp = await fetch('/api/publico/configuracoes/ativas');
-    if (!resp.ok) throw new Error('Falha ao buscar configurações públicas.');
-    const lista = await resp.json();
-    // Esperado: [{ data: "dd/MM/yyyy", horario: "HH:mm|HH:mm:ss|7|07", ativo: true/false, servico: "..." }, ...]
-
-    CONFIG_MAP.clear();
-
-    // helper normalizador: retorna sempre "HH:mm"
-    const normHHMM = (valor) => {
-      if (valor == null) return "";
-      let s = typeof valor === "number" ? String(valor) : String(valor).trim();
-      // "HH:mm:ss" -> "HH:mm"
-      if (/^\d{1,2}:\d{2}:\d{2}$/.test(s)) return s.substring(0,5);
-      // "HH:mm" -> ok
-      if (/^\d{1,2}:\d{2}$/.test(s)) {
-        const [h, m] = s.split(':');
-        return `${h.padStart(2,'0')}:${m}`;
-      }
-      // "H" ou "HH" -> "HH:00"
-      if (/^\d{1,2}$/.test(s)) return `${s.padStart(2,'0')}:00`;
-      // fallback: tenta pegar primeiros 5 quando vier algo tipo "07:00 qualquer"
-      if (s.length >= 5 && s[2] === ':') return s.substring(0,5);
-      return s;
-    };
-
-    for (const c of lista) {
-      const [dd, mm, yyyy] = (c.data || "").split('/');
-      if (!dd || !mm || !yyyy) continue;
-      const key = `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
-
-      if (!CONFIG_MAP.has(key)) CONFIG_MAP.set(key, []);
-      CONFIG_MAP.get(key).push({
-        hora: normHHMM(c.horario),
-        ativo: !!c.ativo,
-        servico: c.servico || "Livre"
+    try {
+      const baseUrl = window.location.origin;
+      const resp = await fetch(`${baseUrl}/api/configuracao-agendamento/publicas`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" }
       });
-    }
 
-    // Ordena horas dentro de cada dia
-    for (const [k, arr] of CONFIG_MAP.entries()) {
-      arr.sort((a,b) => a.hora.localeCompare(b.hora));
+      if (!resp.ok) throw new Error("Erro ao buscar configurações no servidor.");
+
+      const dados = await resp.json();
+      console.log("✅ Dados recebidos do servidor:", dados);
+
+      if (!Array.isArray(dados) || dados.length === 0) {
+        console.warn("⚠️ Nenhum horário ativo encontrado.");
+        return;
+      }
+
+      dados.forEach(cfg => {
+        const dataISO = cfg.data; // já vem no formato 2025-11-10
+        const horario = cfg.horario;
+        const ativo = cfg.ativo;
+
+        if (ativo && dataISO && horario) {
+          // Armazena no localStorage para o calendário
+          const chave = `horarios-${dataISO}`;
+          const armazenado = JSON.parse(localStorage.getItem(chave) || '{"horarios":{}}');
+          armazenado.horarios[horario] = { ativo: true };
+          localStorage.setItem(chave, JSON.stringify(armazenado));
+        }
+      });
+
+      console.log("✅ Horários carregados e aplicados no calendário.");
+    } catch (e) {
+      console.error("❌ Falha ao carregar horários do servidor:", e);
+      alert("⚠️ Não foi possível carregar os horários do servidor. Tente novamente mais tarde.");
     }
   }
+
 
   </script>
 
@@ -969,7 +964,6 @@
 	    horario: horaSelecionada + ":00",
 	    nomeCliente: nome,
 	    telefone: telefone,
-	    servico: servicoSelecionado,
 	    status: "Aguardando"
 	  };
 

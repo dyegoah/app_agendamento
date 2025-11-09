@@ -74,5 +74,30 @@ public class ConfiguracaoAgendamentoController {
         requisicaoRepo.deleteAll(antigas);
         return ResponseEntity.ok("Requisições antigas removidas: " + antigas.size());
     }
+    
+ // 🔓 Endpoint público para o site (sem autenticação)
+    @GetMapping("/publicas")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<List<ConfiguracaoAgendamento>> listarPublicas() {
+        try {
+            List<ConfiguracaoAgendamento> lista = repo.findByAtivoTrue();
+            return ResponseEntity.ok(lista);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @DeleteMapping("/apagar-tudo")
+    public ResponseEntity<?> apagarTudo() {
+        try {
+            repo.deleteAll();
+            requisicaoRepo.deleteAll();
+            return ResponseEntity.ok("Todas as configurações foram removidas com sucesso.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Erro ao tentar apagar todas as configurações.");
+        }
+    }
+
 
 }
