@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.higino.app_agendamento.model.ConfiguracaoAgendamento;
 import br.com.higino.app_agendamento.model.RequisicaoAgendamento;
 import br.com.higino.app_agendamento.repository.ConfiguracaoAgendamentoRepository;
+import br.com.higino.app_agendamento.repository.RequisicaoAgendamentoRepository;
 
 @RestController
 @RequestMapping("/api/configuracao-agendamento")
@@ -26,6 +27,9 @@ public class ConfiguracaoAgendamentoController {
 
     @Autowired
     private ConfiguracaoAgendamentoRepository repo;
+    @Autowired
+    private RequisicaoAgendamentoRepository requisicaoRepo;
+
 
     // ✅ Salva todas as configurações enviadas
     @PostMapping("/salvar")
